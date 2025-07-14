@@ -297,36 +297,6 @@
         .btn-back:hover {
             text-decoration: underline;
         }
-        
-        /* Loading Overlay */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            text-align: center;
-        }
-        #loading-overlay p {
-            font-size: 1.2em;
-            color: #333;
-        }
-        .spinner {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .hidden {
             display: none;
@@ -335,12 +305,7 @@
 </head>
 <body>
 
-    <div id="loading-overlay">
-        <div class="spinner"></div>
-        <p>กำลังเตรียมข้อมูล...</p>
-    </div>
-
-    <div class="main-container hidden" id="main-content">
+    <div class="main-container" id="main-content">
         
         <!-- Layer 1: Initial Symptom Selection -->
         <div id="layer-1" data-layer="1">
@@ -485,6 +450,7 @@
     let userId = null;
     let userName = null;
     let currentRowNumber = null;
+    let liffReadyPromise = null; // [NEW] Promise to track LIFF init status
 
     // --- DATA ---
     const symptomDetails = {
@@ -511,36 +477,42 @@
     };
 
     // --- LIFF Initialization ---
-    async function initializeLiff() {
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const mainContent = document.getElementById('main-content');
-        const loadingText = loadingOverlay.querySelector('p');
-
-        try {
-            await liff.init({ liffId: "2005789397-WRm1lYd9" }); // [FIXED] Updated LIFF ID
-            if (liff.isLoggedIn()) {
-                const profile = await liff.getProfile();
-                userId = profile.userId;
-                userName = profile.displayName;
-                loadingOverlay.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-            } else {
-                liff.login();
-            }
-        } catch (error) {
-            console.error("LIFF init failed:", error);
-            loadingText.textContent = 'เกิดข้อผิดพลาดในการเริ่มต้นแอป โปรดลองอีกครั้งใน LINE';
-        }
+    function initializeLiff() {
+        // [MODIFIED] Start LIFF init in the background and store the promise
+        liffReadyPromise = liff.init({ liffId: "2005789397-WRm1lYd9" })
+            .then(() => {
+                if (liff.isLoggedIn()) {
+                    return liff.getProfile();
+                }
+                liff.login(); // This will redirect, so the promise chain stops here
+            })
+            .then(profile => {
+                if (profile) {
+                    userId = profile.userId;
+                    userName = profile.displayName;
+                    console.log("LIFF Initialized. User:", userName);
+                }
+            })
+            .catch(error => {
+                console.error("LIFF init failed:", error);
+                // Optionally display a non-blocking error message
+                showMessage("เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองอีกครั้ง", 1);
+            });
     }
-    window.onload = initializeLiff;
+    initializeLiff(); // Start initialization immediately
 
     // --- DATA SAVING ---
     async function saveData(key, value) {
-        if (!userId) {
-            console.error("Cannot save data: userId is not available.");
-            return;
-        }
         try {
+            // [MODIFIED] Wait for LIFF to be ready before doing anything
+            await liffReadyPromise;
+
+            if (!userId) {
+                console.error("Cannot save data: userId is not available after init.");
+                showMessage("เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อกับ LINE เพื่อบันทึกข้อมูลได้ โปรดลองอีกครั้ง", currentLayer);
+                return;
+            }
+
             const payload = { userId, userName, key, value, rowNumber: currentRowNumber };
             const response = await fetch(GAS_URL, {
                 method: 'POST',
@@ -679,6 +651,7 @@
         }
 
         try {
+            await liffReadyPromise; // Ensure LIFF is ready before getting profile
             const flexMessage = {
                 "type": "flex",
                 "altText": "ผลการประเมินอาการสโตรก",
