@@ -19,6 +19,8 @@
             --symptom-green: #28a745;
             --symptom-blue: #0b5394;
             --old-rose-pink: #D98880; /* Darker Old Rose color */
+            --orange-pink: #E67E22; /* [NEW] Orange-Pink for time buttons */
+            --dark-red: #C0392B; /* [NEW] Dark red for chronic buttons */
         }
         body {
             font-family: "Noto Sans Thai", sans-serif;
@@ -32,14 +34,15 @@
             margin: 0 auto;
         }
         .section-title {
-            font-size: 1.5em; /* Relative to body font size */
+            font-size: 1.5em;
             font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 8px;
+            margin-bottom: 0; /* [FIXED] Reduced spacing */
         }
         .section-subtitle, .card > p {
-            font-size: 1em; /* Relative to body font size */
+            font-size: 1em;
             color: #555;
+            margin-top: 4px; /* [FIXED] Reduced spacing */
             margin-bottom: 24px;
         }
         .card {
@@ -83,7 +86,7 @@
         }
         .symptom-card p {
             margin: 0;
-            font-size: 1.1em; /* Relative to body font size */
+            font-size: 1.1em;
             font-weight: bold;
             line-height: 1.3;
         }
@@ -104,7 +107,7 @@
             margin: 5px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1em; /* Relative to body font size */
+            font-size: 1em;
             transition: opacity 0.2s;
         }
         .options-container button:hover {
@@ -125,28 +128,31 @@
         
         /* Layer 4 Buttons */
         #layer-4 .options-container button {
-             display: block; /* One button per line */
+             display: block;
              width: auto;
-             margin: 15px auto; /* Centering block buttons */
+             margin: 15px auto;
              font-weight: 700;
-             font-size: 1.1em; /* Relative to body font size */
+             font-size: 1.1em;
         }
         .btn-time-critical { background-color: var(--symptom-red); color: white; }
-        .btn-time-urgent { background-color: var(--old-rose-pink); color: white; }
-        .btn-time-picker { background-color: var(--symptom-green); color: white; }
+        .btn-time-urgent { background-color: var(--orange-pink); color: white; }
+        .btn-time-chronic { background-color: var(--dark-red); color: white; }
+        .btn-time-picker { background-color: var(--symptom-red); color: white; }
 
         /* Layer 5: Emergency */
         .emergency-text {
-            color: var(--symptom-red);
-            font-size: 1.3em; /* Relative to body font size */
+            font-size: 1.3em;
             font-weight: bold;
             text-align: center;
             margin-bottom: 24px;
         }
+        .emergency-text .highlight {
+            color: var(--symptom-red);
+        }
         .btn-emoji {
-            width: 120px;
-            height: 120px;
-            font-size: 3.7em; /* Relative to body font size */
+            width: 150px;
+            height: 150px;
+            font-size: 5em;
             border-radius: 20px;
             display: flex;
             justify-content: center;
@@ -155,22 +161,59 @@
             padding: 0;
             border: none;
         }
+        #location-prompt p {
+            font-size: 0.9em;
+            color: var(--primary-color);
+            margin-top: -10px;
+        }
         #btn-get-location {
             background-color: var(--primary-color);
             color: white;
         }
-        #btn-call {
-            background-color: var(--old-rose-pink);
-            color: white;
-            text-decoration: none;
+        #call-buttons-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
-        #location-result {
+        #call-buttons-container a {
+             text-decoration: none;
+        }
+        .call-button-wrapper {
             text-align: center;
         }
-        #location-result p {
-            font-size: 1em; /* Relative to body font size */
-            margin: 10px 0;
+        .call-button-wrapper p {
+            margin: -10px 0 0 0;
+            font-size: 0.8em;
+            font-weight: bold;
         }
+        .call-button-wrapper .phone-number {
+             color: var(--symptom-red);
+        }
+        #btn-call-sawi {
+            background-color: var(--old-rose-pink);
+            color: white;
+        }
+        #btn-call-1669 {
+            background-color: var(--old-rose-pink);
+            color: white;
+        }
+        #summary-info {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        #summary-info p {
+            font-size: 1em;
+            margin: 8px 0;
+        }
+        .blink {
+            animation: blinker 1s linear infinite;
+            color: var(--symptom-red);
+            font-weight: bold;
+        }
+        @keyframes blinker { 50% { opacity: 0; } }
 
         /* Back Button */
         .btn-back {
@@ -179,7 +222,7 @@
             color: var(--primary-color);
             cursor: pointer;
             padding: 10px;
-            font-size: 0.9em; /* Relative to body font size */
+            font-size: 0.9em;
             position: absolute;
             bottom: 10px;
             right: 20px;
@@ -202,30 +245,12 @@
             <h1 class="section-title">ประเมินอาการสโตรก</h1>
             <p class="section-subtitle">อาการสโตรกทั้ง 5 อย่าง คือ BEFAST ท่านมีอาการใดต่อไปนี้</p>
             <div class="symptom-grid">
-                <div class="symptom-card" onclick="showLayer2('เซมึนหัว')">
-                    <img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="เซมึนหัว">
-                    <p class="symptom-text-red">เซมึนหัว</p>
-                </div>
-                <div class="symptom-card" onclick="showLayer2('ตามัวมาก')">
-                    <img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="ตามัวมาก">
-                    <p class="symptom-text-red">ตามัวมาก</p>
-                </div>
-                <div class="symptom-card" onclick="showLayer2('มุมปากตก')">
-                    <img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="มุมปากตก">
-                    <p class="symptom-text-red">มุมปากตก</p>
-                </div>
-                <div class="symptom-card" onclick="showLayer2('ยกแขนยาก')">
-                    <img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="ยกแขนยาก">
-                    <p class="symptom-text-red">ยกแขนยาก</p>
-                </div>
-                <div class="symptom-card" onclick="showLayer2('ลำบากพูด')">
-                    <img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="ลำบากพูด">
-                    <p class="symptom-text-red">ลำบากพูด</p>
-                </div>
-                <div class="symptom-card" onclick="handleNoSymptom()">
-                    <img src="https://i.ibb.co/yVP6CGv/image.png" alt="ไม่มีอาการ">
-                    <p class="symptom-text-blue">ไม่มีอาการ</p>
-                </div>
+                <div class="symptom-card" onclick="showLayer2('เซมึนหัว')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="เซมึนหัว"><p class="symptom-text-red">เซมึนหัว</p></div>
+                <div class="symptom-card" onclick="showLayer2('ตามัวมาก')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="ตามัวมาก"><p class="symptom-text-red">ตามัวมาก</p></div>
+                <div class="symptom-card" onclick="showLayer2('มุมปากตก')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="มุมปากตก"><p class="symptom-text-red">มุมปากตก</p></div>
+                <div class="symptom-card" onclick="showLayer2('ยกแขนยาก')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="ยกแขนยาก"><p class="symptom-text-red">ยกแขนยาก</p></div>
+                <div class="symptom-card" onclick="showLayer2('ลำบากพูด')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="ลำบากพูด"><p class="symptom-text-red">ลำบากพูด</p></div>
+                <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="ไม่มีอาการ"><p class="symptom-text-blue">ไม่มีอาการ</p></div>
             </div>
         </div>
 
@@ -233,9 +258,7 @@
         <div id="layer-2" class="card hidden" data-layer="2">
             <h2 id="layer-2-title" class="section-title"></h2>
             <p class="section-subtitle">กรุณาเลือกอาการที่ใกล้เคียงกับท่านที่สุด</p>
-            <div id="layer-2-buttons" class="options-container">
-                <!-- Buttons are generated here by JavaScript -->
-            </div>
+            <div id="layer-2-buttons" class="options-container"></div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
 
@@ -254,12 +277,17 @@
             <h2 class="section-title">อาการเกิดขึ้นเมื่อไหร่?</h2>
             <p>กรุณาเลือกช่วงเวลาที่ใกล้เคียงที่สุด</p>
             <div class="options-container">
-                <button class="btn-time-critical" onclick="showLayer(5)">เกิดขึ้นตอนนี้</button>
-                <button class="btn-time-critical" onclick="showLayer(5)">เกิดเมื่อ 10 นาทีก่อน</button>
-                <button class="btn-time-urgent" onclick="showLayer(5)">เกิดเมื่อ 1 ชั่วโมงก่อน</button>
-                <button class="btn-time-urgent" onclick="showLayer(5)">เกิดเมื่อ 3 ชั่วโมงก่อน</button>
-                <button class="btn-time-urgent" onclick="showLayer(5)">เกิดเมื่อ 1 วันก่อน</button>
-                <button class="btn-time-picker" onclick="document.getElementById('time-picker').click()">ระบุเวลา</button>
+                <button class="btn-time-critical" onclick="handleTimeSelection(0)">เกิดขึ้นตอนนี้</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(5)">5 นาทีที่แล้ว</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(10)">10 นาทีที่แล้ว</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(30)">30 นาทีที่แล้ว</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(60)">1 ชั่วโมงที่แล้ว</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(120)">2 ชั่วโมงที่แล้ว</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(180)">3 ชั่วโมงที่แล้ว</button>
+                <button class="btn-time-urgent" onclick="handleTimeSelection(240)">4 ชั่วโมงที่แล้ว</button>
+                <button class="btn-time-chronic" onclick="handleTimeSelection(1440)">1 วันที่แล้ว</button>
+                <button class="btn-time-chronic" onclick="handleChronicSymptom()">เกิดขึ้นเป็นประจำ</button>
+                <button class="btn-time-picker" onclick="document.getElementById('time-picker').click()">ระบุเวลาที่แม่นยำ</button>
                 <input type="time" id="time-picker" class="hidden" onchange="handleTimePicker(this.value)">
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
@@ -268,11 +296,14 @@
         <!-- Layer 5: Emergency Action -->
         <div id="layer-5" class="card hidden" data-layer="5">
             <h2 class="section-title">ข้อควรปฏิบัติฉุกเฉิน</h2>
-            <p class="emergency-text">อาการของคุณมีโอกาสเป็นอาการสโตรก! โปรดโทรเรียกรถพยาบาลทันทีหลังแจ้งพิกัดแล้ว</p>
+            <p class="emergency-text">อาการของคุณมีโอกาส<span class="highlight">เป็นอาการสโตรก!</span> โปรด<span class="highlight">โทรเรียกรถพยาบาล</span>ทันทีหลังแจ้งพิกัดแล้ว</p>
             <div class="options-container">
-                <button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button>
-                <div id="location-result" class="hidden"></div>
-                <a id="btn-call" class="btn-emoji hidden" href="tel:1669">📞</a>
+                <div id="location-prompt">
+                    <button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button>
+                    <p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>
+                </div>
+                <div id="call-buttons-container" class="hidden"></div>
+                <div id="summary-info" class="hidden"></div>
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
@@ -313,6 +344,7 @@
     };
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     let currentLayer = 1;
+    let onsetTime = null;
 
     // --- LIFF Initialization ---
     async function initializeLiff() {
@@ -335,15 +367,12 @@
                 el.classList.add('hidden');
             }
         });
-        window.scrollTo(0, 0); // Scroll to top on layer change
+        window.scrollTo(0, 0);
     }
 
     function goBack() {
-        if (currentLayer === 6) { // From unlikely explanation
-            showLayer(2); // Go back to symptom details
-        } else if (currentLayer > 1) {
-            showLayer(currentLayer - 1);
-        }
+        if (currentLayer === 6) { showLayer(2); }
+        else if (currentLayer > 1) { showLayer(currentLayer - 1); }
     }
 
     function showLayer2(symptomName) {
@@ -351,7 +380,6 @@
         if (!details) return;
 
         document.getElementById('layer-2-title').textContent = `อาการ: ${symptomName}`;
-        
         const buttonsContainer = document.getElementById('layer-2-buttons');
         buttonsContainer.innerHTML = '';
 
@@ -376,113 +404,126 @@
 
     function handleNoSymptom() {
         alert("เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย หากมีอาการผิดปกติเกิดขึ้นฉับพลัน โปรดประเมินอีกครั้ง");
-        if (liff.isInClient()) {
-            liff.closeWindow();
-        }
+        if (liff.isInClient()) liff.closeWindow();
     }
 
     function handleSymptomResult(isLikely) {
-        if (isLikely) {
-            showLayer(3);
-        } else {
-            showLayer(6);
-        }
+        if (isLikely) { showLayer(3); }
+        else { showLayer(6); }
     }
 
     function handleChronicSymptom() {
         alert("อาการที่เป็นๆ หายๆ หรือเรื้อรังอาจเกิดจากสาเหตุอื่น ควรปรึกษาแพทย์เพื่อการวินิจฉัยที่ถูกต้อง แต่หากครั้งนี้อาการรุนแรงกว่าปกติหรือเกิดขึ้นเฉียบพลัน ให้รีบมาโรงพยาบาล");
     }
-    
-    function handleTimePicker(time) {
-        console.log("Time selected:", time);
+
+    function handleTimeSelection(offsetMinutes) {
+        onsetTime = new Date(Date.now() - offsetMinutes * 60000);
         showLayer(5);
     }
     
-    function showLayer5() {
+    function handleTimePicker(timeValue) {
+        const [hours, minutes] = timeValue.split(':');
+        onsetTime = new Date();
+        onsetTime.setHours(hours, minutes, 0, 0);
         showLayer(5);
     }
 
     // --- Geolocation and Distance Calculation ---
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-        var R = 6371; // Radius of the earth in km
-        var dLat = deg2rad(lat2-lat1);
-        var dLon = deg2rad(lon2-lon1);
-        var a =
-            Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon/2) * Math.sin(dLon/2);
-        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        var d = R * c; // Distance in km
-        return d;
+        const R = 6371;
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
 
-    function deg2rad(deg) {
-        return deg * (Math.PI/180)
+    function formatTime(date) {
+        return date.toTimeString().slice(0, 5);
     }
 
-    // [MODIFIED] Using navigator.geolocation
-    function getLocation() {
-        const btnGetLocation = document.getElementById('btn-get-location');
-        
-        if (navigator.geolocation) {
-            btnGetLocation.innerHTML = "กำลังค้นหา...";
+    async function getLocation() {
+        const locationPrompt = document.getElementById('location-prompt');
+        locationPrompt.innerHTML = "<p>กำลังค้นหาพิกัด...</p>";
 
-            navigator.geolocation.getCurrentPosition(
-                // Success callback
-                (position) => {
-                    const userLat = position.coords.latitude;
-                    const userLon = position.coords.longitude;
-
-                    // Calculate distance and estimated time
-                    const distance = getDistanceFromLatLonInKm(userLat, userLon, hospitalCoords.lat, hospitalCoords.lon);
-                    const avgSpeedKmh = 40; // Assume average speed of 40 km/h
-                    const travelTimeHours = distance / avgSpeedKmh;
-                    const hours = Math.floor(travelTimeHours);
-                    const minutes = Math.round((travelTimeHours - hours) * 60);
-
-                    let travelTimeString = "";
-                    if (hours > 0) {
-                        travelTimeString += `${hours} ชั่วโมง `;
-                    }
-                    travelTimeString += `${minutes} นาที`;
-                    
-                    const resultDiv = document.getElementById('location-result');
-                    resultDiv.innerHTML = `
-                        <p>คุณอยู่ห่างจาก รพ.สวี (โดยประมาณ) <strong>${distance.toFixed(1)} กม.</strong></p>
-                        <p>ใช้เวลาเดินทางโดยรถยนต์ (ประมาณ) <strong>${travelTimeString}</strong></p>
-                        <hr style="margin: 15px 0; border-color: #eee;">
-                        <p><strong>กรุณากดปุ่มโทรออกด้วยตัวเอง</strong> แล้วแจ้งอาการ และบอกเจ้าหน้าที่ว่า "ได้แจ้งพิกัดผ่านไลน์สวีรู้ทันสโตรกแล้ว"</p>
-                    `;
-                    
-                    btnGetLocation.classList.add('hidden');
-                    resultDiv.classList.remove('hidden');
-                    document.getElementById('btn-call').classList.remove('hidden');
-                },
-                // Error callback
-                (error) => {
-                    btnGetLocation.innerHTML = "📍"; // Reset button
-                    console.error("Geolocation error:", error);
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            alert("คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ");
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            alert("ไม่สามารถรับข้อมูลตำแหน่งได้ในขณะนี้");
-                            break;
-                        case error.TIMEOUT:
-                            alert("หมดเวลาในการร้องขอตำแหน่ง");
-                            break;
-                        default:
-                            alert("เกิดข้อผิดพลาดที่ไม่รู้จักในการเข้าถึงตำแหน่ง");
-                            break;
-                    }
-                }
-            );
-        } else {
+        if (!navigator.geolocation) {
             alert("เบราว์เซอร์ของคุณไม่รองรับการใช้งาน Geolocation");
+            locationPrompt.innerHTML = `<button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button><p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>`;
+            return;
         }
-    }
 
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const distance = getDistanceFromLatLonInKm(userLat, userLon, hospitalCoords.lat, hospitalCoords.lon);
+                
+                locationPrompt.classList.add('hidden');
+                
+                if (distance > 45) {
+                    alert("คุณอยู่ห่างจาก รพ.สวี เกิน 45 กม. โปรดกดโทรออก 1669 และแจ้งอาการ โรงพยาบาลที่ใกล้ท่านที่สุดจะมารับท่าน");
+                    const callButtonsContainer = document.getElementById('call-buttons-container');
+                    callButtonsContainer.innerHTML = `
+                        <div class="call-button-wrapper">
+                            <a id="btn-call-1669" class="btn-emoji" href="tel:1669">📞</a>
+                            <p class="phone-number">โทร 1669</p>
+                        </div>
+                    `;
+                    callButtonsContainer.classList.remove('hidden');
+                } else {
+                    const avgSpeedKmh = 40;
+                    const travelTimeMinutes = (distance / avgSpeedKmh) * 60;
+
+                    const now = new Date();
+                    const arrivalDeadline = new Date(onsetTime.getTime() + 3.5 * 60 * 60000);
+                    const rtpaDeadline = new Date(onsetTime.getTime() + 4.5 * 60 * 60000);
+                    const privateCarEta = new Date(now.getTime() + travelTimeMinutes * 60000);
+                    const ambulanceEta = new Date(now.getTime() + (travelTimeMinutes * 2) * 60000);
+
+                    let urgencyMessage = `<p>คุณจะมาถึง รพ. (กรณีให้คนมาส่งทันที) เวลาประมาณ: <strong>${formatTime(privateCarEta)} น.</strong></p>
+                                          <p>คุณจะมาถึง รพ. (กรณีรถรพ.ไปรับ) เวลาประมาณ: <strong>${formatTime(ambulanceEta)} น.</strong></p>`;
+
+                    if (privateCarEta > rtpaDeadline) {
+                        urgencyMessage = `<p class="blink">รีบมารพ.โดยด่วน!</p>`;
+                    }
+
+                    const summaryInfo = document.getElementById('summary-info');
+                    summaryInfo.innerHTML = `
+                        <p>คุณอยู่ห่างจาก รพ.สวี (ประมาณ) <strong>${distance.toFixed(1)} กม.</strong></p>
+                        <p>ใช้เวลาเดินทาง (ประมาณ) <strong>${Math.round(travelTimeMinutes)} นาที</strong></p>
+                        <p>เริ่มมีอาการเมื่อเวลา: <strong>${formatTime(onsetTime)} น.</strong></p>
+                        <p>เวลาที่ต้องถึง รพ. ไม่เกิน: <strong>${formatTime(arrivalDeadline)} น.</strong></p>
+                        <p>เวลาที่ต้องได้รับยา rTPA ไม่เกิน: <strong>${formatTime(rtpaDeadline)} น.</strong></p>
+                        ${urgencyMessage}
+                        <hr style="margin: 15px 0; border-color: #eee;">
+                        <p style="color:var(--symptom-red); font-weight:bold;">กรุณากดโทรออกด้วยตัวเอง แล้วแจ้งอาการ</p>
+                    `;
+
+                    const callButtonsContainer = document.getElementById('call-buttons-container');
+                    callButtonsContainer.innerHTML = `
+                        <div class="call-button-wrapper">
+                            <a id="btn-call-sawi" class="btn-emoji" href="tel:0894745523">📞</a>
+                            <p class="phone-number">โทรฉุกเฉิน รพ.สวี</p>
+                        </div>
+                        <div class="call-button-wrapper">
+                            <a id="btn-call-1669" class="btn-emoji" href="tel:1669">📞</a>
+                            <p class="phone-number">โทร 1669</p>
+                        </div>
+                    `;
+
+                    summaryInfo.classList.remove('hidden');
+                    callButtonsContainer.classList.remove('hidden');
+                }
+            },
+            (error) => {
+                locationPrompt.innerHTML = `<button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button><p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>`;
+                console.error("Geolocation error:", error);
+                alert("คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ");
+            }
+        );
+    }
 </script>
 </body>
 </html>
