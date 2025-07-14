@@ -18,16 +18,17 @@
             --symptom-red: #f44336;
             --symptom-green: #28a745;
             --symptom-blue: #0b5394;
-            --old-rose-pink: #D98880; /* Darker Old Rose color */
-            --orange-pink: #E67E22; /* [NEW] Orange-Pink for time buttons */
-            --dark-red: #C0392B; /* [NEW] Dark red for chronic buttons */
+            --old-rose-pink: #D98880;
+            --orange-pink: #E67E22;
+            --dark-red: #C0392B;
+            --light-red-bg: #FADBD8; /* [NEW] Light red background */
         }
         body {
             font-family: "Noto Sans Thai", sans-serif;
             background-color: var(--background-color);
             margin: 0;
             padding: 16px;
-            font-size: 1.5em; /* Base font size increased */
+            font-size: 1.5em;
         }
         .main-container {
             max-width: 600px;
@@ -37,12 +38,12 @@
             font-size: 1.5em;
             font-weight: 700;
             color: var(--text-color);
-            margin-bottom: 0; /* [FIXED] Reduced spacing */
+            margin-bottom: 0;
         }
         .section-subtitle, .card > p {
             font-size: 1em;
             color: #555;
-            margin-top: 4px; /* [FIXED] Reduced spacing */
+            margin-top: 4px;
             margin-bottom: 24px;
         }
         .card {
@@ -52,7 +53,7 @@
             box-shadow: var(--shadow);
             margin-top: 16px;
             position: relative;
-            padding-bottom: 60px; /* Make space for back button */
+            padding-bottom: 60px;
         }
         /* Layer 1: Symptom Grid */
         .symptom-grid {
@@ -133,6 +134,7 @@
              margin: 15px auto;
              font-weight: 700;
              font-size: 1.1em;
+             border: none;
         }
         .btn-time-critical { background-color: var(--symptom-red); color: white; }
         .btn-time-urgent { background-color: var(--orange-pink); color: white; }
@@ -140,19 +142,32 @@
         .btn-time-picker { background-color: var(--symptom-red); color: white; }
 
         /* Layer 5: Emergency */
-        .emergency-text {
-            font-size: 1.3em;
-            font-weight: bold;
+        .emergency-text-container {
+            background-color: var(--light-red-bg); /* [FIXED] Light red background */
+            border-radius: var(--border-radius);
+            padding: 20px;
             text-align: center;
             margin-bottom: 24px;
         }
-        .emergency-text .highlight {
-            color: var(--symptom-red);
+        .emergency-text-container p {
+            margin: 0;
+            line-height: 1.6;
+            font-size: 1.1em;
+            color: var(--text-color); /* Default text color */
+        }
+        .emergency-text-container .highlight-large {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--dark-red); /* [FIXED] Dark red color */
+        }
+        .emergency-text-container .highlight {
+            font-weight: bold;
+            color: var(--dark-red); /* [FIXED] Dark red color */
         }
         .btn-emoji {
-            width: 150px;
-            height: 150px;
-            font-size: 5em;
+            width: 200px; /* [FIXED] Increased size */
+            height: 200px; /* [FIXED] Increased size */
+            font-size: 8em; /* [FIXED] Increased emoji size */
             border-radius: 20px;
             display: flex;
             justify-content: center;
@@ -287,7 +302,7 @@
                 <button class="btn-time-urgent" onclick="handleTimeSelection(240)">4 ชั่วโมงที่แล้ว</button>
                 <button class="btn-time-chronic" onclick="handleTimeSelection(1440)">1 วันที่แล้ว</button>
                 <button class="btn-time-chronic" onclick="handleChronicSymptom()">เกิดขึ้นเป็นประจำ</button>
-                <button class="btn-time-picker" onclick="document.getElementById('time-picker').click()">ระบุเวลาที่แม่นยำ</button>
+                <button id="btn-time-picker-display" class="btn-time-picker" onclick="document.getElementById('time-picker').click()">ระบุเวลาที่แม่นยำ</button>
                 <input type="time" id="time-picker" class="hidden" onchange="handleTimePicker(this.value)">
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
@@ -296,11 +311,17 @@
         <!-- Layer 5: Emergency Action -->
         <div id="layer-5" class="card hidden" data-layer="5">
             <h2 class="section-title">ข้อควรปฏิบัติฉุกเฉิน</h2>
-            <p class="emergency-text">อาการของคุณมีโอกาส<span class="highlight">เป็นอาการสโตรก!</span> โปรด<span class="highlight">โทรเรียกรถพยาบาล</span>ทันทีหลังแจ้งพิกัดแล้ว</p>
+            <!-- [FIXED] Text container with light red background -->
+            <div class="emergency-text-container">
+                <p>อาการของคุณมีโอกาส</p>
+                <p class="highlight-large">เป็นอาการสโตรก!</p>
+                <p>โปรด โทรเรียกรถพยาบาล <span class="highlight">ทันที</span></p>
+                <p>หลังจากแจ้งพิกัดแล้ว</p>
+            </div>
             <div class="options-container">
                 <div id="location-prompt">
                     <button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button>
-                    <p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>
+                    <p style="color: var(--primary-color); font-size: 0.9em; margin-top: -10px;">กดส่งพิกัดและกดอนุญาต</p>
                 </div>
                 <div id="call-buttons-container" class="hidden"></div>
                 <div id="summary-info" class="hidden"></div>
@@ -313,6 +334,13 @@
              <h2 class="section-title">คำแนะนำเบื้องต้น</h2>
              <p>อาการดังกล่าวอาจเกิดจากสาเหตุอื่นที่ไม่ใช่สโตรก แต่หากอาการรุนแรงขึ้นหรือกลับมาเป็นอีกอย่างเฉียบพลันให้รีบมาโรงพยาบาล</p>
              <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
+        </div>
+
+        <!-- Layer 7: Message Display -->
+        <div id="layer-7" class="card hidden" data-layer="7">
+            <h2 id="message-title" class="section-title"></h2>
+            <p id="message-text"></p>
+            <button id="message-back-btn" class="btn-back">ย้อนกลับ</button>
         </div>
 
     </div>
@@ -359,7 +387,7 @@
     // --- UI LOGIC ---
     function showLayer(layerNumber) {
         currentLayer = layerNumber;
-        ['layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5', 'layer-6'].forEach(id => {
+        ['layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5', 'layer-6', 'layer-7'].forEach(id => {
             const el = document.getElementById(id);
             if (el.dataset.layer == currentLayer) {
                 el.classList.remove('hidden');
@@ -368,6 +396,13 @@
             }
         });
         window.scrollTo(0, 0);
+    }
+    
+    function showMessage(title, text, backLayer) {
+        document.getElementById('message-title').textContent = title;
+        document.getElementById('message-text').textContent = text;
+        document.getElementById('message-back-btn').onclick = () => showLayer(backLayer);
+        showLayer(7);
     }
 
     function goBack() {
@@ -403,8 +438,7 @@
     }
 
     function handleNoSymptom() {
-        alert("เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย หากมีอาการผิดปกติเกิดขึ้นฉับพลัน โปรดประเมินอีกครั้ง");
-        if (liff.isInClient()) liff.closeWindow();
+        showMessage("ไม่มีอาการ", "เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย หากมีอาการผิดปกติเกิดขึ้นฉับพลัน โปรดประเมินอีกครั้ง", 1);
     }
 
     function handleSymptomResult(isLikely) {
@@ -413,7 +447,7 @@
     }
 
     function handleChronicSymptom() {
-        alert("อาการที่เป็นๆ หายๆ หรือเรื้อรังอาจเกิดจากสาเหตุอื่น ควรปรึกษาแพทย์เพื่อการวินิจฉัยที่ถูกต้อง แต่หากครั้งนี้อาการรุนแรงกว่าปกติหรือเกิดขึ้นเฉียบพลัน ให้รีบมาโรงพยาบาล");
+        showMessage("คำแนะนำ", "อาการที่เป็นๆ หายๆ หรือเรื้อรังอาจเกิดจากสาเหตุอื่น ควรปรึกษาแพทย์เพื่อการวินิจฉัยที่ถูกต้อง แต่หากครั้งนี้อาการรุนแรงกว่าปกติหรือเกิดขึ้นเฉียบพลัน ให้รีบมาโรงพยาบาล", 3);
     }
 
     function handleTimeSelection(offsetMinutes) {
@@ -425,6 +459,7 @@
         const [hours, minutes] = timeValue.split(':');
         onsetTime = new Date();
         onsetTime.setHours(hours, minutes, 0, 0);
+        document.getElementById('btn-time-picker-display').textContent = `เวลา: ${timeValue} น.`;
         showLayer(5);
     }
 
@@ -441,6 +476,7 @@
     }
 
     function formatTime(date) {
+        if (!date || isNaN(date)) return 'N/A';
         return date.toTimeString().slice(0, 5);
     }
 
@@ -449,7 +485,7 @@
         locationPrompt.innerHTML = "<p>กำลังค้นหาพิกัด...</p>";
 
         if (!navigator.geolocation) {
-            alert("เบราว์เซอร์ของคุณไม่รองรับการใช้งาน Geolocation");
+            showMessage("ข้อผิดพลาด", "เบราว์เซอร์ของคุณไม่รองรับการใช้งาน Geolocation", 5);
             locationPrompt.innerHTML = `<button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button><p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>`;
             return;
         }
@@ -462,16 +498,17 @@
                 
                 locationPrompt.classList.add('hidden');
                 
-                if (distance > 45) {
-                    alert("คุณอยู่ห่างจาก รพ.สวี เกิน 45 กม. โปรดกดโทรออก 1669 และแจ้งอาการ โรงพยาบาลที่ใกล้ท่านที่สุดจะมารับท่าน");
-                    const callButtonsContainer = document.getElementById('call-buttons-container');
+                const callButtonsContainer = document.getElementById('call-buttons-container');
+                const summaryInfo = document.getElementById('summary-info');
+                
+                if (distance > 900) {
+                    summaryInfo.innerHTML = `<p>คุณอยู่ห่างจาก รพ.สวี เกิน 900 กม. โปรดกดโทรออก 1669 และแจ้งอาการ โรงพยาบาลที่ใกล้ท่านที่สุดจะมารับท่าน</p>`;
                     callButtonsContainer.innerHTML = `
                         <div class="call-button-wrapper">
                             <a id="btn-call-1669" class="btn-emoji" href="tel:1669">📞</a>
                             <p class="phone-number">โทร 1669</p>
                         </div>
                     `;
-                    callButtonsContainer.classList.remove('hidden');
                 } else {
                     const avgSpeedKmh = 40;
                     const travelTimeMinutes = (distance / avgSpeedKmh) * 60;
@@ -489,7 +526,6 @@
                         urgencyMessage = `<p class="blink">รีบมารพ.โดยด่วน!</p>`;
                     }
 
-                    const summaryInfo = document.getElementById('summary-info');
                     summaryInfo.innerHTML = `
                         <p>คุณอยู่ห่างจาก รพ.สวี (ประมาณ) <strong>${distance.toFixed(1)} กม.</strong></p>
                         <p>ใช้เวลาเดินทาง (ประมาณ) <strong>${Math.round(travelTimeMinutes)} นาที</strong></p>
@@ -501,7 +537,6 @@
                         <p style="color:var(--symptom-red); font-weight:bold;">กรุณากดโทรออกด้วยตัวเอง แล้วแจ้งอาการ</p>
                     `;
 
-                    const callButtonsContainer = document.getElementById('call-buttons-container');
                     callButtonsContainer.innerHTML = `
                         <div class="call-button-wrapper">
                             <a id="btn-call-sawi" class="btn-emoji" href="tel:0894745523">📞</a>
@@ -512,15 +547,14 @@
                             <p class="phone-number">โทร 1669</p>
                         </div>
                     `;
-
-                    summaryInfo.classList.remove('hidden');
-                    callButtonsContainer.classList.remove('hidden');
                 }
+                summaryInfo.classList.remove('hidden');
+                callButtonsContainer.classList.remove('hidden');
             },
             (error) => {
                 locationPrompt.innerHTML = `<button id="btn-get-location" class="btn-emoji" onclick="getLocation()">📍</button><p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>`;
                 console.error("Geolocation error:", error);
-                alert("คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ");
+                showMessage("การเข้าถึงตำแหน่งถูกปฏิเสธ", "คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ", 5);
             }
         );
     }
