@@ -297,8 +297,8 @@
         .btn-back:hover {
             text-decoration: underline;
         }
-
-        /* [NEW] Loading Overlay */
+        
+        /* Loading Overlay */
         #loading-overlay {
             position: fixed;
             top: 0;
@@ -335,13 +335,11 @@
 </head>
 <body>
 
-    <!-- [NEW] Loading Overlay -->
     <div id="loading-overlay">
         <div class="spinner"></div>
         <p>กำลังเตรียมข้อมูล...</p>
     </div>
 
-    <!-- [MODIFIED] Main container is now hidden by default -->
     <div class="main-container hidden" id="main-content">
         
         <!-- Layer 1: Initial Symptom Selection -->
@@ -519,7 +517,7 @@
         const loadingText = loadingOverlay.querySelector('p');
 
         try {
-            await liff.init({ liffId: "2005789397-37lemBgX" });
+            await liff.init({ liffId: "2005789397-WRm1lYd9" }); // [FIXED] Updated LIFF ID
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 userId = profile.userId;
