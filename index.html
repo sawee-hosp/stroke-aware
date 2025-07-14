@@ -298,6 +298,36 @@
             text-decoration: underline;
         }
 
+        /* [NEW] Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        #loading-overlay p {
+            font-size: 1.2em;
+            color: #333;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         .hidden {
             display: none;
         }
@@ -305,7 +335,14 @@
 </head>
 <body>
 
-    <div class="main-container">
+    <!-- [NEW] Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p>กำลังเตรียมข้อมูล...</p>
+    </div>
+
+    <!-- [MODIFIED] Main container is now hidden by default -->
+    <div class="main-container hidden" id="main-content">
         
         <!-- Layer 1: Initial Symptom Selection -->
         <div id="layer-1" data-layer="1">
@@ -449,22 +486,55 @@
     let countdownInterval = null;
     let userId = null;
     let userName = null;
-    let currentRowNumber = null; // [NEW] To store the current session's row number
+    let currentRowNumber = null;
+
+    // --- DATA ---
+    const symptomDetails = {
+        'เซมึนหัว': {
+            likely: ['เดินเซ หรือทรงตัวไม่มั่นคงทันที', 'เวียนศีรษะอย่างรุนแรงจนล้มได้'],
+            unlikely: ['เวียนหัวจากโรคอื่น เช่น ติดหวัด หรืออาหารไม่ย่อย', 'เดินเซเรื้อรังจากโรคประสาท หรือโรคกระดูก']
+        },
+        'ตามัวมาก': {
+            likely: ['ตาพร่ามัวทันที', 'มองเห็นภาพซ้อน หรือมองไม่เห็นข้างใดข้างหนึ่ง'],
+            unlikely: ['มองไม่ชัดเรื้อรัง เช่น สายตาสั้น สายตายาว', 'ตาแห้ง หรือระคายเคืองชั่วคราว']
+        },
+        'มุมปากตก': {
+            likely: ['หน้าครึ่งซีกหย่อนลงทันที เหมือนยิ้มไม่เท่ากัน', 'ปิดตาข้างใดข้างหนึ่งไม่สนิท'],
+            unlikely: ['หน้าเบี้ยวถาวรจากแผลเป็น หรือโรคประสาทอื่นเรื้อรัง', 'อาการเบี้ยวที่เป็นตั้งแต่เด็ก', 'กล้ามเนื้อใบหน้าผิดปกติจากโรคอื่น เช่น Bell’s palsy']
+        },
+        'ยกแขนยาก': {
+            likely: ['แขนหรือขาข้างใดข้างหนึ่งอ่อนแรงทันที', 'ไม่สามารถยกแขน หรือขยับแขนได้ตามปกติ'],
+            unlikely: ['อ่อนแรงเรื้อรัง หรือเป็นตามวัย', 'อ่อนแรงจากปวดกล้ามเนื้อ หรือโรคข้อเรื้อรัง', 'อ่อนแรงที่เกิดขึ้นช้าๆ และไม่เฉียบพลัน']
+        },
+        'ลำบากพูด': {
+            likely: ['พูดติดอ่าง พูดไม่ชัด หรือพูดไม่ได้ทันที', 'พูดคำผิด ไม่เข้าใจง่าย', 'เกิดอาการทันทีหลังมีอาการอื่นๆ เช่น หน้าเบี้ยว แขนอ่อนแรง'],
+            unlikely: ['พูดไม่ชัดจากความเครียด เหนื่อยล้า', 'ปัญหาพูดเรื้อรัง เช่น พูดติดอ่างมาตั้งแต่เด็ก', 'เสียงแหบจากปัญหาทางเดินหายใจ']
+        }
+    };
 
     // --- LIFF Initialization ---
     async function initializeLiff() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const mainContent = document.getElementById('main-content');
+        const loadingText = loadingOverlay.querySelector('p');
+
         try {
             await liff.init({ liffId: "2005789397-37lemBgX" });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 userId = profile.userId;
                 userName = profile.displayName;
+                loadingOverlay.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            } else {
+                liff.login();
             }
         } catch (error) {
             console.error("LIFF init failed:", error);
+            loadingText.textContent = 'เกิดข้อผิดพลาดในการเริ่มต้นแอป โปรดลองอีกครั้งใน LINE';
         }
     }
-    initializeLiff();
+    window.onload = initializeLiff;
 
     // --- DATA SAVING ---
     async function saveData(key, value) {
@@ -476,7 +546,7 @@
             const payload = { userId, userName, key, value, rowNumber: currentRowNumber };
             const response = await fetch(GAS_URL, {
                 method: 'POST',
-                mode: 'cors', // Important to read the response
+                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
@@ -484,7 +554,6 @@
             
             const result = await response.json();
             
-            // If this was the first save, store the new row number from the response
             if (result.status === 'success' && result.newRowNumber) {
                 currentRowNumber = result.newRowNumber;
                 console.log(`New session started. Row number: ${currentRowNumber}`);
@@ -524,7 +593,7 @@
     }
 
     function showLayer2(symptomName) {
-        saveData('BEFAST', symptomName); // Save initial symptom choice
+        saveData('BEFAST', symptomName);
         
         const details = symptomDetails[symptomName];
         if (!details) return;
