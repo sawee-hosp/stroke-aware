@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประเมินอาการสโตรก</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007BFF;
+            --background-color: #f0f2f5;
+            --card-bg-color: #ffffff;
+            --text-color: #333;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --symptom-red: #f44336;
+            --symptom-blue: #0b5394;
+        }
+        body {
+            font-family: "Noto Sans Thai", sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 16px;
+        }
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        .section-subtitle {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 24px;
+        }
+
+        /* Symptom Grid Styles */
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .symptom-card {
+            background-color: var(--card-bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .symptom-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        .symptom-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .symptom-card p {
+            margin: 0;
+            font-size: 0.9em;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        .symptom-card .symptom-text-red { color: var(--symptom-red); }
+        .symptom-card .symptom-text-blue { color: var(--symptom-blue); }
+
+        /* Frequency Question Section */
+        #frequency-question {
+            display: none; /* Hidden by default */
+            padding: 24px;
+            background-color: var(--card-bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        #frequency-question h3 {
+            margin-top: 0;
+        }
+        .frequency-options button {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+         .frequency-options button:hover {
+            opacity: 0.9;
+         }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <div id="symptom-selection">
+            <h1 class="section-title">ประเมินอาการสโตรก</h1>
+            <p class="section-subtitle">อาการสโตรกทั้ง 5 อย่าง คือ BEFAST ท่านมีอาการใดต่อไปนี้</p>
+
+            <div class="symptom-grid">
+                <!-- Row 1 -->
+                <div class="symptom-card" onclick="selectSymptom('เซื่องซึม/สับสน')">
+                    <img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="เซื่องซึม/สับสน">
+                    <p class="symptom-text-red">เซื่องซึม/สับสน</p>
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('ตามัว')">
+                    <img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="ตามัว เห็นภาพซ้อน">
+                    <p class="symptom-text-red">ตามัว เห็นภาพซ้อน</p>
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('มุมปากตก')">
+                    <img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="มุมปากตก หน้าเบี้ยว">
+                    <p class="symptom-text-red">มุมปากตก หน้าเบี้ยว</p>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="symptom-card" onclick="selectSymptom('แขนขาอ่อนแรง')">
+                    <img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="แขนขาอ่อนแรง">
+                    <p class="symptom-text-red">แขนขาอ่อนแรง</p>
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('พูดไม่ชัด')">
+                    <img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="พูดไม่ชัด พูดลำบาก">
+                    <p class="symptom-text-red">พูดไม่ชัด พูดลำบาก</p>
+                </div>
+                <div class="symptom-card" onclick="selectSymptom('ไม่มีอาการ')">
+                    <img src="https://i.ibb.co/yVP6CGv/image.png" alt="ไม่มีอาการ">
+                    <p class="symptom-text-blue">ไม่มีอาการ</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="frequency-question">
+            <h3 id="selected-symptom-title"></h3>
+            <p>มีอาการบ่อยแค่ไหน?</p>
+            <div class="frequency-options">
+                <button onclick="selectFrequency('ไม่บ่อย')">ไม่บ่อย</button>
+                <button onclick="selectFrequency('บางครั้ง')">บางครั้ง</button>
+                <button onclick="selectFrequency('บ่อยครั้ง')">บ่อยครั้ง</button>
+            </div>
+        </div>
+
+    </div>
+
+<script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+<script>
+    // --- LIFF Initialization (Optional for now) ---
+    async function initializeLiff() {
+        // You can add your LIFF ID here later
+        // await liff.init({ liffId: "YOUR_LIFF_ID" });
+        // if (!liff.isLoggedIn()) {
+        //     liff.login();
+        // }
+    }
+    // initializeLiff();
+
+    // --- UI Logic ---
+    const symptomSelectionDiv = document.getElementById('symptom-selection');
+    const frequencyQuestionDiv = document.getElementById('frequency-question');
+    const selectedSymptomTitle = document.getElementById('selected-symptom-title');
+
+    function selectSymptom(symptomName) {
+        console.log("Selected symptom:", symptomName);
+        
+        if (symptomName === 'ไม่มีอาการ') {
+            // If user has no symptoms, you might close the LIFF or show a thank you message.
+            alert("เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย");
+            // liff.closeWindow(); // Uncomment to close LIFF
+            return;
+        }
+
+        // Hide symptom selection and show frequency question
+        symptomSelectionDiv.style.display = 'none';
+        frequencyQuestionDiv.style.display = 'block';
+
+        // Set the title for the next question
+        selectedSymptomTitle.textContent = `อาการ: ${symptomName}`;
+    }
+
+    function selectFrequency(frequency) {
+        // This is where you would handle the frequency selection
+        // For example, sending the data back to your server or chatbot
+        const symptom = selectedSymptomTitle.textContent.replace('อาการ: ', '');
+        console.log(`Symptom: ${symptom}, Frequency: ${frequency}`);
+        
+        alert(`บันทึกข้อมูล: ${symptom}, ความถี่: ${frequency}`);
+        
+        // You can then close the LIFF or go to the next step
+        // liff.closeWindow(); 
+    }
+
+</script>
+</body>
+</html>
