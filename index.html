@@ -420,52 +420,66 @@
         return deg * (Math.PI/180)
     }
 
-    async function getLocation() {
-        if (!liff.isInClient()) {
-            alert("ฟังก์ชันนี้สามารถใช้ได้ในแอปพลิเคชัน LINE เท่านั้น");
-            return;
-        }
+    // [MODIFIED] Using navigator.geolocation
+    function getLocation() {
         const btnGetLocation = document.getElementById('btn-get-location');
-        try {
+        
+        if (navigator.geolocation) {
             btnGetLocation.innerHTML = "กำลังค้นหา...";
-            const location = await liff.getGeolocation();
-            
-            const userLat = location.latitude;
-            const userLon = location.longitude;
 
-            // Calculate distance and estimated time
-            const distance = getDistanceFromLatLonInKm(userLat, userLon, hospitalCoords.lat, hospitalCoords.lon);
-            const avgSpeedKmh = 40; // Assume average speed of 40 km/h
-            const travelTimeHours = distance / avgSpeedKmh;
-            const hours = Math.floor(travelTimeHours);
-            const minutes = Math.round((travelTimeHours - hours) * 60);
+            navigator.geolocation.getCurrentPosition(
+                // Success callback
+                (position) => {
+                    const userLat = position.coords.latitude;
+                    const userLon = position.coords.longitude;
 
-            let travelTimeString = "";
-            if (hours > 0) {
-                travelTimeString += `${hours} ชั่วโมง `;
-            }
-            travelTimeString += `${minutes} นาที`;
-            
-            const resultDiv = document.getElementById('location-result');
-            resultDiv.innerHTML = `
-                <p>คุณอยู่ห่างจาก รพ.สวี (โดยประมาณ) <strong>${distance.toFixed(1)} กม.</strong></p>
-                <p>ใช้เวลาเดินทางโดยรถยนต์ (ประมาณ) <strong>${travelTimeString}</strong></p>
-                <hr style="margin: 15px 0; border-color: #eee;">
-                <p><strong>กรุณากดปุ่มโทรออกด้วยตัวเอง</strong> แล้วแจ้งอาการ และบอกเจ้าหน้าที่ว่า "ได้แจ้งพิกัดผ่านไลน์สวีรู้ทันสโตรกแล้ว"</p>
-            `;
-            
-            btnGetLocation.classList.add('hidden');
-            resultDiv.classList.remove('hidden');
-            document.getElementById('btn-call').classList.remove('hidden');
+                    // Calculate distance and estimated time
+                    const distance = getDistanceFromLatLonInKm(userLat, userLon, hospitalCoords.lat, hospitalCoords.lon);
+                    const avgSpeedKmh = 40; // Assume average speed of 40 km/h
+                    const travelTimeHours = distance / avgSpeedKmh;
+                    const hours = Math.floor(travelTimeHours);
+                    const minutes = Math.round((travelTimeHours - hours) * 60);
 
-        } catch (error) {
-            btnGetLocation.innerHTML = "📍";
-            console.error("Geolocation error:", error);
-            if (error.code === 'PERMISSION_DENIED') {
-                alert("โปรดอนุญาตการเข้าถึงตำแหน่งเพื่อใช้งานฟังก์ชันนี้");
-            } else {
-                alert("ไม่สามารถเข้าถึงตำแหน่งของคุณได้ โปรดตรวจสอบการตั้งค่า");
-            }
+                    let travelTimeString = "";
+                    if (hours > 0) {
+                        travelTimeString += `${hours} ชั่วโมง `;
+                    }
+                    travelTimeString += `${minutes} นาที`;
+                    
+                    const resultDiv = document.getElementById('location-result');
+                    resultDiv.innerHTML = `
+                        <p>คุณอยู่ห่างจาก รพ.สวี (โดยประมาณ) <strong>${distance.toFixed(1)} กม.</strong></p>
+                        <p>ใช้เวลาเดินทางโดยรถยนต์ (ประมาณ) <strong>${travelTimeString}</strong></p>
+                        <hr style="margin: 15px 0; border-color: #eee;">
+                        <p><strong>กรุณากดปุ่มโทรออกด้วยตัวเอง</strong> แล้วแจ้งอาการ และบอกเจ้าหน้าที่ว่า "ได้แจ้งพิกัดผ่านไลน์สวีรู้ทันสโตรกแล้ว"</p>
+                    `;
+                    
+                    btnGetLocation.classList.add('hidden');
+                    resultDiv.classList.remove('hidden');
+                    document.getElementById('btn-call').classList.remove('hidden');
+                },
+                // Error callback
+                (error) => {
+                    btnGetLocation.innerHTML = "📍"; // Reset button
+                    console.error("Geolocation error:", error);
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            alert("คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ");
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            alert("ไม่สามารถรับข้อมูลตำแหน่งได้ในขณะนี้");
+                            break;
+                        case error.TIMEOUT:
+                            alert("หมดเวลาในการร้องขอตำแหน่ง");
+                            break;
+                        default:
+                            alert("เกิดข้อผิดพลาดที่ไม่รู้จักในการเข้าถึงตำแหน่ง");
+                            break;
+                    }
+                }
+            );
+        } else {
+            alert("เบราว์เซอร์ของคุณไม่รองรับการใช้งาน Geolocation");
         }
     }
 
