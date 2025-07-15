@@ -55,7 +55,6 @@
             position: relative;
             padding-bottom: 60px;
         }
-        /* Layer 1: Symptom Grid */
         .symptom-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -123,12 +122,12 @@
             border: none;
         }
         #layer-4 .options-container button {
-             display: block;
-             width: auto;
-             margin: 15px auto;
-             font-weight: 700;
-             font-size: 1.1em;
-             border: none;
+            display: block;
+            width: auto;
+            margin: 15px auto;
+            font-weight: 700;
+            font-size: 1.1em;
+            border: none;
         }
         .btn-time-critical { background-color: var(--symptom-red); color: white; }
         .btn-time-urgent { background-color: var(--orange-pink); color: white; }
@@ -189,7 +188,7 @@
             flex-wrap: wrap;
         }
         #call-buttons-container a {
-             text-decoration: none;
+            text-decoration: none;
         }
         .call-button-wrapper {
             text-align: center;
@@ -200,7 +199,7 @@
             font-weight: bold;
         }
         .call-button-wrapper .phone-number {
-             color: var(--symptom-red);
+            color: var(--symptom-red);
         }
         #btn-call-sawi {
             background-color: var(--old-rose-pink);
@@ -258,7 +257,7 @@
             margin-bottom: 10px;
             font-size: 1em;
         }
-        .btn-instructions {
+        .btn-instructions, .btn-final-save {
             display: block;
             width: 90%;
             margin: 20px auto 0 auto;
@@ -267,7 +266,7 @@
             color: white;
             border: none;
             border-radius: var(--border-radius);
-            font-size: 1em;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
         }
@@ -288,10 +287,57 @@
         .hidden {
             display: none;
         }
+
+        /* --- NEW: Confirmation Modal Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        .modal-buttons {
+            margin-top: 20px;
+        }
+        .modal-buttons button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #modal-btn-confirm {
+            background-color: var(--symptom-green);
+            color: white;
+            border-color: var(--symptom-green);
+        }
+        #modal-btn-cancel {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
+
     <div class="main-container" id="main-content">
+        
         <!-- Layer 1: Initial Symptom Selection -->
         <div id="layer-1" data-layer="1">
             <h1 class="section-title">ประเมินอาการสโตรก</h1>
@@ -305,6 +351,7 @@
                 <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="ไม่มีอาการ"><p class="symptom-text-blue">ไม่มีอาการ</p></div>
             </div>
         </div>
+
         <!-- Layer 2: Symptom Details -->
         <div id="layer-2" class="card hidden" data-layer="2">
             <h2 id="layer-2-title" class="section-title"></h2>
@@ -312,6 +359,7 @@
             <div id="layer-2-buttons" class="options-container"></div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
+
         <!-- Layer 3: Severity -->
         <div id="layer-3" class="card hidden" data-layer="3">
             <h2 class="section-title">อาการดังกล่าวเกิดขึ้นอย่างไร?</h2>
@@ -321,6 +369,7 @@
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
+
         <!-- Layer 4: Onset Time -->
         <div id="layer-4" class="card hidden" data-layer="4">
             <h2 class="section-title">อาการเกิดขึ้นเมื่อไหร่?</h2>
@@ -341,6 +390,7 @@
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
+        
         <!-- Layer 5: Emergency Action -->
         <div id="layer-5" class="card hidden" data-layer="5">
             <h2 class="section-title">ข้อควรปฏิบัติฉุกเฉิน</h2>
@@ -361,23 +411,27 @@
                 <div id="call-buttons-container" class="hidden"></div>
                 <div id="summary-info" class="hidden"></div>
                 <button id="btn-instructions" class="btn-instructions hidden" onclick="showLayer(8)">ข้อควรปฏิบัติขณะนำผู้ป่วยมา รพ.</button>
+                <button class="btn-final-save" onclick="showConfirmationModal()">บันทึกข้อมูลและปิด</button>
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
+
         <!-- Layer 6: Unlikely Symptom Explanation -->
         <div id="layer-6" class="card hidden" data-layer="6">
-             <h2 class="section-title">คำแนะนำเบื้องต้น</h2>
-             <p>อาการดังกล่าวอาจเกิดจากสาเหตุอื่นที่ไม่ใช่สโตรก แต่หากอาการรุนแรงขึ้นหรือกลับมาเป็นอีกอย่างเฉียบพลันให้รีบมาโรงพยาบาล</p>
-             <div class="options-container" style="margin-top: 20px;">
-                <button id="btn-unlikely-ok" class="btn-symptom-green" onclick="sendUnlikelySymptomResultAndClose()">ตกลง</button>
-             </div>
+            <h2 class="section-title">คำแนะนำเบื้องต้น</h2>
+            <p>อาการดังกล่าวอาจเกิดจากสาเหตุอื่นที่ไม่ใช่สโตรก แต่หากอาการรุนแรงขึ้นหรือกลับมาเป็นอีกอย่างเฉียบพลันให้รีบมาโรงพยาบาล</p>
+            <div class="options-container" style="margin-top: 20px;">
+                <button class="btn-symptom-green" onclick="showConfirmationModal()">ตกลงและปิด</button>
+            </div>
         </div>
+
         <!-- Layer 7: Message Display -->
         <div id="layer-7" class="card hidden" data-layer="7">
             <h2 id="message-title" class="section-title"></h2>
             <p id="message-text"></p>
             <button id="message-back-btn" class="btn-back">ย้อนกลับ</button>
         </div>
+        
         <!-- Layer 8: Instructions Page -->
         <div id="layer-8" class="card hidden" data-layer="8">
             <h2 class="section-title">ข้อควรปฏิบัติขณะรอรถพยาบาล</h2>
@@ -407,226 +461,293 @@
                 <ul>
                     <li>ห้ามกินยาใด ๆ โดยไม่ปรึกษาแพทย์หรือเจ้าหน้าที่ เพราะอาจมีผลข้างเคียงที่อันตราย</li>
                 </ul>
-                 <h4>อย่าปล่อยให้ผู้ป่วยอยู่คนเดียว</h4>
+                <h4>อย่าปล่อยให้ผู้ป่วยอยู่คนเดียว</h4>
                 <ul>
                     <li>ให้ญาติหรือผู้ดูแลเฝ้าระวังและให้กำลังใจจนกว่ารถพยาบาลจะมาถึง</li>
                 </ul>
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
+
     </div>
+
+    <!-- NEW: Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modal-title">ยืนยันการบันทึกข้อมูล</h3>
+            <p id="modal-text">คุณต้องการบันทึกข้อมูลการประเมินนี้และปิดหน้าต่างใช่หรือไม่?</p>
+            <div class="modal-buttons">
+                <button id="modal-btn-cancel" onclick="hideConfirmationModal()">ยกเลิก</button>
+                <button id="modal-btn-confirm" onclick="handleFinalSave()">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-// --- CONFIG & GLOBAL VARIABLES ---
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
-const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
-let currentLayer = 1;
-let onsetTime = null;
-let countdownInterval = null;
-let userId = null;
-let userName = null;
-let currentRowNumber = null;
-let liffReadyPromise = null; // [NEW] Promise to track LIFF init status
+    // --- CONFIG & GLOBAL VARIABLES ---
+    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // <--- PASTE YOUR DEPLOYMENT URL HERE
+    const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
+    
+    let currentLayer = 1;
+    let userId = null;
+    let userName = null;
+    let liffReadyPromise = null;
 
-const symptomDetails = {
-    'เซมึนหัว': {
-        likely: ['เดินเซ หรือทรงตัวไม่มั่นคงทันที', 'เวียนศีรษะอย่างรุนแรงจนล้มได้'],
-        unlikely: ['เวียนหัวจากโรคอื่น เช่น ติดหวัด หรืออาหารไม่ย่อย', 'เดินเซเรื้อรังจากโรคประสาท หรือโรคกระดูก']
-    },
-    'ตามัวมาก': {
-        likely: ['ตาพร่ามัวทันที', 'มองเห็นภาพซ้อน หรือมองไม่เห็นข้างใดข้างหนึ่ง'],
-        unlikely: ['มองไม่ชัดเรื้อรัง เช่น สายตาสั้น สายตายาว', 'ตาแห้ง หรือระคายเคืองชั่วคราว']
-    },
-    'มุมปากตก': {
-        likely: ['หน้าครึ่งซีกหย่อนลงทันที เหมือนยิ้มไม่เท่ากัน', 'ปิดตาข้างใดข้างหนึ่งไม่สนิท'],
-        unlikely: ['หน้าเบี้ยวถาวรจากแผลเป็น หรือโรคประสาทอื่นเรื้อรัง', 'อาการเบี้ยวที่เป็นตั้งแต่เด็ก', 'กล้ามเนื้อใบหน้าผิดปกติจากโรคอื่น เช่น Bell’s palsy']
-    },
-    'ยกแขนยาก': {
-        likely: ['แขนหรือขาข้างใดข้างหนึ่งอ่อนแรงทันที', 'ไม่สามารถยกแขน หรือขยับแขนได้ตามปกติ'],
-        unlikely: ['อ่อนแรงเรื้อรัง หรือเป็นตามวัย', 'อ่อนแรงจากปวดกล้ามเนื้อ หรือโรคข้อเรื้อรัง', 'อ่อนแรงที่เกิดขึ้นช้าๆ และไม่เฉียบพลัน']
-    },
-    'ลำบากพูด': {
-        likely: ['พูดติดอ่าง พูดไม่ชัด หรือพูดไม่ได้ทันที', 'พูดคำผิด ไม่เข้าใจง่าย', 'เกิดอาการทันทีหลังมีอาการอื่นๆ เช่น หน้าเบี้ยว แขนอ่อนแรง'],
-        unlikely: ['พูดไม่ชัดจากความเครียด เหนื่อยล้า', 'ปัญหาพูดเรื้อรัง เช่น พูดติดอ่างมาตั้งแต่เด็ก', 'เสียงแหบจากปัญหาทางเดินหายใจ']
-    }
-};
+    // --- NEW: Data Storage ---
+    let sessionData = {}; // Object to hold all data before final save
 
-// --- LIFF Initialization ---
-function initializeLiff() {
-    liffReadyPromise = liff.init({ liffId: "2005789397-WRm1lYd9" })
-        .then(() => {
-            if (liff.isLoggedIn()) {
-                return liff.getProfile();
-            }
-            liff.login();
-        })
-        .then(profile => {
-            if (profile) {
-                userId = profile.userId;
-                userName = profile.displayName;
-                console.log("LIFF Initialized. User:", userName);
-            }
-        })
-        .catch(error => {
-            console.error("LIFF init failed:", error);
-            showMessage("เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองอีกครั้ง", 1);
-        });
-}
-initializeLiff();
-
-// --- DATA SAVING ---
-async function saveData(key, value) {
-  try {
-    // ต้องมี userId ที่ได้จาก LIFF init ก่อน
-    if (!userId) {
-      alert("ยังไม่ได้เชื่อมต่อกับ LINE (userId ว่าง)");
-      return;
-    }
-
-    // เตรียม payload เป็น JSON string
-    const payload = {
-      userId,
-      userName,
-      key,
-      value,
-      rowNumber: currentRowNumber  // null ถ้าแถวแรก จะสร้างแถวใหม่
+    // --- DATA ---
+    const symptomDetails = {
+        'เซมึนหัว': {
+            likely: ['เดินเซ หรือทรงตัวไม่มั่นคงทันที', 'เวียนศีรษะอย่างรุนแรงจนล้มได้'],
+            unlikely: ['เวียนหัวจากโรคอื่น เช่น ติดหวัด หรืออาหารไม่ย่อย', 'เดินเซเรื้อรังจากโรคประสาท หรือโรคกระดูก']
+        },
+        'ตามัวมาก': {
+            likely: ['ตาพร่ามัวทันที', 'มองเห็นภาพซ้อน หรือมองไม่เห็นข้างใดข้างหนึ่ง'],
+            unlikely: ['มองไม่ชัดเรื้อรัง เช่น สายตาสั้น สายตายาว', 'ตาแห้ง หรือระคายเคืองชั่วคราว']
+        },
+        'มุมปากตก': {
+            likely: ['หน้าครึ่งซีกหย่อนลงทันที เหมือนยิ้มไม่เท่ากัน', 'ปิดตาข้างใดข้างหนึ่งไม่สนิท'],
+            unlikely: ['หน้าเบี้ยวถาวรจากแผลเป็น หรือโรคประสาทอื่นเรื้อรัง', 'อาการเบี้ยวที่เป็นตั้งแต่เด็ก', 'กล้ามเนื้อใบหน้าผิดปกติจากโรคอื่น เช่น Bell’s palsy']
+        },
+        'ยกแขนยาก': {
+            likely: ['แขนหรือขาข้างใดข้างหนึ่งอ่อนแรงทันที', 'ไม่สามารถยกแขน หรือขยับแขนได้ตามปกติ'],
+            unlikely: ['อ่อนแรงเรื้อรัง หรือเป็นตามวัย', 'อ่อนแรงจากปวดกล้ามเนื้อ หรือโรคข้อเรื้อรัง', 'อ่อนแรงที่เกิดขึ้นช้าๆ และไม่เฉียบพลัน']
+        },
+        'ลำบากพูด': {
+            likely: ['พูดติดอ่าง พูดไม่ชัด หรือพูดไม่ได้ทันที', 'พูดคำผิด ไม่เข้าใจง่าย', 'เกิดอาการทันทีหลังมีอาการอื่นๆ เช่น หน้าเบี้ยว แขนอ่อนแรง'],
+            unlikely: ['พูดไม่ชัดจากความเครียด เหนื่อยล้า', 'ปัญหาพูดเรื้อรัง เช่น พูดติดอ่างมาตั้งแต่เด็ก', 'เสียงแหบจากปัญหาทางเดินหายใจ']
+        }
     };
 
-    // ใช้ URLSearchParams ส่งเป็น application/x-www-form-urlencoded
-    // เพื่อเลี่ยง CORS preflight
-    const params = new URLSearchParams();
-    params.append('payload', JSON.stringify(payload));
+    // --- LIFF Initialization ---
+    function initializeLiff() {
+        liffReadyPromise = liff.init({ liffId: "2005789397-WRm1lYd9" }) // <--- PASTE YOUR LIFF ID HERE
+            .then(() => {
+                if (liff.isLoggedIn()) {
+                    return liff.getProfile();
+                }
+                liff.login();
+            })
+            .then(profile => {
+                if (profile) {
+                    userId = profile.userId;
+                    userName = profile.displayName;
+                    // Store user info in session data
+                    sessionData.userID = userId;
+                    sessionData.userName = userName;
+                    console.log("LIFF Initialized. User:", userName);
+                }
+            })
+            .catch(error => {
+                console.error("LIFF init failed:", error);
+                showMessage("เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองอีกครั้ง", 1);
+            });
+    }
+    initializeLiff();
 
-    const response = await fetch(GAS_URL, {
-      method: 'POST',
-      body: params
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // --- MODIFIED: Data Handling ---
+    /**
+     * Stores a piece of data in the local sessionData object.
+     * Does NOT send data to the server immediately.
+     * @param {string} key - The key for the data (e.g., "BEFAST", "symptom").
+     * @param {any} value - The value to store.
+     */
+    function saveData(key, value) {
+        sessionData[key] = value;
+        console.log("Data stored locally:", sessionData);
     }
 
-    // แปลง response เป็น JSON
-    const result = await response.json();
+    /**
+     * Sends all collected data from sessionData to the Google Apps Script server.
+     * This is called only at the very end.
+     */
+    async function sendAllDataToServer() {
+        await liffReadyPromise; // Ensure user profile is loaded
 
-    if (result.status === 'success') {
-      if (result.newRowNumber) {
-        currentRowNumber = result.newRowNumber;
-        console.log(`สร้างแถวใหม่: ${currentRowNumber}`);
-      } else {
-        console.log(`บันทึกข้อมูลสำเร็จ: ${key}`);
-      }
-    } else {
-      alert("บันทึกข้อมูลผิดพลาด: " + result.message);
-      console.error("GAS Error:", result);
+        if (!sessionData.userID) {
+            console.error("Cannot save data: userId is not available.");
+            throw new Error("ไม่สามารถเชื่อมต่อกับ LINE เพื่อบันทึกข้อมูลได้");
+        }
+        
+        console.log("Sending final data to server:", sessionData);
+
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sessionData) // Send the entire sessionData object
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        }
+        
+        return await response.json();
     }
-  } catch (error) {
-    alert("ส่งข้อมูลไม่สำเร็จ: " + error.message);
-    console.error("saveData error:", error);
-  }
-}
 
-
-
-// --- UI LOGIC ---
-window.showLayer = function(layerNumber) {
-    currentLayer = layerNumber;
-    if (layerNumber === 4) resetTimePickerButton();
-    if (countdownInterval) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
+    // --- NEW: Modal and Final Save Logic ---
+    function showConfirmationModal() {
+        document.getElementById('confirmation-modal').classList.remove('hidden');
     }
-    ['layer-1', 'layer-2', 'layer-3', 'layer-4', 'layer-5', 'layer-6', 'layer-7', 'layer-8'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el.dataset.layer == currentLayer) el.classList.remove('hidden');
-        else el.classList.add('hidden');
-    });
-    window.scrollTo(0, 0);
-};
 
-window.showMessage = function(title, text, backLayer) {
-    document.getElementById('message-title').textContent = title;
-    document.getElementById('message-text').textContent = text;
-    document.getElementById('message-back-btn').onclick = () => window.showLayer(backLayer);
-    window.showLayer(7);
-};
+    function hideConfirmationModal() {
+        document.getElementById('confirmation-modal').classList.add('hidden');
+    }
 
-window.goBack = function() {
-    if (currentLayer === 6) window.showLayer(2);
-    else if (currentLayer === 8) window.showLayer(5);
-    else if (currentLayer > 1) window.showLayer(currentLayer - 1);
-};
+    async function handleFinalSave() {
+        const confirmBtn = document.getElementById('modal-btn-confirm');
+        confirmBtn.textContent = 'กำลังบันทึก...';
+        confirmBtn.disabled = true;
 
-window.showLayer2 = function(symptomName) {
-    saveData('BEFAST', symptomName);
-    const details = symptomDetails[symptomName];
-    if (!details) return;
-    document.getElementById('layer-2-title').textContent = `อาการ: ${symptomName}`;
-    const buttonsContainer = document.getElementById('layer-2-buttons');
-    buttonsContainer.innerHTML = '';
-    details.likely.forEach(text => {
-        const button = document.createElement('button');
-        button.textContent = text;
-        button.className = 'btn-symptom-likely';
-        button.onclick = () => window.handleSymptomResult(true, text);
-        buttonsContainer.appendChild(button);
-    });
-    details.unlikely.forEach(text => {
-        const button = document.createElement('button');
-        button.textContent = text;
-        button.className = 'btn-symptom-unlikely';
-        button.onclick = () => window.handleSymptomResult(false, text);
-        buttonsContainer.appendChild(button);
-    });
-    window.showLayer(2);
-};
+        try {
+            const result = await sendAllDataToServer();
+            if (result.status === 'success') {
+                console.log("Data saved successfully:", result.message);
+                if (liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                    // For non-LIFF environment, maybe hide the modal
+                    hideConfirmationModal();
+                }
+            } else {
+                throw new Error(result.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            }
+        } catch (error) {
+            console.error("Failed to save final data:", error);
+            document.getElementById('modal-title').textContent = "เกิดข้อผิดพลาด";
+            document.getElementById('modal-text').textContent = "ไม่สามารถบันทึกข้อมูลได้: " + error.message;
+            confirmBtn.textContent = 'ตกลง';
+            confirmBtn.disabled = false;
+            // Don't close the modal on error, let the user try again or cancel.
+        }
+    }
 
-window.handleNoSymptom = function() {
-    saveData('BEFAST', 'ไม่มีอาการ');
-    window.showMessage("ไม่มีอาการ", "เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย หากมีอาการผิดปกติเกิดขึ้นฉับพลัน โปรดประเมินอีกครั้ง", 1);
-};
 
-window.handleSymptomResult = function(isLikely, symptomText) {
-    saveData('symptom', symptomText);
-    if (isLikely) { window.showLayer(3); }
-    else { window.showLayer(6); }
-};
+    // --- UI LOGIC ---
+    function showLayer(layerNumber) {
+        currentLayer = layerNumber;
+        if (layerNumber === 4) resetTimePickerButton();
+        
+        document.querySelectorAll('[data-layer]').forEach(el => {
+            if (el.dataset.layer == currentLayer) el.classList.remove('hidden');
+            else el.classList.add('hidden');
+        });
+        window.scrollTo(0, 0);
+    }
+    
+    function showMessage(title, text, backLayer) {
+        document.getElementById('message-title').textContent = title;
+        document.getElementById('message-text').textContent = text;
+        document.getElementById('message-back-btn').onclick = () => showLayer(backLayer);
+        showLayer(7);
+    }
 
-window.handleSeveritySelection = function(severityText) {
-    saveData('frequency', severityText);
-    window.showLayer(4);
-};
+    function goBack() {
+        if (currentLayer === 8) showLayer(5);
+        else if (currentLayer > 1) showLayer(currentLayer - 1);
+    }
 
-window.handleChronicSymptom = function() {
-    saveData('frequency', 'เกิดขึ้นเรื้อรัง เป็นๆ หายๆ');
-    window.showMessage("คำแนะนำ", "อาการที่เป็นๆ หายๆ หรือเรื้อรังอาจเกิดจากสาเหตุอื่น ควรปรึกษาแพทย์เพื่อการวินิจฉัยที่ถูกต้อง แต่หากครั้งนี้อาการรุนแรงกว่าปกติหรือเกิดขึ้นเฉียบพลัน ให้รีบมาโรงพยาบาล", 3);
-};
+    function showLayer2(symptomName) {
+        saveData('BEFAST', symptomName);
+        
+        const details = symptomDetails[symptomName];
+        if (!details) return;
 
-window.handleTimeSelection = function(offsetMinutes) {
-    onsetTime = new Date(Date.now() - offsetMinutes * 60000);
-    saveData('time', onsetTime.toISOString());
-    window.showLayer(5);
-};
+        document.getElementById('layer-2-title').textContent = `อาการ: ${symptomName}`;
+        const buttonsContainer = document.getElementById('layer-2-buttons');
+        buttonsContainer.innerHTML = '';
 
-window.openTimePicker = function() {
-    document.getElementById('time-picker').click();
-};
+        details.likely.forEach(text => {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.className = 'btn-symptom-likely';
+            button.onclick = () => handleSymptomResult(true, text);
+            buttonsContainer.appendChild(button);
+        });
 
-window.handleTimePickerChange = function(timeValue) {
-    const [hours, minutes] = timeValue.split(':');
-    onsetTime = new Date();
-    onsetTime.setHours(hours, minutes, 0, 0);
-    saveData('time', onsetTime.toISOString());
-    const displayButton = document.getElementById('btn-time-picker-display');
-    displayButton.textContent = `เวลา: ${timeValue} น. (คลิกเพื่อไปต่อ)`;
-    displayButton.onclick = () => window.showLayer(5);
-};
+        details.unlikely.forEach(text => {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.className = 'btn-symptom-unlikely';
+            button.onclick = () => handleSymptomResult(false, text);
+            buttonsContainer.appendChild(button);
+        });
+        
+        showLayer(2);
+    }
 
-function resetTimePickerButton() {
-    const displayButton = document.getElementById('btn-time-picker-display');
-    displayButton.textContent = 'ระบุเวลาที่แม่นยำ';
-    displayButton.onclick = window.openTimePicker;
-}
+    function handleNoSymptom() {
+        saveData('BEFAST', 'ไม่มีอาการ');
+        showMessage("ไม่มีอาการ", "เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย กดปุ่มด้านล่างเพื่อบันทึกและปิด", 1);
+        // Add a save button to the message layer if needed, or rely on the user going back.
+        // For now, the user has to go back to layer 1 and there is no direct save button.
+        // Let's add a save button to the message layer.
+        const msgLayer = document.getElementById('layer-7');
+        let saveBtn = msgLayer.querySelector('.btn-final-save');
+        if (!saveBtn) {
+            saveBtn = document.createElement('button');
+            saveBtn.className = 'btn-final-save';
+            saveBtn.textContent = 'บันทึกและปิด';
+            saveBtn.onclick = showConfirmationModal;
+            msgLayer.appendChild(saveBtn);
+        }
+    }
+
+    function handleSymptomResult(isLikely, symptomText) {
+        saveData('symptom', symptomText);
+        if (isLikely) { showLayer(3); }
+        else { showLayer(6); } // Layer 6 has a "Save & Close" button
+    }
+    
+    function handleSeveritySelection(severityText) {
+        saveData('frequency', severityText);
+        showLayer(4);
+    }
+
+    function handleChronicSymptom() {
+        saveData('frequency', 'เกิดขึ้นเรื้อรัง เป็นๆ หายๆ');
+        showMessage("คำแนะนำ", "อาการที่เป็นๆ หายๆ หรือเรื้อรังอาจเกิดจากสาเหตุอื่น ควรปรึกษาแพทย์เพื่อการวินิจฉัยที่ถูกต้อง แต่หากครั้งนี้อาการรุนแรงกว่าปกติหรือเกิดขึ้นเฉียบพลัน ให้รีบมาโรงพยาบาล", 3);
+        const msgLayer = document.getElementById('layer-7');
+        let saveBtn = msgLayer.querySelector('.btn-final-save');
+        if (!saveBtn) {
+            saveBtn = document.createElement('button');
+            saveBtn.className = 'btn-final-save';
+            saveBtn.textContent = 'บันทึกและปิด';
+            saveBtn.onclick = showConfirmationModal;
+            msgLayer.appendChild(saveBtn);
+        }
+    }
+
+    function handleTimeSelection(offsetMinutes) {
+        const onsetTime = new Date(Date.now() - offsetMinutes * 60000);
+        saveData('time', onsetTime.toISOString());
+        showLayer(5); // Layer 5 has a "Save & Close" button
+    }
+    
+    function openTimePicker() {
+        document.getElementById('time-picker').click();
+    }
+
+    function handleTimePickerChange(timeValue) {
+        const [hours, minutes] = timeValue.split(':');
+        const onsetTime = new Date();
+        onsetTime.setHours(hours, minutes, 0, 0);
+        saveData('time', onsetTime.toISOString());
+        const displayButton = document.getElementById('btn-time-picker-display');
+        displayButton.textContent = `เวลา: ${timeValue} น. (คลิกเพื่อไปต่อ)`;
+        displayButton.onclick = () => showLayer(5);
+    }
+    
+    function resetTimePickerButton() {
+        const displayButton = document.getElementById('btn-time-picker-display');
+        displayButton.textContent = 'ระบุเวลาที่แม่นยำ';
+        displayButton.onclick = openTimePicker;
+    }
 
 window.sendUnlikelySymptomResultAndClose = async function() {
     const okButton = document.getElementById('btn-unlikely-ok');
