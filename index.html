@@ -477,38 +477,39 @@ initializeLiff();
 // --- DATA SAVING ---
 async function saveData(key, value) {
   try {
-    // ตรวจสอบว่า LIFF init สำเร็จ และมี userId
+    // ต้องมี userId ที่ได้จาก LIFF init ก่อน
     if (!userId) {
       alert("ยังไม่ได้เชื่อมต่อกับ LINE (userId ว่าง)");
       return;
     }
 
-    // เตรียมข้อมูลที่จะส่ง
+    // เตรียม payload เป็น JSON string
     const payload = {
-      userId: userId,
-      userName: userName,
-      key: key,
-      value: value,
-      rowNumber: currentRowNumber  // null ครั้งแรกจะสร้างแถวใหม่
+      userId,
+      userName,
+      key,
+      value,
+      rowNumber: currentRowNumber  // null ถ้าแถวแรก จะสร้างแถวใหม่
     };
 
-    // ส่ง POST แบบ simple request (ไม่ใส่ headers ใดๆ)
+    // ใช้ URLSearchParams ส่งเป็น application/x-www-form-urlencoded
+    // เพื่อเลี่ยง CORS preflight
+    const params = new URLSearchParams();
+    params.append('payload', JSON.stringify(payload));
+
     const response = await fetch(GAS_URL, {
       method: 'POST',
-      body: JSON.stringify(payload)
+      body: params
     });
 
-    // ตรวจสอบสถานะ HTTP
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // แปลงผลลัพธ์เป็น JSON
+    // แปลง response เป็น JSON
     const result = await response.json();
 
-    // ตรวจสอบผลลัพธ์จาก GAS
     if (result.status === 'success') {
-      // ถ้าเป็นการสร้างแถวใหม่ จะได้ newRowNumber คืนมา
       if (result.newRowNumber) {
         currentRowNumber = result.newRowNumber;
         console.log(`สร้างแถวใหม่: ${currentRowNumber}`);
@@ -524,6 +525,7 @@ async function saveData(key, value) {
     console.error("saveData error:", error);
   }
 }
+
 
 
 // --- UI LOGIC ---
