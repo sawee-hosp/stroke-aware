@@ -10,7 +10,6 @@
     <style>
         :root {
             --primary-color: #007BFF;
-            --secondary-color: #6f42c1; /* Gemini Purple */
             --background-color: #f0f2f5;
             --card-bg-color: #ffffff;
             --text-color: #333;
@@ -258,7 +257,7 @@
             margin-bottom: 10px;
             font-size: 1em;
         }
-        .btn-instructions, .btn-final-save, .btn-gemini-summary {
+        .btn-instructions, .btn-final-save {
             display: block;
             width: 90%;
             margin: 20px auto 0 auto;
@@ -272,7 +271,6 @@
         }
         .btn-instructions { background-color: var(--symptom-blue); }
         .btn-final-save { background-color: var(--symptom-green); }
-        .btn-gemini-summary { background-color: var(--secondary-color); }
         .btn-back {
             background: none;
             border: none;
@@ -337,17 +335,6 @@
         }
         #modal-btn-cancel {
             background-color: #f1f1f1;
-        }
-        #summary-text-area {
-            width: 100%;
-            font-family: "Noto Sans Thai", sans-serif;
-            font-size: 0.9em;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-            resize: vertical;
-            background-color: #f9f9f9;
         }
     </style>
 </head>
@@ -429,7 +416,6 @@
                 <div id="summary-info" class="hidden"></div>
                 <!-- Action Buttons -->
                 <div id="action-buttons" class="hidden" style="margin-top: 20px;">
-                    <button class="btn-gemini-summary" onclick="generateSymptomSummary()">✨ สร้างสรุปอาการเพื่อแจ้งเจ้าหน้าที่</button>
                     <button class="btn-instructions" onclick="showLayer(8)">ข้อควรปฏิบัติขณะนำผู้ป่วยมา รพ.</button>
                     <button class="btn-final-save" onclick="showConfirmationModal()">บันทึกข้อมูลและปิด</button>
                 </div>
@@ -504,19 +490,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Gemini Summary Modal -->
-    <div id="summary-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 id="summary-modal-title">สรุปอาการสำหรับแจ้งเจ้าหน้าที่</h3>
-            <textarea id="summary-text-area" readonly rows="10"></textarea>
-            <div class="modal-buttons">
-                <button id="modal-btn-copy" onclick="copySummary()">คัดลอก</button>
-                <button onclick="hideSummaryModal()">ปิด</button>
-            </div>
-        </div>
-    </div>
-
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
@@ -651,75 +624,6 @@
             confirmBtn.disabled = false;
         }
     }
-
-    // --- NEW: Gemini Summary Feature ---
-    function showSummaryModal(summaryText) {
-        document.getElementById('summary-text-area').value = summaryText;
-        document.getElementById('summary-modal').classList.remove('hidden');
-    }
-
-    function hideSummaryModal() {
-        document.getElementById('summary-modal').classList.add('hidden');
-    }
-
-    function copySummary() {
-        const textArea = document.getElementById('summary-text-area');
-        textArea.select();
-        textArea.setSelectionRange(0, 99999); // For mobile devices
-        try {
-            document.execCommand('copy');
-            const copyBtn = document.getElementById('modal-btn-copy');
-            copyBtn.textContent = 'คัดลอกแล้ว!';
-            setTimeout(() => { copyBtn.textContent = 'คัดลอก'; }, 2000);
-        } catch (err) {
-            console.error('Copy failed', err);
-            alert('ไม่สามารถคัดลอกได้');
-        }
-    }
-
-    async function generateSymptomSummary() {
-        const summaryModal = document.getElementById('summary-modal');
-        const summaryTextArea = document.getElementById('summary-text-area');
-        const summaryTitle = document.getElementById('summary-modal-title');
-        
-        summaryTitle.textContent = "กำลังสร้างสรุปอาการ...";
-        summaryTextArea.value = "กรุณารอสักครู่ AI กำลังประมวลผลข้อมูลของคุณ...";
-        summaryModal.classList.remove('hidden');
-
-        const prompt = `คุณคือผู้ช่วยทางการแพทย์ AI อัจฉริยะ กรุณาสร้างบทสรุปสั้นๆ ที่ชัดเจนสำหรับให้ผู้ป่วยหรือผู้ดูแลอ่านแจ้งเจ้าหน้าที่ฉุกเฉิน (เช่น 1669) โดยใช้ข้อมูล JSON ต่อไปนี้: ${JSON.stringify(sessionData, null, 2)}. บทสรุปต้องเป็นภาษาไทย เข้าใจง่าย และเรียงลำดับความสำคัญ โดยเริ่มจากอาการหลักและเวลาที่เริ่มมีอาการก่อนเสมอ. ไม่ต้องใส่คำอธิบายที่ไม่จำเป็น ให้เขียนเป็นบทพูดที่พร้อมใช้งานได้ทันที.`;
-
-        let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-        const payload = { contents: chatHistory };
-        const apiKey = ""; // Leave empty, managed by the environment
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-        try {
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error(`API request failed with status ${response.status}`);
-            }
-
-            const result = await response.json();
-            
-            if (result.candidates && result.candidates[0].content.parts[0].text) {
-                const summaryText = result.candidates[0].content.parts[0].text;
-                summaryTitle.textContent = "สรุปอาการสำหรับแจ้งเจ้าหน้าที่";
-                summaryTextArea.value = summaryText;
-            } else {
-                throw new Error("ไม่ได้รับข้อมูลที่ถูกต้องจาก AI");
-            }
-        } catch (error) {
-            console.error("Gemini API call failed:", error);
-            summaryTitle.textContent = "เกิดข้อผิดพลาด";
-            summaryTextArea.value = "ไม่สามารถสร้างสรุปอาการได้ในขณะนี้ กรุณาลองอีกครั้ง\n\n" + error.message;
-        }
-    }
-
 
     // --- UI LOGIC ---
     function showLayer(layerNumber) {
