@@ -502,36 +502,59 @@
     initializeLiff(); // Start initialization immediately
 
     // --- DATA SAVING ---
-    async function saveData(key, value) {
-        try {
-            // [MODIFIED] Wait for LIFF to be ready before doing anything
-            await liffReadyPromise;
+ let userId = null;       // set จาก LIFF profile
+let userName = null;     // set จาก LIFF profile
+let currentRowNumber = null;
 
-            if (!userId) {
-                console.error("Cannot save data: userId is not available after init.");
-                showMessage("เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อกับ LINE เพื่อบันทึกข้อมูลได้ โปรดลองอีกครั้ง", currentLayer);
-                return;
-            }
-
-            const payload = { userId, userName, key, value, rowNumber: currentRowNumber };
-            const response = await fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            const result = await response.json();
-            
-            if (result.status === 'success' && result.newRowNumber) {
-                currentRowNumber = result.newRowNumber;
-                console.log(`New session started. Row number: ${currentRowNumber}`);
-            }
-        } catch (error) {
-            console.error(`Failed to save data for key: ${key}`, error);
+async function saveData(key, value) {
+    try {
+        // ถ้า LIFF ยังไม่ได้ init user ให้ return ออก
+        if (!userId) {
+            alert("ยังไม่ได้เชื่อมต่อ LINE (userId ว่าง)");
+            return;
         }
+
+        const payload = {
+            userId: userId,
+            userName: userName,
+            key: key,
+            value: value,
+            rowNumber: currentRowNumber // อาจเป็น null ตอนแรก (เพิ่มแถวใหม่)
+        };
+
+        // ***** ห้ามใส่ Content-Type: application/json *****
+        const response = await fetch(GAS_URL, {
+            method: 'POST',
+            // ไม่ต้องใส่ headers
+            body: JSON.stringify(payload)
+        });
+
+        // เช็ค HTTP response
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // แปลง response เป็น json
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            // ถ้าเป็น row ใหม่ จะได้ newRowNumber คืนมา
+            if (result.newRowNumber) {
+                currentRowNumber = result.newRowNumber;
+                console.log(`สร้างแถวใหม่: ${currentRowNumber}`);
+            } else {
+                console.log(`บันทึกข้อมูลสำเร็จ: ${key}`);
+            }
+        } else {
+            // ถ้ามี error ฝั่ง GAS
+            alert("บันทึกข้อมูลผิดพลาด: " + result.message);
+            console.error("GAS Error:", result);
+        }
+    } catch (error) {
+        alert("ส่งข้อมูลไม่สำเร็จ: " + error.message);
+        console.error("saveData error:", error);
     }
+}
 
     // --- UI LOGIC ---
     function showLayer(layerNumber) {
