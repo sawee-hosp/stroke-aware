@@ -476,42 +476,55 @@ initializeLiff();
 
 // --- DATA SAVING ---
 async function saveData(key, value) {
-    try {
-        if (!userId) {
-            alert("ยังไม่ได้เชื่อมต่อ LINE (userId ว่าง)");
-            return;
-        }
-        const payload = {
-            userId: userId,
-            userName: userName,
-            key: key,
-            value: value,
-            rowNumber: currentRowNumber
-        };
-        const response = await fetch(GAS_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-        if (result.status === 'success') {
-            if (result.newRowNumber) {
-                currentRowNumber = result.newRowNumber;
-                console.log(`สร้างแถวใหม่: ${currentRowNumber}`);
-            } else {
-                console.log(`บันทึกข้อมูลสำเร็จ: ${key}`);
-            }
-        } else {
-            alert("บันทึกข้อมูลผิดพลาด: " + result.message);
-            console.error("GAS Error:", result);
-        }
-    } catch (error) {
-        alert("ส่งข้อมูลไม่สำเร็จ: " + error.message);
-        console.error("saveData error:", error);
+  try {
+    // ตรวจสอบว่า LIFF init สำเร็จ และมี userId
+    if (!userId) {
+      alert("ยังไม่ได้เชื่อมต่อกับ LINE (userId ว่าง)");
+      return;
     }
+
+    // เตรียมข้อมูลที่จะส่ง
+    const payload = {
+      userId: userId,
+      userName: userName,
+      key: key,
+      value: value,
+      rowNumber: currentRowNumber  // null ครั้งแรกจะสร้างแถวใหม่
+    };
+
+    // ส่ง POST แบบ simple request (ไม่ใส่ headers ใดๆ)
+    const response = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+
+    // ตรวจสอบสถานะ HTTP
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // แปลงผลลัพธ์เป็น JSON
+    const result = await response.json();
+
+    // ตรวจสอบผลลัพธ์จาก GAS
+    if (result.status === 'success') {
+      // ถ้าเป็นการสร้างแถวใหม่ จะได้ newRowNumber คืนมา
+      if (result.newRowNumber) {
+        currentRowNumber = result.newRowNumber;
+        console.log(`สร้างแถวใหม่: ${currentRowNumber}`);
+      } else {
+        console.log(`บันทึกข้อมูลสำเร็จ: ${key}`);
+      }
+    } else {
+      alert("บันทึกข้อมูลผิดพลาด: " + result.message);
+      console.error("GAS Error:", result);
+    }
+  } catch (error) {
+    alert("ส่งข้อมูลไม่สำเร็จ: " + error.message);
+    console.error("saveData error:", error);
+  }
 }
+
 
 // --- UI LOGIC ---
 window.showLayer = function(layerNumber) {
