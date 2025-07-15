@@ -288,54 +288,6 @@
         .hidden {
             display: none;
         }
-
-        /* --- Modal Styles --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            text-align: center;
-            max-width: 90%;
-            width: 500px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .modal-content h3 {
-            margin-top: 0;
-            font-size: 1.2em;
-        }
-        .modal-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .modal-buttons button {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        #modal-btn-confirm {
-            background-color: var(--symptom-green);
-            color: white;
-            border-color: var(--symptom-green);
-        }
-        #modal-btn-cancel {
-            background-color: #f1f1f1;
-        }
     </style>
 </head>
 <body>
@@ -417,7 +369,7 @@
                 <!-- Action Buttons -->
                 <div id="action-buttons" class="hidden" style="margin-top: 20px;">
                     <button class="btn-instructions" onclick="showLayer(8)">ข้อควรปฏิบัติขณะนำผู้ป่วยมา รพ.</button>
-                    <button class="btn-final-save" onclick="showConfirmationModal()">บันทึกข้อมูลและปิด</button>
+                    <button class="btn-final-save" onclick="handleFinalSave(this)">บันทึกข้อมูลและปิด</button>
                 </div>
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
@@ -428,7 +380,7 @@
             <h2 class="section-title">คำแนะนำเบื้องต้น</h2>
             <p>อาการดังกล่าวอาจเกิดจากสาเหตุอื่นที่ไม่ใช่สโตรก แต่หากอาการรุนแรงขึ้นหรือกลับมาเป็นอีกอย่างเฉียบพลันให้รีบมาโรงพยาบาล</p>
             <div class="options-container" style="margin-top: 20px;">
-                <button class="btn-symptom-green" onclick="showConfirmationModal()">ตกลงและปิด</button>
+                <button class="btn-symptom-green" onclick="handleFinalSave(this)">ตกลงและปิด</button>
             </div>
         </div>
 
@@ -477,18 +429,6 @@
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
 
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmation-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 id="modal-title">ยืนยันการบันทึกข้อมูล</h3>
-            <p id="modal-text">คุณต้องการบันทึกข้อมูลการประเมินนี้และปิดหน้าต่างใช่หรือไม่?</p>
-            <div class="modal-buttons">
-                <button id="modal-btn-cancel" onclick="hideConfirmationModal()">ยกเลิก</button>
-                <button id="modal-btn-confirm" onclick="handleFinalSave()">ตกลง</button>
-            </div>
-        </div>
     </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
@@ -589,19 +529,13 @@
         return await response.json();
     }
 
-    // --- Confirmation Modal and Final Save Logic ---
-    function showConfirmationModal() {
-        document.getElementById('confirmation-modal').classList.remove('hidden');
-    }
-
-    function hideConfirmationModal() {
-        document.getElementById('confirmation-modal').classList.add('hidden');
-    }
-
-    async function handleFinalSave() {
-        const confirmBtn = document.getElementById('modal-btn-confirm');
-        confirmBtn.textContent = 'กำลังบันทึก...';
-        confirmBtn.disabled = true;
+    // --- Final Save Logic (No Modal) ---
+    async function handleFinalSave(clickedButton) {
+        const originalButtonText = clickedButton.textContent;
+        if (clickedButton) {
+            clickedButton.textContent = 'กำลังบันทึก...';
+            clickedButton.disabled = true;
+        }
 
         try {
             const result = await sendAllDataToServer();
@@ -611,17 +545,17 @@
                     liff.closeWindow();
                 } else {
                     alert("บันทึกข้อมูลเรียบร้อยแล้ว");
-                    hideConfirmationModal();
                 }
             } else {
                 throw new Error(result.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
             }
         } catch (error) {
             console.error("Failed to save final data:", error);
-            document.getElementById('modal-title').textContent = "เกิดข้อผิดพลาด";
-            document.getElementById('modal-text').textContent = "ไม่สามารถบันทึกข้อมูลได้: " + error.message;
-            confirmBtn.textContent = 'ตกลง';
-            confirmBtn.disabled = false;
+            alert("ไม่สามารถบันทึกข้อมูลได้: " + error.message);
+            if (clickedButton) {
+                clickedButton.textContent = originalButtonText;
+                clickedButton.disabled = false;
+            }
         }
     }
 
@@ -692,7 +626,7 @@
             saveBtn = document.createElement('button');
             saveBtn.className = 'btn-final-save';
             saveBtn.textContent = 'บันทึกและปิด';
-            saveBtn.onclick = showConfirmationModal;
+            saveBtn.onclick = () => handleFinalSave(saveBtn);
             msgButtons.appendChild(saveBtn);
         }
     }
@@ -718,7 +652,7 @@
             saveBtn = document.createElement('button');
             saveBtn.className = 'btn-final-save';
             saveBtn.textContent = 'บันทึกและปิด';
-            saveBtn.onclick = showConfirmationModal;
+            saveBtn.onclick = () => handleFinalSave(saveBtn);
             msgButtons.appendChild(saveBtn);
         }
     }
