@@ -487,7 +487,10 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
     // --- CONFIG & GLOBAL VARIABLES ---
-    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // <--- PASTE YOUR DEPLOYMENT URL HERE
+    // [CRITICAL] PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+    // It MUST be the /exec URL from your latest deployment.
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
+    
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     
     let currentLayer = 1;
@@ -524,7 +527,7 @@
 
     // --- LIFF Initialization ---
     function initializeLiff() {
-        liffReadyPromise = liff.init({ liffId: "2005789397-WRm1lYd9" }) // <--- PASTE YOUR LIFF ID HERE
+        liffReadyPromise = liff.init({ liffId: "2005789397-WRm1lYd9" })
             .then(() => {
                 if (liff.isLoggedIn()) {
                     return liff.getProfile();
@@ -549,23 +552,13 @@
     initializeLiff();
 
     // --- MODIFIED: Data Handling ---
-    /**
-     * Stores a piece of data in the local sessionData object.
-     * Does NOT send data to the server immediately.
-     * @param {string} key - The key for the data (e.g., "BEFAST", "symptom").
-     * @param {any} value - The value to store.
-     */
     function saveData(key, value) {
         sessionData[key] = value;
         console.log("Data stored locally:", sessionData);
     }
 
-    /**
-     * Sends all collected data from sessionData to the Google Apps Script server.
-     * This is called only at the very end.
-     */
     async function sendAllDataToServer() {
-        await liffReadyPromise; // Ensure user profile is loaded
+        await liffReadyPromise;
 
         if (!sessionData.userID) {
             console.error("Cannot save data: userId is not available.");
@@ -578,7 +571,7 @@
             method: 'POST',
             mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(sessionData) // Send the entire sessionData object
+            body: JSON.stringify(sessionData)
         });
 
         if (!response.ok) {
@@ -611,7 +604,6 @@
                     liff.closeWindow();
                 } else {
                     alert("บันทึกข้อมูลเรียบร้อยแล้ว");
-                    // For non-LIFF environment, maybe hide the modal
                     hideConfirmationModal();
                 }
             } else {
@@ -623,7 +615,6 @@
             document.getElementById('modal-text').textContent = "ไม่สามารถบันทึกข้อมูลได้: " + error.message;
             confirmBtn.textContent = 'ตกลง';
             confirmBtn.disabled = false;
-            // Don't close the modal on error, let the user try again or cancel.
         }
     }
 
@@ -643,6 +634,12 @@
     function showMessage(title, text, backLayer) {
         document.getElementById('message-title').textContent = title;
         document.getElementById('message-text').textContent = text;
+        const msgLayer = document.getElementById('layer-7');
+        
+        // Remove previous save button if exists
+        const oldSaveBtn = msgLayer.querySelector('.btn-final-save');
+        if(oldSaveBtn) oldSaveBtn.remove();
+        
         document.getElementById('message-back-btn').onclick = () => showLayer(backLayer);
         showLayer(7);
     }
@@ -684,9 +681,7 @@
     function handleNoSymptom() {
         saveData('BEFAST', 'ไม่มีอาการ');
         showMessage("ไม่มีอาการ", "เยี่ยมมาก! คุณไม่มีอาการที่น่าสงสัย กดปุ่มด้านล่างเพื่อบันทึกและปิด", 1);
-        // Add a save button to the message layer if needed, or rely on the user going back.
-        // For now, the user has to go back to layer 1 and there is no direct save button.
-        // Let's add a save button to the message layer.
+        
         const msgLayer = document.getElementById('layer-7');
         let saveBtn = msgLayer.querySelector('.btn-final-save');
         if (!saveBtn) {
@@ -701,7 +696,7 @@
     function handleSymptomResult(isLikely, symptomText) {
         saveData('symptom', symptomText);
         if (isLikely) { showLayer(3); }
-        else { showLayer(6); } // Layer 6 has a "Save & Close" button
+        else { showLayer(6); }
     }
     
     function handleSeveritySelection(severityText) {
@@ -712,6 +707,7 @@
     function handleChronicSymptom() {
         saveData('frequency', 'เกิดขึ้นเรื้อรัง เป็นๆ หายๆ');
         showMessage("คำแนะนำ", "อาการที่เป็นๆ หายๆ หรือเรื้อรังอาจเกิดจากสาเหตุอื่น ควรปรึกษาแพทย์เพื่อการวินิจฉัยที่ถูกต้อง แต่หากครั้งนี้อาการรุนแรงกว่าปกติหรือเกิดขึ้นเฉียบพลัน ให้รีบมาโรงพยาบาล", 3);
+        
         const msgLayer = document.getElementById('layer-7');
         let saveBtn = msgLayer.querySelector('.btn-final-save');
         if (!saveBtn) {
@@ -726,7 +722,7 @@
     function handleTimeSelection(offsetMinutes) {
         const onsetTime = new Date(Date.now() - offsetMinutes * 60000);
         saveData('time', onsetTime.toISOString());
-        showLayer(5); // Layer 5 has a "Save & Close" button
+        showLayer(5);
     }
     
     function openTimePicker() {
@@ -749,177 +745,128 @@
         displayButton.onclick = openTimePicker;
     }
 
-window.sendUnlikelySymptomResultAndClose = async function() {
-    const okButton = document.getElementById('btn-unlikely-ok');
-    okButton.textContent = "กำลังส่ง...";
-    okButton.disabled = true;
-    if (!liff.isInClient()) {
-        alert("ฟังก์ชันนี้ใช้ได้ใน LINE เท่านั้น");
-        okButton.textContent = "ตกลง";
-        okButton.disabled = false;
-        return;
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
     }
-    try {
-        await liffReadyPromise;
-        const flexMessage = {
-            "type": "flex",
-            "altText": "ผลการประเมินอาการสโตรก",
-            "contents": {
-                "type": "bubble",
-                "header": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        { "type": "text", "text": "ผลการประเมินอาการสโตรก", "weight": "bold", "size": "lg" },
-                        { "type": "text", "text": `ของ ${userName} เมื่อ ${formatTime(new Date())} น.`, "size": "sm", "color": "#666666", "margin": "md" }
-                    ]
-                },
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                        { "type": "text", "text": "คำแนะนำเบื้องต้น", "weight": "bold", "margin": "none", "size": "md" },
-                        { "type": "text", "text": "อาการดังกล่าวอาจเกิดจากสาเหตุอื่นที่ไม่ใช่สโตรก แต่หากอาการรุนแรงขึ้นหรือกลับมาเป็นอีกอย่างเฉียบพลันให้รีบมาโรงพยาบาล", "wrap": true, "size": "md", "margin": "md" }
-                    ]
-                }
+
+    function formatTime(dateStr) {
+        const date = new Date(dateStr);
+        if (!date || isNaN(date)) return 'N/A';
+        return date.toTimeString().slice(0, 5);
+    }
+
+    function startCountdown(deadlineStr) {
+        const deadline = new Date(deadlineStr).getTime();
+        const countdownElement = document.getElementById('countdown-timer');
+        if (!countdownElement || isNaN(deadline)) return;
+        
+        const interval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = deadline - now;
+            if (distance < 0) {
+                clearInterval(interval);
+                countdownElement.innerHTML = "หมดเวลาแล้ว";
+                return;
             }
-        };
-        await liff.sendMessages([flexMessage]);
-        liff.closeWindow();
-    } catch (error) {
-        console.error("Send Flex failed:", error);
-        window.showMessage("เกิดข้อผิดพลาด", "ไม่สามารถส่งข้อความได้ กรุณาลองอีกครั้ง", 6);
-        okButton.textContent = "ตกลง";
-        okButton.disabled = false;
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            countdownElement.innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
     }
-};
 
-function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * (Math.PI / 180);
-    const dLon = (lon2 - lon1) * (Math.PI / 180);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-}
+    function displayCallButtonsAndSummary(htmlSummary, htmlCallButtons) {
+        document.getElementById('summary-info').innerHTML = htmlSummary;
+        document.getElementById('call-buttons-container').innerHTML = htmlCallButtons;
+        document.getElementById('summary-info').classList.remove('hidden');
+        document.getElementById('call-buttons-container').classList.remove('hidden');
+        document.getElementById('btn-instructions').classList.remove('hidden');
+        const rtpaDeadline = new Date(new Date(sessionData.time).getTime() + 4.5 * 60 * 60000);
+        startCountdown(rtpaDeadline.toISOString());
+    }
+    
+    function createCallButton(id, href, svgPath, text) {
+        return `
+            <div class="call-button-wrapper">
+                <a id="${id}" class="btn-emoji" href="${href}" onclick="saveData('tel', '${text}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="${svgPath}"/></svg>
+                </a>
+                <p class="phone-number">${text}</p>
+            </div>
+        `;
+    }
 
-function formatTime(date) {
-    if (!date || isNaN(date)) return 'N/A';
-    return date.toTimeString().slice(0, 5);
-}
+    function getLocation() {
+        const locationPrompt = document.getElementById('location-prompt');
+        locationPrompt.innerHTML = "<p>กำลังค้นหาพิกัด...</p>";
 
-function startCountdown(deadline) {
-    const countdownElement = document.getElementById('countdown-timer');
-    if (!countdownElement) return;
-    if (countdownInterval) clearInterval(countdownInterval);
-    countdownInterval = setInterval(() => {
-        const now = new Date().getTime();
-        const distance = deadline - now;
-        if (distance < 0) {
-            clearInterval(countdownInterval);
-            countdownElement.innerHTML = "หมดเวลาแล้ว";
+        if (!navigator.geolocation) {
+            showMessage("ข้อผิดพลาด", "เบราว์เซอร์ของคุณไม่รองรับการใช้งาน Geolocation", 5);
             return;
         }
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        countdownElement.innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }, 1000);
-}
 
-function displayCallButtonsAndSummary(htmlSummary, htmlCallButtons) {
-    const summaryInfo = document.getElementById('summary-info');
-    const callButtonsContainer = document.getElementById('call-buttons-container');
-    summaryInfo.innerHTML = htmlSummary;
-    callButtonsContainer.innerHTML = htmlCallButtons;
-    summaryInfo.classList.remove('hidden');
-    callButtonsContainer.classList.remove('hidden');
-    document.getElementById('btn-instructions').classList.remove('hidden');
-    const rtpaDeadline = new Date(onsetTime.getTime() + 4.5 * 60 * 60000);
-    startCountdown(rtpaDeadline);
-}
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const distance = getDistanceFromLatLonInKm(userLat, userLon, hospitalCoords.lat, hospitalCoords.lon);
+                
+                saveData('location', `${userLat},${userLon}`);
+                saveData('distance', `${distance.toFixed(1)} km`);
+                
+                locationPrompt.classList.add('hidden');
+                
+                let summaryHtml = '';
+                let callButtonsHtml = '';
+                const phoneIconPath = "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z";
+                const onsetTime = new Date(sessionData.time);
 
-function createCallButton(id, href, svgPath, text) {
-    return `
-        <div class="call-button-wrapper">
-            <a id="${id}" class="btn-emoji" href="${href}" onclick="saveData('tel', 'yes')">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="${svgPath}"/></svg>
-            </a>
-            <p class="phone-number">${text}</p>
-        </div>
-    `;
-}
-
-window.getLocation = function() {
-    const locationPrompt = document.getElementById('location-prompt');
-    locationPrompt.innerHTML = "<p>กำลังค้นหาพิกัด...</p>";
-    if (!navigator.geolocation) {
-        window.showMessage("ข้อผิดพลาด", "เบราว์เซอร์ของคุณไม่รองรับการใช้งาน Geolocation", 5);
-        locationPrompt.innerHTML = `<button id="btn-get-location" class="btn-emoji" onclick="getLocation()"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></button><p style="color: var(--primary-color);">กดส่งพิกัดและกดอนุญาต</p>`;
-        return;
-    }
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const userLat = position.coords.latitude;
-            const userLon = position.coords.longitude;
-            const distance = getDistanceFromLatLonInKm(userLat, userLon, hospitalCoords.lat, hospitalCoords.lon);
-            saveData('location', `${userLat},${userLon}`);
-            saveData('distance', `${distance.toFixed(1)} km`);
-            locationPrompt.classList.add('hidden');
-            let summaryHtml = '';
-            let callButtonsHtml = '';
-            const phoneIconPath = "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z";
-            if (distance > 450) {
-                summaryHtml = `<p>คุณอยู่ห่างจาก รพ.สวี เกิน 450 กม. โปรดกดโทรออก 1669 และแจ้งอาการ โรงพยาบาลที่ใกล้ท่านที่สุดจะมารับท่าน</p>
-                               <p>เวลาที่เริ่มมีอาการ: <strong>${formatTime(onsetTime)} น.</strong></p>
-                               <p>เวลาที่ต้องถึงรพ.(ภายใน 3:30 ชม.): <strong>${formatTime(new Date(onsetTime.getTime() + 3.5 * 60 * 60000))} น.</strong></p>
-                               <p>เวลาที่ต้องได้รับยาละลายลิ่มเลือด(ภายใน 4:30 ชม.): <strong>${formatTime(new Date(onsetTime.getTime() + 4.5 * 60 * 60000))} น.</strong></p>
-                               <p>นับถอยหลัง เหลือเวลาอีก <strong id="countdown-timer">--:--:--</strong></p>`;
-                callButtonsHtml = createCallButton('btn-call-1669', 'tel:1669', phoneIconPath, 'โทร 1669');
-            } else {
-                const avgSpeedKmh = 40;
-                const travelTimeMinutes = (distance / avgSpeedKmh) * 60;
-                saveData('duration', `${Math.round(travelTimeMinutes)} mins`);
-                const now = new Date();
-                const arrivalDeadline = new Date(onsetTime.getTime() + 3.5 * 60 * 60000);
-                const rtpaDeadline = new Date(onsetTime.getTime() + 4.5 * 60 * 60000);
-                const privateCarEta = new Date(now.getTime() + travelTimeMinutes * 60000);
-                const ambulanceEta = new Date(now.getTime() + (travelTimeMinutes * 2) * 60000);
-                const privateCarStatus = privateCarEta <= arrivalDeadline ? "ยังมีเวลา" : "ไม่ทัน";
-                const ambulanceStatus = ambulanceEta <= arrivalDeadline ? "ยังมีเวลา" : "ไม่ทัน";
-                let urgencyMessage = (privateCarEta > rtpaDeadline) ? `<p class="blink">รีบมารพ.โดยด่วน!</p>` : '';
-                summaryHtml = `<p>คุณอยู่ห่างจากรพ.สวี <strong>${distance.toFixed(1)} กม.</strong> เดินทางโดยรถยนต์ <strong>${Math.round(travelTimeMinutes)} นาที</strong></p>
-                               <p>เวลาที่เริ่มมีอาการ: <strong>${formatTime(onsetTime)} น.</strong></p>
-                               <p>เวลาที่ต้องถึงรพ.(ภายใน 3:30 ชม.): <strong>${formatTime(arrivalDeadline)} น.</strong></p>
-                               <p>เวลาที่ต้องได้รับยาละลายลิ่มเลือด(ภายใน 4:30 ชม.): <strong>${formatTime(rtpaDeadline)} น.</strong></p>
-                               <p>นับถอยหลัง เหลือเวลาอีก <strong id="countdown-timer">--:--:--</strong></p>
-                               <div class="calculation-box">
-                                   <h4>จากการคำนวณ</h4>
-                                   <p>- ถ้าท่านรอรถโรงพยาบาลไปรับ สถานะ: <strong>${ambulanceStatus}</strong></p>
-                                   <p>- ถ้าท่านรีบออกมารพ.ทันที สถานะ: <strong>${privateCarStatus}</strong> (จะถึงตอน <strong>${formatTime(privateCarEta)} น.</strong>)</p>
-                               </div>
-                               ${urgencyMessage}
-                               <hr style="margin: 15px 0; border-color: #eee;">
-                               <p class="blink" style="font-size: 1.1em;">คุณต้องกดโทรออกด้วยตัวเอง</p>
-                               <p>แล้วแจ้งเจ้าหน้าที่ รพ.ว่าส่งพิกัดทาง line สวีรู้ทันสโตรกแล้ว</p>`;
-                callButtonsHtml = createCallButton('btn-call-sawi', 'tel:0894745523', phoneIconPath, 'โทรฉุกเฉิน รพ.สวี') +
-                                  createCallButton('btn-call-1669', 'tel:1669', phoneIconPath, 'โทร 1669 (โทรฟรี)');
-            }
-            displayCallButtonsAndSummary(summaryHtml, callButtonsHtml);
-        },
-        (error) => {
-            locationPrompt.classList.add('hidden');
-            document.getElementById('location-error').innerHTML = `<p style="color:var(--symptom-red);">การเข้าถึงตำแหน่งถูกปฏิเสธ<br>คุณได้ปฏิเสธการเข้าถึงตำแหน่ง โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ</p>`;
-            document.getElementById('location-error').classList.remove('hidden');
-            const phoneIconPath = "M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z";
-            const callButtonsHtml = createCallButton('btn-call-sawi', 'tel:0894745523', phoneIconPath, 'โทรฉุกเฉิน รพ.สวี') +
+                if (distance > 450) {
+                    summaryHtml = `<p>คุณอยู่ห่างจาก รพ.สวี เกิน 450 กม. โปรดกดโทรออก 1669 และแจ้งอาการ โรงพยาบาลที่ใกล้ท่านที่สุดจะมารับท่าน</p>
+                                   <p>เวลาที่เริ่มมีอาการ: <strong>${formatTime(onsetTime)} น.</strong></p>
+                                   <p>เวลาที่ต้องได้รับยา(ภายใน 4:30 ชม.): <strong>${formatTime(new Date(onsetTime.getTime() + 4.5 * 60 * 60000))} น.</strong></p>
+                                   <p>นับถอยหลัง เหลือเวลาอีก <strong id="countdown-timer">--:--:--</strong></p>`;
+                    callButtonsHtml = createCallButton('btn-call-1669', 'tel:1669', phoneIconPath, 'โทร 1669');
+                } else {
+                    const avgSpeedKmh = 40;
+                    const travelTimeMinutes = (distance / avgSpeedKmh) * 60;
+                    saveData('duration', `${Math.round(travelTimeMinutes)} นาที`);
+                    
+                    const now = new Date();
+                    const arrivalDeadline = new Date(onsetTime.getTime() + 3.5 * 60 * 60000);
+                    const privateCarEta = new Date(now.getTime() + travelTimeMinutes * 60000);
+                    
+                    summaryHtml = `<p>คุณอยู่ห่างจากรพ.สวี <strong>${distance.toFixed(1)} กม.</strong></p>
+                                   <p>เวลาที่เริ่มมีอาการ: <strong>${formatTime(onsetTime)} น.</strong></p>
+                                   <p>เวลาที่ต้องถึงรพ.(ภายใน 3:30 ชม.): <strong>${formatTime(arrivalDeadline)} น.</strong></p>
+                                   <p>นับถอยหลัง เหลือเวลาอีก <strong id="countdown-timer">--:--:--</strong></p>
+                                   <div class="calculation-box">
+                                        <h4>จากการคำนวณ</h4>
+                                        <p>- ถ้าท่านรีบออกมารพ.ทันที จะถึงประมาณ: <strong>${formatTime(privateCarEta)} น.</strong></p>
+                                   </div>
+                                   <hr style="margin: 15px 0; border-color: #eee;">
+                                   <p class="blink" style="font-size: 1.1em;">คุณต้องกดโทรออกด้วยตัวเอง</p>
+                                   <p>แล้วแจ้งเจ้าหน้าที่ รพ.ว่าส่งพิกัดทาง line สวีรู้ทันสโตรกแล้ว</p>`;
+                    callButtonsHtml = createCallButton('btn-call-sawi', 'tel:0894745523', phoneIconPath, 'โทรฉุกเฉิน รพ.สวี') +
                                       createCallButton('btn-call-1669', 'tel:1669', phoneIconPath, 'โทร 1669 (โทรฟรี)');
-            displayCallButtonsAndSummary('', callButtonsHtml);
-        }
-    );
-};
+                }
+                displayCallButtonsAndSummary(summaryHtml, callButtonsHtml);
+            },
+            (error) => {
+                locationPrompt.classList.add('hidden');
+                document.getElementById('location-error').innerHTML = `<p style="color:var(--symptom-red);">การเข้าถึงตำแหน่งถูกปฏิเสธ<br>โปรดตรวจสอบการอนุญาตในตั้งค่าเบราว์เซอร์หรือโทรศัพท์ของคุณ</p>`;
+                document.getElementById('location-error').classList.remove('hidden');
+            }
+        );
+    }
+
 </script>
 </body>
 </html>
