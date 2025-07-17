@@ -124,7 +124,7 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
     // --- Constants & Globals ---
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwQ4v88k5K1tW7MNCrwq4u6hC0Pjx3m4G_aD1zC1-A37Q89v-UaLgy2R-BwH_iFf-2S/exec"; // Please replace with your actual GAS URL
+    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
     const LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
@@ -155,24 +155,16 @@
         'Arm': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนได้ไม่เท่ากัน', 'ของหลุดจากมือ', 'เดินลากขา/กะเผลก'], unlikely: ['ปวด/อักเสบกล้ามเนื้อ', 'ชาจากการนอนทับ', 'หมอนรองกระดูกทับเส้น'] },
         'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดคนอื่น'], unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/เป็นหวัด'] }
     };
-    
 
     window.onload = async () => {
         try {
             await liff.init({ liffId: LIFF_ID });
             if (!liff.isLoggedIn()) { liff.login(); return; }
-            
             const profile = await liff.getProfile();
             sessionData.userID = profile.userId;
             sessionData.userName = profile.displayName;
-            
             fetchUserData(profile.userId);
             setupTimeOptions();
-
-            if (!sessionStorage.getItem('disclaimerShown')) {
-                document.getElementById('disclaimerModal').style.display = 'flex';
-                sessionStorage.setItem('disclaimerShown', 'true');
-            }
         } catch (err) { console.error(err); alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); }
         document.getElementById('info-icon').onclick = () => { document.getElementById('disclaimerModal').style.display = 'flex'; };
     };
@@ -193,10 +185,7 @@
             sessionData.district = data.district;
             sessionData.village = data.village;
             const riskTimestamp = data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A';
-            historyCard.innerHTML = `
-                <h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2>
-                <p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก(${data.risk_group || 'N/A'}): <strong>${data.thai_cv_risk_score}%</strong></p>
-                <p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${riskTimestamp}</p>`;
+            historyCard.innerHTML = `<h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2><p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก(${data.risk_group || 'N/A'}): <strong>${data.thai_cv_risk_score}%</strong></p><p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${riskTimestamp}</p>`;
             if(sessionData.district && sessionData.village) {
                 fetchVolunteerData(`ต.${sessionData.district} ม.${sessionData.village}`);
             }
@@ -204,43 +193,6 @@
             historyCard.innerHTML = `<p style="text-align:center;">คุณยังไม่ได้ลงทะเบียนกับแอปประเมินความเสี่ยง <a href="${REGISTRATION_LIFF_URL}">คลิกที่นี่เพื่อลงทะเบียน</a></p>`;
         }
         historyCard.classList.remove('hidden');
-    }
-    function setupTimeOptions() {
-        const container = document.getElementById('time-options-container');
-        container.innerHTML = '';
-        const now = new Date();
-        const timeOptions = [
-            { text: `เพิ่งเกิด (${formatTime(now)})`, minutes: 0 }, { text: '10 นาที', minutes: 10 },
-            { text: '30 นาที', minutes: 30 }, { text: '1 ชม.', minutes: 60 },
-            { text: '2 ชม.', minutes: 120 }, { text: '3 ชม.', minutes: 180 },
-            { text: '4 ชม.', minutes: 240 }, { text: '6 ชม.', minutes: 360 },
-            { text: '12 ชม.', minutes: 720 },
-            { text: '1 วันก่อน', minutes: 1440, chronic: true },
-            { text: 'หลายวันก่อน', minutes: 0, chronic: true, final: true }
-        ];
-
-        const startColor = { r: 224, g: 224, b: 224 }; // #E0E0E0
-        const endColor = { r: 255, g: 193, b: 7 }; // #FFC107
-        
-        timeOptions.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.textContent = opt.text;
-            btn.onclick = () => handleTimeSelection(opt.minutes, opt.chronic);
-            
-            if (opt.final) {
-                 btn.style.backgroundColor = `rgb(${endColor.r}, ${endColor.g}, ${endColor.b})`;
-            } else if (opt.chronic) {
-                btn.style.backgroundColor = '#E67E22'; // Chronic button color
-                btn.style.color = 'white';
-            } else {
-                const ratio = index / (timeOptions.length - 3);
-                const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
-                const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
-                const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
-                btn.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-            }
-            container.appendChild(btn);
-        });
     }
 
     function fetchVolunteerData(areaKey) {
@@ -260,9 +212,7 @@
     function handleFinalSave(button, isEmergency) {
         if(button && button.disabled) return;
         if(button) button.disabled = true;
-        
         sessionData.isEmergency = isEmergency;
-
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
@@ -294,12 +244,7 @@
     }
     
     function saveData(key, value) { sessionData[key] = value; }
-    
-    function showLayer(layerId) {
-        document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden'));
-        document.getElementById(layerId).classList.remove('hidden');
-    }
-    
+    function showLayer(layerId) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(layerId).classList.remove('hidden'); }
     function goBack(targetLayer) { showLayer(targetLayer); }
 
     function handleNoSymptom() {
@@ -351,7 +296,6 @@
     }
     
     function handleSeveritySelection(frequencyText) { saveData('frequency', frequencyText); showLayer('layer-4'); }
-    
     function handleChronicSymptom(frequencyText) {
         saveData('frequency', frequencyText);
         showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรปรึกษาแพทย์เพื่อหาสาเหตุที่แท้จริง");
@@ -374,7 +318,6 @@
         if (countdownInterval) clearInterval(countdownInterval);
         const timerElement = document.getElementById('countdown-timer');
         if (!timerElement) return;
-
         const updateTimer = () => {
             const distance = deadlineMillis - new Date().getTime();
             if (distance < 0) {
@@ -394,8 +337,9 @@
     function buildSummaryPage() {
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
-        
+        const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
         const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
+        sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
         startCountdown(rtpaDeadline.getTime());
         
@@ -403,39 +347,55 @@
         tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
         tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
         tableHtml += createTableRow(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
-        tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน', sessionData.rtpaDeadline + ' น.');
+        tableHtml += createTableRow(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', sessionData.arrivalDeadline + ' น.');
+        tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
         tableHtml += '</tbody>';
-        
         document.getElementById('summary-table').innerHTML = tableHtml;
-
         buildActionContainer();
-        updateSummaryAndActions(null); // Initial call without distance
+        updateSummaryAndActions(null);
     }
 
     function updateSummaryAndActions(distance) {
         const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
-        // Clear any previous distance rows
-        const existingDistanceRows = document.querySelectorAll('.distance-row');
-        existingDistanceRows.forEach(row => row.remove());
+        document.querySelectorAll('.distance-row').forEach(row => row.remove());
 
-        let extraHtml = '';
         if (distance !== null) {
+            let extraHtml = '';
+            const sawiButtonWrapper = document.querySelector('.tel-sawi-button').closest('.action-button-wrapper');
             if (distance > 450) {
-                extraHtml += createTableRow('mdi:alert-circle-outline', 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด', true);
-                 const sawiButton = document.querySelector('.tel-sawi-button');
-                if (sawiButton) sawiButton.parentElement.style.display = 'none';
+                extraHtml += createTableRow('mdi:alert-circle-outline', 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด', true, 'distance-row');
+                if (sawiButtonWrapper) sawiButtonWrapper.style.display = 'none';
             } else {
+                if (sawiButtonWrapper) sawiButtonWrapper.style.display = 'flex';
                 const travelTimeMinutes = (distance / 40) * 60;
+                const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
+                const selfTravelArrival = new Date(Date.now() + travelTimeMinutes * 60000);
+                const ambulanceArrival = new Date(Date.now() + ambulanceTravelTime * 60000);
+                const rtpaDeadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 60 * 60 * 1000) : new Date();
+
                 sessionData.distance = `${distance.toFixed(1)} กม.`;
                 sessionData.duration = formatDuration(travelTimeMinutes);
+                sessionData.selfTravelEstimate = selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+                sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+
                 extraHtml += createTableRow(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance, false, 'distance-row');
                 extraHtml += createTableRow(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration, false, 'distance-row');
+                extraHtml += createTableRow(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate, sessionData.selfTravelEstimate.includes('ไม่ทัน'), 'distance-row');
+                extraHtml += createTableRow(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate, sessionData.ambulanceEstimate.includes('ไม่ทัน'), 'distance-row');
             }
+            table.insertAdjacentHTML('beforeend', extraHtml);
         }
-        table.innerHTML += extraHtml;
 
         const contactContainer = document.getElementById('contact-buttons');
-        contactContainer.innerHTML = ''; // Clear previous buttons
+        contactContainer.innerHTML = '';
+        const routeContainer = document.getElementById('route-button-container');
+        routeContainer.innerHTML = '';
+
+        if (distance !== null && distance <= 450) {
+            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}`;
+            routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button route-button"><span class="iconify" data-icon="${icons.route}"></span><span class="label">เส้นทางไป รพ.สวี</span></a>`;
+        }
+        
         if (sessionData.volunteerContacts) {
             const contacts = sessionData.volunteerContacts;
             let areaInfo = (sessionData.district && sessionData.village) ? `(ต.${sessionData.district} ม.${sessionData.village})` : '';
@@ -455,11 +415,40 @@
                     <td class="${valueClass}">${value || 'N/A'}</td>
                 </tr>`;
     }
-
-    function createContactButton(tel, label, key) {
-        return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${key}')"><span class="iconify" data-icon="${icons.contact}"></span><span class="label">${label}</span></a>`;
+    
+    function setupTimeOptions() {
+        const container = document.getElementById('time-options-container');
+        container.innerHTML = '';
+        const now = new Date();
+        const timeOptions = [
+            { text: `เพิ่งเกิด (${formatTime(now)})`, minutes: 0 }, { text: '10 นาที', minutes: 10 },
+            { text: '30 นาที', minutes: 30 }, { text: '1 ชม.', minutes: 60 },
+            { text: '2 ชม.', minutes: 120 }, { text: '3 ชม.', minutes: 180 },
+            { text: '4 ชม.', minutes: 240 }, { text: '6 ชม.', minutes: 360 },
+            { text: '12 ชม.', minutes: 720 },
+            { text: '1 วันก่อน', minutes: 1440, chronic: true },
+            { text: 'หลายวันก่อน', minutes: 0, chronic: true, final: true }
+        ];
+        const startColor = { r: 224, g: 224, b: 224 };
+        const endColor = { r: 255, g: 193, b: 7 };
+        timeOptions.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.textContent = opt.text;
+            btn.onclick = () => handleTimeSelection(opt.minutes, opt.chronic);
+            if (opt.final) { btn.style.backgroundColor = `rgb(${endColor.r}, ${endColor.g}, ${endColor.b})`; } 
+            else if (opt.chronic) { btn.style.backgroundColor = '#E67E22'; btn.style.color = 'white'; } 
+            else {
+                const ratio = index / (timeOptions.length - 3);
+                const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
+                const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
+                const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
+                btn.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            }
+            container.appendChild(btn);
+        });
     }
 
+    function createContactButton(tel, label, key) { return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${key}')"><span class="iconify" data-icon="${icons.contact}"></span><span class="label">${label}</span></a>`; }
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         container.innerHTML = `
@@ -467,19 +456,15 @@
             <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')"><div class="action-button tel-sawi-button"><span class="iconify" data-icon="${icons.phone}"></span></div><p class="action-button-text">โทร รพ.สวี</p></a>
             <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')"><div class="action-button tel-1669-button"><span class="iconify" data-icon="${icons.phone}"></span></div><p class="action-button-text">โทร 1669</p></a>`;
     }
-    
     function getLocation() {
         const locButton = document.getElementById('location-action');
         const locText = document.getElementById('location-text');
-        locButton.onclick = null;
-        locText.textContent = 'กำลังค้นหา...';
-        
+        locButton.onclick = null; locText.textContent = 'กำลังค้นหา...';
         navigator.geolocation.getCurrentPosition(
             position => {
                 locButton.classList.add('success');
                 locButton.innerHTML = `<span class="iconify" data-icon="${icons.check}"></span>`;
                 locText.textContent = 'ส่งพิกัดแล้ว';
-                
                 const { latitude, longitude } = position.coords;
                 saveData('location', `${latitude},${longitude}`);
                 const distance = getDistanceFromLatLonInKm(latitude, longitude, hospitalCoords.lat, hospitalCoords.lon);
@@ -487,15 +472,12 @@
             },
             error => {
                 alert("ไม่สามารถเข้าถึงตำแหน่งได้ โปรดเปิด GPS และอนุญาตให้แอปเข้าถึงตำแหน่ง");
-                locButton.onclick = getLocation;
-                locText.textContent = 'ส่งพิกัดที่อยู่';
+                locButton.onclick = getLocation; locText.textContent = 'ส่งพิกัดที่อยู่';
                 updateSummaryAndActions(null);
             }
         );
     }
-    
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
-    
     function formatFullDateTime(date) {
         if (!date || isNaN(new Date(date).getTime())) return 'N/A';
         const d = new Date(date);
@@ -506,7 +488,6 @@
         const mm = String(d.getMinutes()).padStart(2, '0');
         return `${day}/${month}/${year} ${hh}:${mm} น.`;
     }
-
     function formatDuration(minutes) {
         if (isNaN(minutes) || minutes < 0) return 'N/A';
         const h = Math.floor(minutes / 60);
@@ -514,7 +495,6 @@
         if (h > 0) return `${h} ชม. ${m} นาที`;
         return `${m} นาที`;
     }
-
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
