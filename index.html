@@ -371,7 +371,7 @@
         container.appendChild(button);
     }
 
-    function showLayer2(symptomKey) {
+function showLayer2(symptomKey) {
         saveData('symptomCategory', symptomKey);
         const symptomTranslations = {'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด'};
         document.getElementById('layer-2-title').textContent = `อาการด้าน${symptomTranslations[symptomKey]}`;
@@ -379,7 +379,8 @@
         buttonsContainer.innerHTML = '';
         const details = symptomDetails[symptomKey];
         details.likely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-likely', () => handleSymptomResult(true, text)));
-        details.unlikely.forEach(text => createButton(buttons-container, text, 'btn-symptom-unlikely', () => handleSymptomResult(false, text)));
+        details.unlikely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-unlikely', () => handleSymptomResult(false, text)));
+        
         showLayer('layer-2');
     }
 
