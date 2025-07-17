@@ -318,14 +318,10 @@
 
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
-            // This function will now be called correctly
             if (response && response.status === 'success') {
-                // No alert needed here, just show the modal
                 if (isEmergency) {
                     document.getElementById('how-to-act-modal').style.display = 'flex';
-                } else {
-                    if(liff.isInClient()) liff.closeWindow();
-                }
+                } else { if(liff.isInClient()) liff.closeWindow(); }
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
                 if(button) button.disabled = false;
@@ -336,7 +332,6 @@
         const scriptTag = document.createElement('script');
         scriptTag.src = url;
         scriptTag.onerror = function() {
-            // This is the error you were seeing
             alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
             if(button) button.disabled = false;
         };
@@ -350,10 +345,8 @@
      */
     function triggerSave(element, key) {
         if (key.startsWith('tel_')) {
-            // Add the timestamp for the specific call button pressed
             sessionData[key] = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
         }
-        // Also keep track of the general action for the summary text
         sessionData.contactedVia = key; 
         handleFinalSave(element, true);
     }
@@ -438,7 +431,8 @@
         if (!timerElement) return;
 
         const updateTimer = () => {
-            const distance = deadline - new Date().getTime();
+            const now = new Date().getTime();
+            const distance = deadline - now; // Use the passed deadline directly
             if (distance < 0) {
                 timerElement.textContent = "ถ้าได้รับยาหลังจากนี้อาจไม่มีประสิทธิภาพแล้ว";
                 timerElement.style.color = "var(--dark-red)";
@@ -456,22 +450,28 @@
     function buildSummaryPage() {
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
-        const arrivalDeadline = new Date(onset.getTime() + 210 * 60000); // 3.5 hours
-        const rtpaDeadline = new Date(onset.getTime() + 270 * 60000);   // 4.5 hours
-        saveData('arrivalDeadline', formatTime(arrivalDeadline));
-        saveData('rtpaDeadline', formatTime(rtpaDeadline));
+        
+        const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
+        const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
+        
+        sessionData.arrivalDeadline = formatTime(arrivalDeadline);
+        sessionData.rtpaDeadline = formatTime(rtpaDeadline);
+
+        // Pass the deadline timestamp (milliseconds) to the countdown
         startCountdown(rtpaDeadline.getTime());
         
-        document.getElementById('summary-container').innerHTML = 
-            createInfoCard(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName) +
-            createInfoCard(icons.symptom, 'อาการ', sessionData.symptomDetail) +
-            createInfoCard(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
-                                  
-        document.getElementById('time-details-container').innerHTML =
-            createInfoCard(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', formatTime(arrivalDeadline) + ' น.') +
-            createInfoCard(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', formatTime(rtpaDeadline) + ' น.');
+        let tableHtml = '<tbody>'; // Start table body
+        tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
+        tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
+        tableHtml += createTableRow(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
+        tableHtml += createTableRow(icons.hourglass, 'ต้องถึง รพ. ภายใน', sessionData.arrivalDeadline + ' น.');
+        tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน', sessionData.rtpaDeadline + ' น.');
+        tableHtml += '</tbody>';
+        
+        document.getElementById('summary-table').innerHTML = tableHtml;
 
         buildActionContainer();
+        // Location-dependent part is handled by updateSummaryAndActions
     }
     
     /**
@@ -481,25 +481,9 @@
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         container.innerHTML = `
-            <div class="action-button-wrapper">
-                <div id="location-action" class="action-button location-button" onclick="getLocation()">
-                    <span class="iconify" data-icon="${icons.pin}"></span>
-                </div>
-                <p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
-            </div>
-            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')">
-                <div class="action-button tel-sawi-button">
-                    <span class="iconify" data-icon="${icons.phone}"></span>
-                </div>
-                <p class="action-button-text">โทร รพ.สวี</p>
-            </a>
-            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')">
-                <div class="action-button tel-1669-button">
-                    <span class="iconify" data-icon="${icons.phone}"></span>
-                </div>
-                <p class="action-button-text">โทร 1669 (ฟรี)</p>
-            </a>
-        `;
+            <div class="action-button-wrapper"><div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="${icons.pin}"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p></div>
+            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')"><div class="action-button tel-sawi-button"><span class="iconify" data-icon="${icons.phone}"></span></div><p class="action-button-text">โทร รพ.สวี</p></a>
+            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')"><div class="action-button tel-1669-button"><span class="iconify" data-icon="${icons.phone}"></span></div><p class="action-button-text">โทร 1669 (ฟรี)</p></a>`;
     }
 
     function getLocation() {
@@ -533,46 +517,30 @@
      * This function now passes the correct key to createContactButton.
      */
     function updateSummaryAndActions(distance) {
-        const timeDetailsContainer = document.getElementById('time-details-container');
-        const contactContainer = document.getElementById('contact-buttons');
-        const routeContainer = document.getElementById('route-button-container');
-        let extraSummaryHtml = '';
-
-        contactContainer.innerHTML = '';
-        routeContainer.innerHTML = '';
+        const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
+        let extraHtml = '';
 
         if (distance !== null) {
             if (distance > 450) {
-                extraSummaryHtml = createInfoCard('mdi:alert-circle-outline', 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด');
-                const sawiButton = document.querySelector('.tel-sawi-button');
+                extraHtml += createTableRow('mdi:alert-circle-outline', 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด', true);
+                 const sawiButton = document.querySelector('.tel-sawi-button');
                 if (sawiButton) sawiButton.parentElement.style.display = 'none';
             } else {
                 const travelTimeMinutes = (distance / 40) * 60;
-                const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
-                const selfTravelArrival = new Date(Date.now() + travelTimeMinutes * 60000);
-                const ambulanceArrival = new Date(Date.now() + ambulanceTravelTime * 60000);
-                const rtpaDeadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 60 * 60 * 1000) : new Date();
-
                 sessionData.distance = `${distance.toFixed(1)} กม.`;
                 sessionData.duration = formatDuration(travelTimeMinutes);
-                sessionData.selfTravelEstimate = selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
-                sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
-
-                extraSummaryHtml += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
-                extraSummaryHtml += createInfoCard(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration);
-                extraSummaryHtml += createInfoCard(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate);
-                extraSummaryHtml += createInfoCard(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate);
-                
-                const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}`;
-                routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button route-button"><span class="iconify" data-icon="${icons.route}"></span><span class="label">เส้นทางไป รพ.สวี</span></a>`;
+                extraHtml += createTableRow(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
+                extraHtml += createTableRow(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration);
             }
         }
-        timeDetailsContainer.insertAdjacentHTML('beforeend', extraSummaryHtml);
-        
+        table.innerHTML += extraHtml;
+
+        // Contact buttons logic remains the same
+        const contactContainer = document.getElementById('contact-buttons');
         if (sessionData.volunteerContacts) {
             const contacts = sessionData.volunteerContacts;
             let areaInfo = (sessionData.district && sessionData.village) ? `(ต.${sessionData.district} ม.${sessionData.village})` : '';
-            contactContainer.innerHTML = `<h3 style="font-size:1.1em; text-align:center; margin-top: 20px; margin-bottom: 10px;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h3>`;
+            contactContainer.innerHTML = `<h3 style="font-size:1.1em; text-align:center;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h3>`;
             if (contacts.volunteer1_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer1_tel, "โทรหา อสม. คนที่ 1", "tel_asm1");
             if (contacts.volunteer2_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer2_tel, "โทรหา อสม. คนที่ 2", "tel_asm2");
             if (contacts.headman_tel) contactContainer.innerHTML += createContactButton(contacts.headman_tel, `โทรหา ผู้นำชุมชน ${areaInfo}`, "tel_header");
@@ -605,6 +573,14 @@ function createInfoCard(iconName, label, value) {
                 </div>
             </div>`;
 }
+    function createTableRow(iconName, label, value, isUrgent = false) {
+        const valueClass = isUrgent ? 'value-col value-urgent' : 'value-col';
+        return `<tr>
+                    <td class="icon-col"><span class="iconify" data-icon="${iconName}"></span></td>
+                    <td class="label-col">${label}</td>
+                    <td class="${valueClass}">${value || 'N/A'}</td>
+                </tr>`;
+    }
 
     function setupTimeOptions() {
         const container = document.getElementById('time-options-container');
