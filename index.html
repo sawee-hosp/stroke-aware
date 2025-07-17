@@ -155,6 +155,7 @@
         'Arm': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนได้ไม่เท่ากัน', 'ของหลุดจากมือ', 'เดินลากขา/กะเผลก'], unlikely: ['ปวด/อักเสบกล้ามเนื้อ', 'ชาจากการนอนทับ', 'หมอนรองกระดูกทับเส้น'] },
         'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดคนอื่น'], unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/เป็นหวัด'] }
     };
+    
 
     window.onload = async () => {
         try {
@@ -203,6 +204,43 @@
             historyCard.innerHTML = `<p style="text-align:center;">คุณยังไม่ได้ลงทะเบียนกับแอปประเมินความเสี่ยง <a href="${REGISTRATION_LIFF_URL}">คลิกที่นี่เพื่อลงทะเบียน</a></p>`;
         }
         historyCard.classList.remove('hidden');
+    }
+    function setupTimeOptions() {
+        const container = document.getElementById('time-options-container');
+        container.innerHTML = '';
+        const now = new Date();
+        const timeOptions = [
+            { text: `เพิ่งเกิด (${formatTime(now)})`, minutes: 0 }, { text: '10 นาที', minutes: 10 },
+            { text: '30 นาที', minutes: 30 }, { text: '1 ชม.', minutes: 60 },
+            { text: '2 ชม.', minutes: 120 }, { text: '3 ชม.', minutes: 180 },
+            { text: '4 ชม.', minutes: 240 }, { text: '6 ชม.', minutes: 360 },
+            { text: '12 ชม.', minutes: 720 },
+            { text: '1 วันก่อน', minutes: 1440, chronic: true },
+            { text: 'หลายวันก่อน', minutes: 0, chronic: true, final: true }
+        ];
+
+        const startColor = { r: 224, g: 224, b: 224 }; // #E0E0E0
+        const endColor = { r: 255, g: 193, b: 7 }; // #FFC107
+        
+        timeOptions.forEach((opt, index) => {
+            const btn = document.createElement('button');
+            btn.textContent = opt.text;
+            btn.onclick = () => handleTimeSelection(opt.minutes, opt.chronic);
+            
+            if (opt.final) {
+                 btn.style.backgroundColor = `rgb(${endColor.r}, ${endColor.g}, ${endColor.b})`;
+            } else if (opt.chronic) {
+                btn.style.backgroundColor = '#E67E22'; // Chronic button color
+                btn.style.color = 'white';
+            } else {
+                const ratio = index / (timeOptions.length - 3);
+                const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
+                const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
+                const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
+                btn.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            }
+            container.appendChild(btn);
+        });
     }
 
     function fetchVolunteerData(areaKey) {
