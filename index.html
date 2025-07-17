@@ -12,29 +12,16 @@
             --primary-color: #007BFF; --background-color: #f0f2f5;
             --card-bg-color: #ffffff; --text-color: #333;
             --shadow: 0 4px 12px rgba(0,0,0,0.1); --border-radius: 12px;
-            --symptom-red: #f44336; --symptom-green: #28a745;
+            --symptom-red: #D32F2F; --symptom-green: #388E3C;
             --dark-red: #C0392B; --light-red-bg: #FADBD8;
         }
-        body {
-            font-family: "Noto Sans Thai", sans-serif;
-            background-color: var(--background-color);
-            margin: 0; padding: 16px; font-size: 1.2em;
-        }
+        body { font-family: "Noto Sans Thai", sans-serif; background-color: var(--background-color); margin: 0; padding: 16px; font-size: 1.2em; }
         .main-container { max-width: 600px; margin: 0 auto; }
-        .section-title { font-size: 1.5em; font-weight: 700; color: var(--text-color); margin-bottom: 0; }
+        .section-title { font-size: 1.5em; font-weight: 700; color: var(--text-color); margin-bottom: 0; display: flex; align-items: center; justify-content: center; }
         .section-subtitle { font-size: 1em; color: #555; margin-top: 4px; margin-bottom: 24px; }
-        .card {
-            padding: 24px; background-color: var(--card-bg-color);
-            border-radius: var(--border-radius); box-shadow: var(--shadow);
-            margin-top: 16px; position: relative; padding-bottom: 60px;
-        }
+        .card { padding: 24px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 16px; position: relative; padding-bottom: 70px; }
         .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .symptom-card {
-            border-radius: var(--border-radius); box-shadow: var(--shadow);
-            text-align: center; padding: 12px; cursor: pointer;
-            transition: transform 0.2s ease; display: flex; flex-direction: column;
-            justify-content: space-between; align-items: center;
-        }
+        .symptom-card { border-radius: var(--border-radius); box-shadow: var(--shadow); text-align: center; padding: 12px; cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
         .symptom-card:hover { transform: translateY(-5px); }
         .symptom-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
         .symptom-card p { margin: 0; font-size: 1.1em; font-weight: bold; line-height: 1.3; }
@@ -42,65 +29,43 @@
         .symptom-card .symptom-text-blue { color: #0b5394; }
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; }
         .options-container { text-align: center; }
-        .options-container button {
-            display: inline-block; padding: 12px 24px; margin: 5px;
-            border-radius: 8px; font-size: 1em; transition: opacity 0.2s;
-        }
-        .btn-action {
-            display: block; width: 90%; margin: 20px auto 0 auto;
-            padding: 15px; color: white; border-radius: var(--border-radius);
-            font-size: 1.1em; font-weight: bold;
-        }
-        .btn-final-save { background-color: var(--symptom-green); }
-        .btn-symptom-likely, .btn-severity-acute, .btn-time-critical, .btn-time-picker {
-            background-color: var(--symptom-red); color: white;
-        }
+        .options-container button { display: block; width: 100%; padding: 15px; margin: 8px 0; border-radius: 8px; font-size: 1em; font-weight: bold; }
+        .btn-action { width: 90%; margin: 20px auto 0 auto; color: white; }
+        .btn-final-save { background-color: #28a745; }
+        .btn-symptom-likely { background-color: var(--symptom-red); color: white; }
         .btn-symptom-unlikely { background-color: var(--symptom-green); color: white; }
-        .btn-severity-chronic, .btn-time-chronic { background-color: #E67E22; color: white; }
-        .emergency-text-container {
-            background-color: var(--light-red-bg); border-radius: var(--border-radius);
-            padding: 20px; text-align: center; margin-bottom: 24px;
-        }
+        .btn-severity-acute { background-color: var(--symptom-red); color: white; }
+        .btn-severity-chronic { background-color: #E67E22; color: white; }
+        .emergency-text-container { background-color: var(--light-red-bg); border-radius: var(--border-radius); padding: 20px; text-align: center; margin-bottom: 24px; }
         .emergency-text-container p { margin: 0; line-height: 1.6; font-size: 1.1em; }
         .emergency-text-container .highlight-large { font-size: 1.5em; font-weight: bold; color: var(--dark-red); }
         .blink { animation: blinker 1.2s linear infinite; font-weight: bold; color: var(--symptom-red); }
         @keyframes blinker { 50% { opacity: 0.2; } }
-        #call-buttons-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
-        .call-button-wrapper { text-align: center; }
-        .call-button-wrapper a { text-decoration: none; }
-        .call-button-wrapper p { margin-top:-5px; font-size: 0.8em; font-weight: bold; }
-        .btn-emoji {
-            width: 80px; height: 80px; border-radius: 20px;
-            display: flex; justify-content: center; align-items: center; margin: 10px auto;
-            color: white; border: none;
-        }
-        .btn-emoji svg { width: 60%; height: 60%; fill: white; }
-        #btn-get-location { background-color: var(--primary-color); }
-        .btn-call { background-color: var(--dark-red); }
-        #summary-info { text-align: left; margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: var(--border-radius); }
-        #summary-info p { font-size: 1em; margin: 8px 0; }
         .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 0.9em; position: absolute; bottom: 10px; right: 20px; }
         .hidden { display: none; }
+        .info-icon { font-size: 18px; cursor: pointer; color: #007BFF; margin-left: 8px; font-style: normal; border: 1px solid #007BFF; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; }
+        .modal-content { background-color: #fefefe; padding: 20px; border-radius: 10px; width: 85%; max-width: 400px; text-align: left; }
     </style>
 </head>
 <body>
     <div class="main-container">
         <div id="layer-1" data-layer="1">
-            <h1 class="section-title">ประเมินอาการสโตรกรายวัน</h1>
+            <h1 class="section-title">ประเมินอาการสโตรกรายวัน <span id="info-icon" class="info-icon">i</span></h1>
             <p class="section-subtitle">วันนี้ท่านมีอาการตามหลัก BEFAST หรือไม่?</p>
             <div class="symptom-grid">
-                <div class="symptom-card" onclick="showLayer2('เซ/ทรงตัวลำบาก')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="เซ"><p class="symptom-text-red">เซ/ทรงตัวลำบาก</p></div>
-                <div class="symptom-card" onclick="showLayer2('ตามัว/เห็นภาพซ้อน')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="ตา"><p class="symptom-text-red">ตามัว/เห็นภาพซ้อน</p></div>
-                <div class="symptom-card" onclick="showLayer2('หน้าเบี้ยว/มุมปากตก')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="หน้า"><p class="symptom-text-red">หน้าเบี้ยว</p></div>
-                <div class="symptom-card" onclick="showLayer2('แขนขาอ่อนแรง')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="แขน"><p class="symptom-text-red">แขนขาอ่อนแรง</p></div>
-                <div class="symptom-card" onclick="showLayer2('พูดไม่ชัด/ลิ้นแข็ง')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="พูด"><p class="symptom-text-red">พูดไม่ชัด</p></div>
+                <div class="symptom-card" onclick="showLayer2('การทรงตัว')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="เซ"><p class="symptom-text-red">การทรงตัว</p></div>
+                <div class="symptom-card" onclick="showLayer2('สายตา')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="ตา"><p class="symptom-text-red">สายตา</p></div>
+                <div class="symptom-card" onclick="showLayer2('ใบหน้า')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="หน้า"><p class="symptom-text-red">ใบหน้า</p></div>
+                <div class="symptom-card" onclick="showLayer2('แขนขา')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="แขน"><p class="symptom-text-red">แขนขา</p></div>
+                <div class="symptom-card" onclick="showLayer2('การพูด')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="พูด"><p class="symptom-text-red">การพูด</p></div>
                 <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="ไม่มีอาการ"><p class="symptom-text-blue">ไม่มีอาการ</p></div>
             </div>
         </div>
 
         <div id="layer-2" class="card hidden" data-layer="2">
             <h2 id="layer-2-title" class="section-title"></h2>
-            <p class="section-subtitle">กรุณาเลือกอาการที่ใกล้เคียงกับท่านที่สุด</p>
+            <p class="section-subtitle">กรุณาเลือกรายละเอียดอาการที่ใกล้เคียงที่สุด</p>
             <div id="layer-2-buttons" class="options-container"></div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
@@ -108,84 +73,64 @@
         <div id="layer-3" class="card hidden" data-layer="3">
             <h2 class="section-title">อาการดังกล่าวเกิดขึ้นอย่างไร?</h2>
             <div class="options-container">
-                <button class="btn-severity-acute" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน ไม่เคยเป็นมาก่อน')">เกิดขึ้นอย่างเฉียบพลัน ไม่เคยเป็นมาก่อน</button>
-                <button class="btn-severity-chronic" onclick="handleChronicSymptom()">เกิดขึ้นเรื้อรัง เป็นๆ หายๆ</button>
-            </div>
-            <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
-        </div>
-
-        <div id="layer-4" class="card hidden" data-layer="4">
-            <h2 class="section-title">อาการเกิดขึ้นเมื่อไหร่?</h2>
-            <p class="section-subtitle">กรุณาเลือกช่วงเวลาที่ใกล้เคียงที่สุด</p>
-            <div class="options-container">
-                <button class="btn-time-critical" onclick="handleTimeSelection(0)">เกิดขึ้นตอนนี้</button>
-                <button onclick="handleTimeSelection(30)">30 นาทีที่แล้ว</button>
-                <button onclick="handleTimeSelection(180)">3 ชั่วโมงที่แล้ว</button>
-                <button id="btn-time-picker-display" class="btn-time-picker" onclick="openTimePicker()">ระบุเวลาที่แม่นยำ</button>
-                <input type="time" id="time-picker" class="hidden" onchange="handleTimePickerChange(this.value)">
+                <button class="btn-severity-acute" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button>
+                <button class="btn-severity-chronic" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button>
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
         
-        <div id="layer-5" class="card hidden" data-layer="5">
-            <div class="emergency-text-container">
-                <p>อาการของคุณมีโอกาส</p>
-                <p class="highlight-large">เป็นอาการสโตรก!</p>
-                <p class="blink">โปรด โทรเรียกรถพยาบาล ทันที</p>
-                <p>และแจ้งข้อมูลด้านล่างกับเจ้าหน้าที่</p>
-            </div>
-            <div id="summary-info" class="hidden"></div>
-            <div id="call-buttons-container">
-                 <div class="call-button-wrapper">
-                     <button id="btn-get-location" class="btn-emoji" onclick="getLocation()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                    </button>
-                    <p>ส่งพิกัด</p>
-                </div>
-                <div class="call-button-wrapper">
-                    <a class="btn-emoji btn-call" href="tel:0894745523" onclick="saveData('tel', '0894745523')">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z"/></svg>
-                    </a>
-                    <p>โทรฉุกเฉิน รพ.สวี</p>
-                </div>
-                <div class="call-button-wrapper">
-                    <a class="btn-emoji btn-call" href="tel:1669" onclick="saveData('tel', '1669')">
-                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.02.74-.25 1.02l-2.2 2.2z"/></svg>
-                    </a>
-                    <p>โทร 1669 (ฟรี)</p>
-                </div>
-            </div>
-            <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกข้อมูลและปิด</button>
-            <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
+        <div id="layer-final" class="card hidden" data-layer="final">
+             <h2 id="final-title" class="section-title" style="text-align:center;"></h2>
+             <p id="final-text" style="text-align:center;"></p>
+             <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกและปิด</button>
         </div>
 
-        <div id="layer-6" class="card hidden" data-layer="6">
-            <h2 id="final-title" class="section-title"></h2>
-            <p id="final-text"></p>
-            <div id="final-icon" style="text-align:center; margin: 20px 0;"></div>
-            <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกและปิด</button>
+        <div id="disclaimerModal" class="modal hidden">
+            <div class="modal-content">
+                <h2 style="text-align:center;">ข้อจำกัดความรับผิดชอบ</h2>
+                <p>• แอปพลิเคชันนี้ใช้เพื่อ **เสนอข้อมูลและประเมินอาการเบื้องต้น** เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p>
+                <p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p>
+                <p>• แอปพลิเคชันนี้ **ไม่ได้โทรออกฉุกเฉินให้ท่าน** หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p>
+                <button onclick="document.getElementById('disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; width:100%; padding:10px; margin-top:15px; border-radius:8px;">ตกลง</button>
+            </div>
         </div>
     </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-    // --- ใส่ค่าจริงของคุณที่นี่ ---
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec"; // <-- ใส่ค่า GAS_URL ของคุณแล้ว
-    const LIFF_ID = "2005789397-WRm1lYd9"; // <-- ใส่ค่า LIFF ID ของคุณแล้ว
+    // --- ค่าจริงของคุณได้ถูกใส่ไว้เรียบร้อยแล้ว ---
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
+    const LIFF_ID = "2005789397-WRm1lYd9";
     
-    const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
-    
+    // --- Global Variables & Data ---
     let currentLayer = 1;
     let sessionData = {};
 
+    // --- [ปรับปรุงใหม่] รายละเอียดอาการแบบกระชับ ---
     const symptomDetails = {
-        'เซ/ทรงตัวลำบาก': { likely: ['เดินเซ หรือทรงตัวไม่มั่นคงทันที', 'เวียนศีรษะอย่างรุนแรงจนล้มได้'], unlikely: ['เวียนหัวจากโรคอื่น เช่น ติดหวัด', 'เดินเซเรื้อรัง'] },
-        'ตามัว/เห็นภาพซ้อน': { likely: ['ตาพร่ามัวทันที', 'มองเห็นภาพซ้อนข้างเดียว'], unlikely: ['มองไม่ชัดเรื้อรัง', 'ตาแห้ง หรือระคายเคือง'] },
-        'หน้าเบี้ยว/มุมปากตก': { likely: ['หน้าครึ่งซีกหย่อนลงทันที', 'ปิดตาข้างใดข้างหนึ่งไม่สนิท'], unlikely: ['หน้าเบี้ยวถาวรแต่กำเนิด', 'กล้ามเนื้อใบหน้าผิดปกติจากโรคอื่น'] },
-        'แขนขาอ่อนแรง': { likely: ['แขนหรือขาข้างหนึ่งอ่อนแรงทันที', 'ไม่สามารถยกแขนได้ตามปกติ'], unlikely: ['อ่อนแรงเรื้อรัง', 'อ่อนแรงจากปวดกล้ามเนื้อ'] },
-        'พูดไม่ชัด/ลิ้นแข็ง': { likely: ['พูดติดอ่าง พูดไม่ชัดทันที', 'พูดคำผิด ไม่เข้าใจง่าย'], unlikely: ['พูดไม่ชัดจากความเครียด', 'ปัญหาพูดเรื้อรัง'] }
+        'การทรงตัว': {
+            likely: ['เดินเซรุนแรง, ทรงตัวไม่ได้', 'เวียนหัวรุนแรง, บ้านหมุน'],
+            unlikely: ['เวียนหัวเล็กน้อยពេលเปลี่ยนท่า', 'อาการของโรคน้ำในหู', 'ทรงตัวลำบาก (เรื้อรัง)']
+        },
+        'สายตา': {
+            likely: ['ตามัว/มืดบอดหนึ่งข้าง', 'เห็นภาพซ้อน', 'มองไม่เห็นภาพครึ่งซีก'],
+            unlikely: ['ปัญหาสายตาที่เป็นอยู่เดิม', 'เห็นจุดดำลอยไปมา']
+        },
+        'ใบหน้า': {
+            likely: ['ใบหน้าเบี้ยว/มุมปากตก', 'หลับตาไม่สนิทหนึ่งข้าง'],
+            unlikely: ['อาจเป็น Bell\'s Palsy', 'บวมจากปัญหาในช่องปาก']
+        },
+        'แขนขา': {
+            likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่ขึ้น/ของหลุดมือ'],
+            unlikely: ['ชาจากการนอนทับ', 'ปวด/อักเสบกล้ามเนื้อ']
+        },
+        'การพูด': {
+            likely: ['พูดไม่ชัด, ลิ้นแข็ง, อ้อแอ้', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดผู้อื่น'],
+            unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/ปัญหาการได้ยิน']
+        }
     };
 
+    // --- Core Functions ---
     window.onload = async () => {
         try {
             await liff.init({ liffId: LIFF_ID });
@@ -194,57 +139,49 @@
                 sessionData.userID = profile.userId;
                 sessionData.userName = profile.displayName;
             } else { liff.login(); }
-        } catch (err) { alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); }
+        } catch (err) {
+            alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง");
+        }
+        document.getElementById('info-icon').onclick = () => { document.getElementById('disclaimerModal').style.display = 'flex'; };
     };
-    
-    function saveData(key, value) { sessionData[key] = value; }
 
- // --- [สำคัญ] แก้ไขเฉพาะฟังก์ชันนี้ใน index.html ของคุณ ---
-    async function handleFinalSave(button) {
+    function saveData(key, value) {
+        sessionData[key] = value;
+        console.log("Data Stored:", sessionData);
+    }
+    
+    function handleFinalSave(button) {
         button.textContent = 'กำลังบันทึก...';
         button.disabled = true;
 
-        // 1. สร้างชื่อ callback ที่ไม่ซ้ำกัน
         const callbackName = 'saveCallback' + Date.now();
-
-        // 2. สร้างฟังก์ชัน callback ไว้รอรับผลลัพธ์จากเซิร์ฟเวอร์
         window[callbackName] = function(response) {
-            // 5. เมื่อเซิร์ฟเวอร์ตอบกลับ ฟังก์ชันนี้จะทำงาน
             if (response && response.status === 'success') {
-                if (liff.isInClient()) {
-                    liff.closeWindow();
-                } else {
-                    alert("บันทึกข้อมูลเรียบร้อยแล้ว");
-                }
+                if (liff.isInClient()) liff.closeWindow();
+                else alert("บันทึกข้อมูลเรียบร้อยแล้ว");
             } else {
-                const errorMessage = response ? response.message : 'Unknown error';
-                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + errorMessage);
+                alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
                 button.textContent = 'บันทึกและปิด';
                 button.disabled = false;
             }
-
-            // 6. ล้างฟังก์ชันและ script tag ที่สร้างขึ้น
             delete window[callbackName];
             document.head.removeChild(scriptTag);
         };
 
-        // 3. เตรียมข้อมูลและสร้าง URL สำหรับ JSONP
         const dataStr = encodeURIComponent(JSON.stringify(sessionData));
         const url = `${GAS_URL}?callback=${callbackName}&data=${dataStr}`;
-
-        // 4. สร้างและแทรก script tag เพื่อส่ง request
         const scriptTag = document.createElement('script');
         scriptTag.src = url;
         scriptTag.onerror = function() {
-            // จัดการกรณีที่ request ล้มเหลว (เช่น network error)
-            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์บันทึกข้อมูลได้");
+            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
             button.textContent = 'บันทึกและปิด';
             button.disabled = false;
             delete window[callbackName];
         };
         document.head.appendChild(scriptTag);
     }
-
+    
+    // --- UI & Flow Functions ---
     function showLayer(layerNumber) {
         currentLayer = layerNumber;
         document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden'));
@@ -254,109 +191,74 @@
     
     function goBack() { if (currentLayer > 1) showLayer(currentLayer - 1); }
 
-    function showFinalMessage(title, text, isGoodNews) {
+    function showFinalMessage(title, text) {
         document.getElementById('final-title').textContent = title;
         document.getElementById('final-text').textContent = text;
-        const iconContainer = document.getElementById('final-icon');
-        iconContainer.innerHTML = isGoodNews ? 
-            '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="#28a745" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>' :
-            '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="#E67E22" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>';
-        showLayer(6);
+        showLayer('final');
     }
 
-    function showLayer2(symptomName) {
-        saveData('BEFAST', symptomName);
-        const details = symptomDetails[symptomName];
-        document.getElementById('layer-2-title').textContent = `อาการ: ${symptomName}`;
+    function createButton(container, text, className, onClick) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.className = className;
+        button.onclick = onClick;
+        container.appendChild(button);
+    }
+
+    function showLayer2(symptomCategory) {
+        saveData('symptomCategory', symptomCategory);
+        document.getElementById('layer-2-title').textContent = `อาการด้าน${symptomCategory}`;
         const buttonsContainer = document.getElementById('layer-2-buttons');
         buttonsContainer.innerHTML = '';
-        details.likely.forEach(text => {
-            const button = document.createElement('button');
-            button.textContent = text;
-            button.className = 'btn-symptom-likely';
-            button.onclick = () => handleSymptomResult(true, text);
-            buttonsContainer.appendChild(button);
-        });
-        details.unlikely.forEach(text => {
-            const button = document.createElement('button');
-            button.textContent = text;
-            button.className = 'btn-symptom-unlikely';
-            button.onclick = () => handleSymptomResult(false, text);
-            buttonsContainer.appendChild(button);
-        });
+        const details = symptomDetails[symptomCategory];
+        
+        details.likely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-likely', () => handleSymptomResult(true, text)));
+        details.unlikely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-unlikely', () => handleSymptomResult(false, text)));
         showLayer(2);
     }
 
     function handleNoSymptom() {
-        saveData('BEFAST', 'ไม่มีอาการ');
-        showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัย ขอให้มีสุขภาพที่แข็งแรงต่อไปครับ", true);
+        saveData('symptomCategory', 'ไม่มีอาการ');
+        showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัย ขอให้มีสุขภาพที่แข็งแรงต่อไปครับ");
     }
 
-    function handleSymptomResult(isLikely, symptomText) {
-        saveData('symptom', symptomText);
-        if (isLikely) { showLayer(3); } 
-        else { showFinalMessage("คำแนะนำเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่อาการของสโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์", false); }
+    function handleSymptomResult(isLikely, symptomDetail) {
+        saveData('symptomDetail', symptomDetail);
+        if (isLikely) { 
+            showLayer(3); 
+        } else {
+            saveData('frequency', 'อาจไม่เข้าข่ายสโตรกเฉียบพลัน');
+            showFinalMessage("คำแนะนำเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่อาการของสโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์");
+        }
     }
     
     function handleSeveritySelection(frequencyText) {
         saveData('frequency', frequencyText);
-        showLayer(4);
+        // เมื่อเลือก "เฉียบพลัน" ให้ข้ามไปหน้าสรุปฉุกเฉินทันที
+        // โดยตั้งเวลาเป็น "ตอนนี้"
+        const now = new Date();
+        sessionData.onsetTimeObject = now;
+        saveData('onsetTime', formatFullDateTime(now));
+
+        // สร้างหน้าสรุปฉุกเฉิน (จะถูกแทนที่ด้วย app ที่ซับซ้อนกว่าในอนาคต)
+        // สำหรับตอนนี้ เราจะแสดง alert และบันทึกข้อมูล
+        alert("ตรวจพบอาการเฉียบพลันที่เข้าข่ายสโตรก! โปรดโทร 1669 ทันที");
+        handleFinalSave(document.createElement('button')); // ส่งปุ่มจำลองเพื่อบันทึก
     }
 
-    function handleChronicSymptom() {
-        saveData('frequency', 'เกิดขึ้นเรื้อรัง เป็นๆ หายๆ');
-        showFinalMessage("คำแนะนำ", "อาการเรื้อรังควรปรึกษาแพทย์เพื่อวินิจฉัย แต่หากครั้งนี้รุนแรงกว่าปกติหรือเฉียบพลัน ให้รีบมาโรงพยาบาลทันที", false);
+    function handleChronicSymptom(frequencyText) {
+        saveData('frequency', frequencyText);
+        showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรปรึกษาแพทย์เพื่อหาสาเหตุที่แท้จริง");
     }
 
-    function handleTimeSelection(offsetMinutes) {
-        const onsetTime = new Date(Date.now() - offsetMinutes * 60000);
-        saveData('time', onsetTime.toISOString());
-        showLayer(5);
-    }
-
-    function openTimePicker() { document.getElementById('time-picker').click(); }
-
-    function handleTimePickerChange(timeValue) {
-        const [hours, minutes] = timeValue.split(':');
-        const onsetTime = new Date();
-        onsetTime.setHours(hours, minutes, 0, 0);
-        saveData('time', onsetTime.toISOString());
-        const displayButton = document.getElementById('btn-time-picker-display');
-        displayButton.textContent = `เวลา: ${timeValue} น. (คลิกเพื่อไปต่อ)`;
-        displayButton.onclick = () => showLayer(5);
-    }
-
-    function getLocation() {
-        const locButton = document.getElementById('btn-get-location');
-        locButton.innerHTML = 'กำลังค้นหา...';
-        locButton.disabled = true;
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                saveData('location', `${latitude},${longitude}`);
-                const distance = getDistanceFromLatLonInKm(latitude, longitude, hospitalCoords.lat, hospitalCoords.lon);
-                saveData('distance', `${distance.toFixed(1)} km`);
-                const travelTimeMinutes = (distance / 40) * 60;
-                saveData('duration', `${Math.round(travelTimeMinutes)} นาที`);
-                const summaryContainer = document.getElementById('summary-info');
-                summaryContainer.innerHTML = `<p>ระยะทางถึง รพ.สวี: <strong>${distance.toFixed(1)} กม.</strong></p><p>ใช้เวลาเดินทางประมาณ: <strong>${Math.round(travelTimeMinutes)} นาที</strong></p>`;
-                summaryContainer.classList.remove('hidden');
-                locButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-            },
-            (error) => {
-                alert("การเข้าถึงตำแหน่งถูกปฏิเสธ โปรดตรวจสอบการตั้งค่า");
-                locButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>';
-                locButton.disabled = false;
-            }
-        );
-    }
-
-    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2-lat1) * Math.PI / 180, dLon = (lon2-lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    function formatFullDateTime(date) {
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear() + 543;
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        const ss = String(date.getSeconds()).padStart(2, '0');
+        return `${d}/${m}/${y} ${hh}:${mm}:${ss}`;
     }
 </script>
 </body>
