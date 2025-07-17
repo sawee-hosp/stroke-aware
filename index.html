@@ -124,7 +124,7 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
     // --- Constants & Globals ---
-    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
     const LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
@@ -314,12 +314,53 @@
         buildSummaryPage();
     }
 
+    
+ /**
+     * FIXED
+     * This function now correctly calculates the deadline and passes it to the countdown.
+     */
+    function buildSummaryPage() {
+        const onset = sessionData.onsetTimeObject;
+        if (!onset) return;
+
+        // 1. Calculate the two deadlines
+        const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
+        const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
+        
+        // 2. Save the formatted times to the session data for logging
+        sessionData.arrivalDeadline = formatTime(arrivalDeadline);
+        sessionData.rtpaDeadline = formatTime(rtpaDeadline);
+
+        // 3. Pass the raw millisecond timestamp of the deadline to the countdown function
+        startCountdown(rtpaDeadline.getTime());
+        
+        // 4. Build the summary table with all information
+        let tableHtml = '<tbody>';
+        tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
+        tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
+        tableHtml += createTableRow(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
+        tableHtml += createTableRow(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', sessionData.arrivalDeadline + ' น.');
+        tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
+        tableHtml += '</tbody>';
+        
+        document.getElementById('summary-table').innerHTML = tableHtml;
+        buildActionContainer();
+        updateSummaryAndActions(null);
+    }
+
+    /**
+     * FIXED
+     * This function now correctly calculates the remaining time based on the deadline.
+     */
     function startCountdown(deadlineMillis) {
         if (countdownInterval) clearInterval(countdownInterval);
         const timerElement = document.getElementById('countdown-timer');
         if (!timerElement) return;
+
         const updateTimer = () => {
+            // Calculate the distance between the deadline and the current time
             const distance = deadlineMillis - new Date().getTime();
+
             if (distance < 0) {
                 timerElement.textContent = "ถ้าได้รับยาหลังจากนี้อาจไม่มีประสิทธิภาพแล้ว";
                 timerElement.style.color = "var(--dark-red)";
@@ -334,28 +375,7 @@
         countdownInterval = setInterval(updateTimer, 1000);
     }
 
-    function buildSummaryPage() {
-        const onset = sessionData.onsetTimeObject;
-        if (!onset) return;
-        const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
-        const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
-        sessionData.arrivalDeadline = formatTime(arrivalDeadline);
-        sessionData.rtpaDeadline = formatTime(rtpaDeadline);
-        startCountdown(rtpaDeadline.getTime());
-        
-        let tableHtml = '<tbody>';
-        tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
-        tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
-        tableHtml += createTableRow(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
-        tableHtml += createTableRow(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', sessionData.arrivalDeadline + ' น.');
-        tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
-        tableHtml += '</tbody>';
-        document.getElementById('summary-table').innerHTML = tableHtml;
-        buildActionContainer();
-        updateSummaryAndActions(null);
-    }
-
-    function updateSummaryAndActions(distance) {
+function updateSummaryAndActions(distance) {
         const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
         document.querySelectorAll('.distance-row').forEach(row => row.remove());
 
@@ -367,6 +387,8 @@
                 if (sawiButtonWrapper) sawiButtonWrapper.style.display = 'none';
             } else {
                 if (sawiButtonWrapper) sawiButtonWrapper.style.display = 'flex';
+                
+                // --- ส่วนที่แก้ไข ---
                 const travelTimeMinutes = (distance / 40) * 60;
                 const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
                 const selfTravelArrival = new Date(Date.now() + travelTimeMinutes * 60000);
@@ -375,13 +397,18 @@
 
                 sessionData.distance = `${distance.toFixed(1)} กม.`;
                 sessionData.duration = formatDuration(travelTimeMinutes);
-                sessionData.selfTravelEstimate = selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
-                sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+                
+                // สร้างข้อความแสดงผลแบบใหม่
+                const selfTravelText = `${formatTime(selfTravelArrival)} น. (${selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน'})`;
+                const ambulanceTravelText = `${formatTime(ambulanceArrival)} น. (${ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน'})`;
+
+                sessionData.selfTravelEstimate = selfTravelText;
+                sessionData.ambulanceEstimate = ambulanceTravelText;
 
                 extraHtml += createTableRow(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance, false, 'distance-row');
                 extraHtml += createTableRow(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration, false, 'distance-row');
-                extraHtml += createTableRow(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate, sessionData.selfTravelEstimate.includes('ไม่ทัน'), 'distance-row');
-                extraHtml += createTableRow(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate, sessionData.ambulanceEstimate.includes('ไม่ทัน'), 'distance-row');
+                extraHtml += createTableRow(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate, selfTravelText.includes('ไม่ทัน'), 'distance-row');
+                extraHtml += createTableRow(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate, ambulanceTravelText.includes('ไม่ทัน'), 'distance-row');
             }
             table.insertAdjacentHTML('beforeend', extraHtml);
         }
