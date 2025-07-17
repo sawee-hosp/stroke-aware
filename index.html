@@ -169,8 +169,10 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // <-- [สำคัญ] ใส่ URL ของคุณที่นี่
-    const LIFF_ID = "YOUR_LIFF_ID"; // <-- [สำคัญ] ใส่ LIFF ID ของคุณ
+    // --- ใส่ค่าจริงของคุณที่นี่ ---
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec"; // <-- ใส่ค่า GAS_URL ของคุณแล้ว
+    const LIFF_ID = "2005789397-WRm1lYd9"; // <-- ใส่ค่า LIFF ID ของคุณแล้ว
+    
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     
     let currentLayer = 1;
@@ -192,23 +194,30 @@
                 sessionData.userID = profile.userId;
                 sessionData.userName = profile.displayName;
             } else { liff.login(); }
-        } catch (err) { alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองอีกครั้ง"); }
+        } catch (err) { alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); }
     };
     
-    function saveData(key, value) { sessionData[key] = value; console.log("Data Stored:", sessionData); }
+    function saveData(key, value) { sessionData[key] = value; }
 
     async function handleFinalSave(button) {
         button.textContent = 'กำลังบันทึก...'; button.disabled = true;
         try {
-            await fetch(GAS_URL, {
-                method: 'POST', mode: 'no-cors',
+            const response = await fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'cors', // Use cors for proper response handling
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(sessionData)
             });
-            if (liff.isInClient()) { liff.closeWindow(); } 
-            else { alert("บันทึกข้อมูลเรียบร้อยแล้ว (จำลอง)"); }
+            if (!response.ok) throw new Error('Server response was not ok.');
+            
+            if (liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+            }
         } catch (error) {
-            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            console.error("Save Error:", error);
+            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + error.message);
             button.textContent = 'บันทึกและปิด'; button.disabled = false;
         }
     }
@@ -307,7 +316,6 @@
                 saveData('distance', `${distance.toFixed(1)} km`);
                 const travelTimeMinutes = (distance / 40) * 60;
                 saveData('duration', `${Math.round(travelTimeMinutes)} นาที`);
-
                 const summaryContainer = document.getElementById('summary-info');
                 summaryContainer.innerHTML = `<p>ระยะทางถึง รพ.สวี: <strong>${distance.toFixed(1)} กม.</strong></p><p>ใช้เวลาเดินทางประมาณ: <strong>${Math.round(travelTimeMinutes)} นาที</strong></p>`;
                 summaryContainer.classList.remove('hidden');
