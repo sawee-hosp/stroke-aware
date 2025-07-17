@@ -14,16 +14,14 @@
             --shadow: 0 4px 12px rgba(0,0,0,0.1); --border-radius: 12px;
             --symptom-red: #D32F2F; --symptom-green: #388E3C;
             --dark-red: #C0392B; --light-red-bg: #FFF0F0;
-            --time-yellow: #FFC107; --action-blue: #007BFF;
-            --action-green: #28A745; --action-orange: #E67E22;
-            --action-gray: #6C757D; --action-text: #fff;
+            --action-blue: #007BFF; --action-green: #28A745;
+            --action-orange: #E67E22; --action-gray: #6C757D;
         }
         body { font-family: "Noto Sans Thai", sans-serif; background-color: var(--background-color); margin: 0; padding: 16px; font-size: 18px; }
         .main-container { max-width: 600px; margin: 0 auto; }
-        .card { padding: 24px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 16px; position: relative; padding-bottom: 20px; }
+        .card { padding: 24px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 16px; position: relative; padding-bottom: 70px; }
         .section-title { font-size: 1.6em; font-weight: 700; color: var(--text-color); margin-bottom: 0; display: flex; align-items: center; justify-content: center; }
         .section-subtitle { font-size: 1.1em; color: #555; margin-top: 4px; margin-bottom: 24px; text-align: center; }
-        
         .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .symptom-card { border-radius: var(--border-radius); box-shadow: var(--shadow); text-align: center; padding: 12px; cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 150px; }
         .symptom-card:hover { transform: translateY(-5px); }
@@ -31,34 +29,31 @@
         .symptom-card p { margin: 0; line-height: 1.3; font-weight: bold; }
         .symptom-card p.large-red { font-size: 24px; color: var(--symptom-red); }
         .symptom-card p.large-blue { font-size: 24px; color: var(--primary-color); }
-
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; }
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; }
+        .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; color: white; background-color: var(--action-gray); }
         .time-options button { width: calc(50% - 4px); flex-grow: 0; }
-        .time-options button.yellow-time { background-color: var(--time-yellow); color: var(--text-color); }
-        .btn-action { width: 100%; padding: 15px; color: var(--action-text); margin-top: 20px; font-size: 1.2em; border-radius: 10px; }
-        .btn-final-confirm { background-color: var(--primary-color); }
-        .btn-symptom-likely { background-color: var(--symptom-red); color: var(--action-text); }
-        .btn-symptom-unlikely { background-color: var(--symptom-green); color: var(--action-text); }
-        .btn-severity-acute, .btn-severity-chronic { width: 100%; padding: 15px; margin: 8px 0; border-radius: 10px; }
-        .btn-severity-acute { background-color: var(--symptom-red); color: var(--action-text); }
-        .btn-severity-chronic { background-color: #E67E22; color: var(--action-text); }
-        .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 1em; position: absolute; bottom: 5px; right: 15px; }
-
+        .btn-action { width: 100%; padding: 15px; color: white; margin-top: 20px; font-size: 1.2em; border-radius: 10px; }
+        .btn-final-confirm { background-color: var(--primary-color); font-size: 1.3em !important; padding: 20px !important; }
+        .btn-symptom-likely { background-color: var(--symptom-red); }
+        .btn-symptom-unlikely { background-color: var(--symptom-green); }
+        .btn-severity-acute { background-color: var(--symptom-red); color: white; width:100%; }
+        .btn-severity-chronic { background-color: #E67E22; color: white; width:100%; }
+        .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 1em; position: absolute; bottom: 10px; right: 15px; }
         .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--symptom-red); }
-        .emergency-text-container .highlight-large { font-size: 2em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
-        .emergency-text-container .highlight-small { font-size: 1.1em; color: black; animation: blinker 1.5s linear infinite; }
+        .emergency-text-container .highlight-large { font-size: 1.6em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
+        .emergency-text-container .highlight-small { font-size: 1.0em; color: black; animation: blinker 1.5s linear infinite; }
+        .countdown-timer { font-size: 1em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
         @keyframes blinker { 50% { opacity: 0.3; } }
-        .action-buttons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; place-items: center; }
-        .action-button { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 15px; cursor: pointer; text-align: center; color: var(--action-text); text-decoration: none; transition: background-color 0.3s; }
+        .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; place-items: center; }
+        .action-button { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 15px; cursor: pointer; text-align: center; color: white; text-decoration: none; transition: background-color 0.3s; }
         .action-button-icon { width: 48px; height: 48px; }
-        .action-button-text { font-size: 0.9em; margin-top: 5px; font-weight: bold;}
+        .action-button-text { font-size: 0.9em; margin-top: 5px; font-weight: bold; color: inherit;}
         .location-button { background-color: var(--action-blue); }
         .location-button.success { background-color: var(--action-green); }
-        .tel-button { background-color: var(--action-tel); }
+        .tel-swe-button { background-color: var(--action-orange); }
+        .tel-1669-button { background-color: var(--dark-red); }
         #summary-container .info-card { display: flex; align-items: center; gap: 15px; padding: 12px 5px; border-bottom: 1px solid #eee; }
-        #summary-container .info-card:last-child { border-bottom: none; }
         .info-card-icon { width: 30px; height: 30px; flex-shrink: 0; color: var(--primary-color);}
         .info-card-text p { margin: 0; }
         .info-card-text .label { font-size: 0.9em; color: #666; }
@@ -68,33 +63,27 @@
         .contact-button:hover { background-color: #f0f0f0; }
         .contact-button svg { width: 24px; height: 24px; fill: var(--action-gray); }
         .contact-button .label { flex-grow: 1; }
-
         .hidden { display: none; }
         .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
-        .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .modal-content p { font-size: 1em; margin: 10px 0; }
+        .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal-content p, .modal-content li { font-size: 0.9em; margin: 10px 0; }
+        .modal-content ul { padding-left: 20px; }
         .modal-content button { width: 100%; padding: 15px; font-size: 1.1em; border-radius: 10px; }
-        #registration-footer { text-align: center; margin-top: 20px; font-size: 1em; padding: 15px; background: #fff; border-radius: 8px; }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <div id="user-info-bar" class="card hidden" style="padding:15px; margin-bottom:10px; background-color:#E3F2FD;">
-            <p style="margin:0; font-size:1em;"><strong>ผู้ประเมิน:</strong> <span id="user-name-display"></span></p>
-            <p style="margin:0; font-size:0.9em; color:#555;"><strong>ผลประเมินความเสี่ยงล่าสุด:</strong> <span id="user-risk-display"></span></p>
-        </div>
-
         <div id="layer-1" data-layer="1" class="card">
             <h1 class="section-title">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1>
             <p class="section-subtitle">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p>
             <div class="symptom-grid">
-                <div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p class="large-red">เซ/มึนหัว</p></div>
-                <div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p class="large-red">ตามัวมาก</p></div>
-                <div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p class="large-red">มุมปากตก</p></div>
-                <div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p class="large-red">ยกแขนยาก</p></div>
-                <div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p class="large-red">ลำบากพูด</p></div>
-                <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p class="large-blue">ไม่มีอาการ</p></div>
+                <div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p class="large-red">เซ/มึนหัว (Balance)</p></div>
+                <div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p class="large-red">ตามัวมาก (Eye)</p></div>
+                <div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p class="large-red">มุมปากตก (Face)</p></div>
+                <div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p class="large-red">ยกแขนยาก (Arm)</p></div>
+                <div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p class="large-red">ลำบากพูด (Speech)</p></div>
+                <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p class="large-blue">ไม่มีอาการดังกล่าว</p></div>
             </div>
         </div>
 
@@ -102,6 +91,7 @@
             <h2 id="layer-2-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2>
             <p class="section-subtitle">กรุณาเลือกรายละเอียดอาการที่ใกล้เคียงที่สุด</p>
             <div id="layer-2-buttons" class="options-container"></div>
+            <div style="height: 40px;"></div>
             <button class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</button>
         </div>
 
@@ -111,6 +101,7 @@
                 <button class="btn-severity-acute" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button>
                 <button class="btn-severity-chronic" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button>
             </div>
+            <div style="height: 40px;"></div>
             <button class="btn-back" onclick="goBack('layer-2')">ย้อนกลับ</button>
         </div>
 
@@ -118,6 +109,7 @@
             <h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเริ่มเป็นเมื่อไหร่?</h2>
             <p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p>
             <div class="options-container time-options" id="time-options-container"></div>
+            <div style="height: 40px;"></div>
             <button class="btn-back" onclick="goBack('layer-3')">ย้อนกลับ</button>
         </div>
         
@@ -125,33 +117,68 @@
              <div class="emergency-text-container">
                  <p class="highlight-large">อาจเป็นอาการสโตรก (Stroke)!</p>
                  <p class="highlight-small">โปรดโทรเรียกรถพยาบาลทันที</p>
-                 <p style="font-size:1em; margin-top:10px;">หลังจากกดส่งพิกัดและกดโทรออกด้วยตัวเอง</p>
+                 <div id="countdown-timer" class="countdown-timer"></div>
+                 <p style="font-size:0.9em; margin-top:10px;">หลังจากกดส่งพิกัดและกดโทรออกด้วยตัวเอง</p>
              </div>
              <div id="action-grid-container" class="action-buttons-grid"></div>
              <hr style="margin-top:20px; border-top: 1px solid #ddd; border-bottom: none;">
              <div id="summary-container"></div>
              <div id="contact-buttons" class="contact-buttons"></div>
-             <button class="btn-action" style="background-color: var(--dark-red); font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, true)">บันทึกข้อมูลและปิดหน้าต่าง</button>
+             <div id="route-button-container"></div>
+             <button class="btn-action" style="background-color: var(--dark-red); font-size:1.3em; padding: 20px;" onclick="triggerSave(this)">บันทึกข้อมูลและปิดหน้าต่าง</button>
+             <div style="height: 40px;"></div>
              <button class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</button>
         </div>
         
         <div id="layer-6" data-layer="6" class="card hidden">
+             <div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div>
              <h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2>
              <p id="final-text" style="text-align:center; font-size:1.1em;"></p>
              <button class="btn-action btn-final-confirm" style="font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button>
         </div>
-
+        
         <div id="disclaimerModal" class="modal hidden" onclick="this.style.display='none'">
             <div class="modal-content" onclick="event.stopPropagation()">
                 <h2 style="text-align:center; font-size:1.2em;">ข้อจำกัดความรับผิดชอบ</h2>
                 <p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p>
                 <p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p>
                 <p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p>
-                <button onclick="document.getElementById('disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">ตกลง</button>
+                <p style="font-size:0.9em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล เช่น ความดันโลหิต หรือเบาหวาน</p>
+                <button onclick="document.getElementById('disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">รับทราบ</button>
             </div>
         </div>
-
-        <div id="registration-footer" class="card hidden" style="background-color: #f8f9fa; text-align:center;"></div>
+        <div id="how-to-act-modal" class="modal hidden">
+             <div class="modal-content" onclick="event.stopPropagation()">
+                <h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2>
+                <div style="text-align:left; font-size:0.9em;">
+                    <strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong>
+                    <ul>
+                        <li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li>
+                        <li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li>
+                        <li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li>
+                    </ul>
+                    <strong>2. ขณะรอรถพยาบาล</strong>
+                    <ul>
+                        <li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li>
+                        <li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li>
+                        <li>เฝ้าสังเกตอาการและการหายใจ</li>
+                    </ul>
+                    <strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong>
+                    <ul>
+                        <li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li>
+                        <li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li>
+                        <li>เตรียมบัตรประชาชน</li>
+                    </ul>
+                    <strong>4. เมื่อถึงโรงพยาบาล</strong>
+                    <ul>
+                        <li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li>
+                    </ul>
+                </div>
+                <button onclick="document.getElementById('how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button>
+            </div>
+        </div>
+        
+        <div id="registration-footer" class="card hidden"></div>
     </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
@@ -163,6 +190,7 @@
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     
     let sessionData = {};
+    let countdownInterval;
 
     const symptomDetails = {
         'Balance': { likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้', 'เวียนหัวรุนแรงมาก'], unlikely: ['เวียนหัวពេលเปลี่ยนท่า', 'อาการน้ำในหูไม่เท่ากัน', 'เมาค้าง/พักผ่อนน้อย'] },
@@ -171,16 +199,23 @@
         'Arm': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนได้ไม่เท่ากัน', 'ของหลุดจากมือ', 'เดินลากขา/กะเผลก'], unlikely: ['ปวด/อักเสบกล้ามเนื้อ', 'ชาจากการนอนทับ', 'หมอนรองกระดูกทับเส้น'] },
         'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดคนอื่น'], unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/เป็นหวัด'] }
     };
-    
+
+    const positiveGreetings = [
+        "เยี่ยมมาก! วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย", "ยินดีด้วย! ขอให้คุณสุขภาพดี ปลอดโรคปลอดภัย",
+        "แข็งแรงดี! รักษาสุขภาพที่ดีแบบนี้ต่อไปนะครับ", "สุดยอด! ไม่พบอาการผิดปกติในวันนี้",
+        "เป็นวันที่ดี! ไม่มีสัญญาณเตือนของโรคหลอดเลือดสมอง"
+    ];
+
+    const positiveEmojis = ['👍', '🎉', '💪', '✅', '😊'];
+
     const icons = {
         user: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>',
-        symptom: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-        clock: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>',
-        hourglass: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6z"/></svg>',
-        map: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3l-1.39 1.39C19.78 3.03 18.28 2 16.5 2c-1.2 0-2.33.49-3.15 1.28L12 5.92 10.65 3.28C9.83 2.49 8.7 2 7.5 2 5.72 2 4.22 3.03 3.81 4.39L3.5 3 2 4.5l1.39 1.39C3.03 5.22 2 6.72 2 8.5c0 1.2.49 2.33 1.28 3.15L5.92 12l-2.64 1.35C2.49 14.17 2 15.3 2 16.5c0 1.78 1.03 3.28 2.39 3.81L3 21.5l1.5 1.5 1.39-1.39C6.22 21.97 7.72 23 9.5 23c1.2 0 2.33-.49 3.15-1.28L14.08 18l2.64 1.35c.78.39 1.67.65 2.58.65 1.78 0 3.28-1.03 3.81-2.39z"/></svg>',
-        car: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11C5.84 5 5.28 5.42 5.08 6.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5S18.33 16 17.5 16zM5 11l1.5-4.5h11L19 11H5z"/></svg>',
-        ambulance: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V6.21c0-2.61-1.91-4.94-4.51-5.19A5.008 5.008 0 007 6v2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h1c.55 0 1-.45 1-1v-1h10v1c0 .55.45 1 1 1h3c1.1 0 2-.9 2-2v-3.19c1.16-.41 2-1.51 2-2.81v-1c0-1.65-1.35-3-3-3zm-9-4c1.1 0 2 .9 2 2v2H9V6c0-1.1.9-2 2-2zm8 8.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM6.5 14c.83 0 1.5.67 1.5 1.5S7.33 17 6.5 17 5 16.33 5 15.5 5.67 14 6.5 14z"/></svg>',
-        runner: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 11.7V18h2v-6l2.1-2.1c.2-.2.5-.2.7 0l2.1 2.1c-.2.4-.4.8-.4 1.3 0 1.1.9 2 2 2s2-.9 2-2-.9-2-2-2c-.5 0-.9.2-1.3.4L12 9l-1.5 1.5-1-1-1.7 1.4z"/></svg>',
+        symptom: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>',
+        clock: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
+        hourglass: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-5.25-4.25-9.5-9.5-9.5S.5 6.75.5 12s4.25 9.5 9.5 9.5 9.5-4.25 9.5-9.5z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 1v4m0 14v4m-5-9.5a2.5 2.5 0 105 0 2.5 2.5 0 00-5 0z" /></svg>',
+        map: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m0 0v2.25m0-2.25h3.75m-3.75 0H5.25m0 0V6.75m0 0A2.25 2.25 0 017.5 4.5h9A2.25 2.25 0 0118.75 6.75v8.5A2.25 2.25 0 0116.5 17.5H7.5A2.25 2.25 0 015.25 15.25V6.75m15 9.75l-3.75-3.75" /></svg>',
+        car: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5h10.5a1.125 1.125 0 001.125-1.125V6.75a1.125 1.125 0 00-1.125-1.125H4.5A1.125 1.125 0 003.375 6.75v10.5a1.125 1.125 0 001.125 1.125z" /></svg>',
+        ambulance: '<svg class="info-card-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>',
         contact: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.5 15.5 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57a1 1 0 011 1v3.5a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>',
         pin: '<svg class="action-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>',
         phone: '<svg class="action-button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.5 15.5 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57a1 1 0 011 1v3.5a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>',
@@ -211,27 +246,24 @@
         if (!userId) return;
         const callbackName = 'userCallback' + Date.now();
         window[callbackName] = function(response) {
-            const nameDisplay = document.getElementById('user-name-display');
-            const riskDisplay = document.getElementById('user-risk-display');
-            const footer = document.getElementById('registration-footer');
-
-            if (response.status === 'found' && response.data.name) {
+            const historyCard = document.getElementById('history-card');
+            if (response.status === 'found' && response.data) {
                 const data = response.data;
                 sessionData.registeredName = data.name;
                 sessionData.district = data.district;
                 sessionData.village = data.village;
-                nameDisplay.textContent = data.name || '(ไม่พบชื่อในระบบ)';
-                riskDisplay.textContent = `${data.thai_cv_risk_score || 'N/A'} (${data.risk_group || 'N/A'})`;
-                document.getElementById('user-info-bar').classList.remove('hidden');
-                footer.innerHTML = `<p style="font-size:0.8em;text-align:center;">ข้อมูลนี้ดึงจากแอปประเมินความเสี่ยง</p>`;
+                historyCard.innerHTML = `
+                    <h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2>
+                    <p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก: <strong>${data.thai_cv_risk_score || 'N/A'} (${data.risk_group || 'N/A'})</strong></p>
+                    <p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A'}</p>`;
+
                 if(sessionData.district && sessionData.village) {
                     fetchVolunteerData(`ต.${sessionData.district} ม.${sessionData.village}`);
                 }
             } else {
-                document.getElementById('user-info-bar').classList.add('hidden');
-                footer.innerHTML = `<p>คุณยังไม่ได้ลงทะเบียน <a href="${REGISTRATION_LIFF_URL}">คลิกที่นี่เพื่อลงทะเบียน</a></p>`;
+                historyCard.innerHTML = `<p style="text-align:center;">คุณยังไม่ได้ลงทะเบียนกับแอปประเมินความเสี่ยง <a href="${REGISTRATION_LIFF_URL}">คลิกที่นี่เพื่อลงทะเบียน</a></p>`;
             }
-            footer.classList.remove('hidden');
+            historyCard.classList.remove('hidden');
             delete window[callbackName];
             if(document.head.contains(scriptTag)) document.head.removeChild(scriptTag);
         };
@@ -258,16 +290,25 @@
     }
     
     function handleFinalSave(button, isEmergency) {
+        if (button.disabled) return;
+        button.disabled = true;
+        
         sessionData.isEmergency = isEmergency;
-        button.textContent = 'กำลังบันทึก...'; button.disabled = true;
+        
+        if (isEmergency) { saveData('tel', button.dataset.tel); }
+
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
-                if (liff.isInClient()) liff.closeWindow();
-                else alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                if (isEmergency) {
+                    document.getElementById('how-to-act-modal').style.display = 'flex';
+                } else {
+                    alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                    if(liff.isInClient()) liff.closeWindow();
+                }
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
-                button.textContent = 'บันทึกและปิด'; button.disabled = false;
+                button.disabled = false;
             }
             delete window[callbackName];
             if(document.head.contains(scriptTag)) document.head.removeChild(scriptTag);
@@ -278,7 +319,7 @@
         scriptTag.src = url;
         scriptTag.onerror = function() {
             alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
-            button.textContent = 'บันทึกและปิด'; button.disabled = false;
+            button.disabled = false;
             delete window[callbackName];
         };
         document.head.appendChild(scriptTag);
@@ -297,6 +338,8 @@
         saveData('symptomDetail', text);
         document.getElementById('final-title').textContent = title;
         document.getElementById('final-text').textContent = text;
+        const randomEmoji = positiveEmojis[Math.floor(Math.random() * positiveEmojis.length)];
+        document.getElementById('final-emoji').textContent = randomEmoji;
         showLayer('layer-6');
     }
 
@@ -321,8 +364,9 @@
 
     function handleNoSymptom() {
         saveData('symptomCategory', 'ไม่มีอาการ');
-        saveData('symptomDetail', 'ไม่มีอาการผิดปกติ');
-        showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัย");
+        const randomGreeting = positiveGreetings[Math.floor(Math.random() * positiveGreetings.length)];
+        saveData('randomGreeting', randomGreeting);
+        showFinalMessage("เยี่ยมมาก!", randomGreeting);
     }
 
     function handleSymptomResult(isLikely, symptomDetail) {
@@ -354,6 +398,27 @@
         buildSummaryPage();
     }
 
+    function startCountdown(deadline) {
+        if (countdownInterval) clearInterval(countdownInterval);
+        const timerElement = document.getElementById('countdown-timer');
+        
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const distance = deadline - now;
+            if (distance < 0) {
+                timerElement.textContent = "หมดเวลาสำหรับให้ยาแล้ว!";
+                timerElement.style.color = "var(--dark-red)";
+                clearInterval(countdownInterval);
+                return;
+            }
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            timerElement.textContent = `ต้องได้รับยา rt-PA ภายในไม่เกิน ${minutes} นาที ${seconds} วินาที`;
+        };
+        updateTimer();
+        countdownInterval = setInterval(updateTimer, 1000);
+    }
+
     function buildSummaryPage() {
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
@@ -361,12 +426,11 @@
         const rtpaDeadline = new Date(onset.getTime() + 270 * 60000);
         saveData('arrivalDeadline', formatTime(arrivalDeadline));
         saveData('rtpaDeadline', formatTime(rtpaDeadline));
+        startCountdown(rtpaDeadline.getTime());
         
         let summaryHtml = createInfoCard(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName) +
                           createInfoCard(icons.symptom, 'อาการ', sessionData.symptomDetail) +
-                          createInfoCard(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset)) +
-                          createInfoCard(icons.hourglass, 'ต้องถึง รพ. ก่อน', formatTime(arrivalDeadline) + ' น.') +
-                          createInfoCard(icons.hourglass, 'ต้องได้รับยาภายใน', formatTime(rtpaDeadline) + ' น.');
+                          createInfoCard(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
                           
         document.getElementById('summary-container').innerHTML = summaryHtml;
         buildActionContainer();
@@ -377,11 +441,17 @@
         container.innerHTML = `
             <div id="location-action" class="action-button location-button" onclick="getLocation()">
                 ${icons.pin}
-                <p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
+                <p id="location-text" class="action-button-text" style="color:white;">ส่งพิกัดที่อยู่</p>
             </div>
-            <a href="tel:0894745523" class="action-button tel-button" onclick="recordCall('รพ.สวี')">${icons.phone}<p class="action-button-text">โทร รพ.สวี</p></a>
-            <a href="tel:1669" class="action-button tel-button" onclick="recordCall('1669')">${icons.phone}<p class="action-button-text">โทร 1669</p></a>
+            <a class="action-button tel-button" onclick="triggerSave(this, 'รพ.สวี')" href="tel:0894745523">${icons.phone}<p class="action-button-text">โทร รพ.สวี</p></a>
+            <a class="action-button tel-1669-button" onclick="triggerSave(this, '1669 (ฟรี)')" href="tel:1669">${icons.phone}<p class="action-button-text">โทร 1669 (ฟรี)</p></a>
         `;
+    }
+
+    function triggerSave(button, tel = '') {
+        saveData('tel', tel);
+        const finalSaveButton = document.querySelector('#layer-5 .btn-action');
+        handleFinalSave(finalSaveButton, true);
     }
 
     function getLocation() {
@@ -395,7 +465,6 @@
                 locButton.querySelector('.action-button-icon').innerHTML = icons.check;
                 const locText = document.getElementById('location-text');
                 locText.textContent = 'ส่งพิกัดแล้ว';
-                locText.style.color = 'var(--action-green)';
                 
                 const { latitude, longitude } = position.coords;
                 saveData('location', `${latitude},${longitude}`);
@@ -411,49 +480,51 @@
         );
     }
     
-    function recordCall(tel) { saveData('tel', tel); }
-
     function updateSummaryAndActions(distance) {
-        const summaryContainer = document.getElementById('summary-container');
-        const contactContainer = document.getElementById('contact-buttons');
-        const actionGrid = document.getElementById('action-grid-container');
-
+        let summaryContainer = document.getElementById('summary-container');
+        let contactContainer = document.getElementById('contact-buttons');
+        let routeContainer = document.getElementById('route-button-container');
+        
+        // Clear previous dynamic content
+        contactContainer.innerHTML = '';
+        routeContainer.innerHTML = '';
+        
         if (distance !== null) {
-            const travelTimeMinutes = (distance / 40) * 60;
-            const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
-            const selfTravelArrival = new Date(new Date().getTime() + travelTimeMinutes * 60000);
-            const ambulanceArrival = new Date(new Date().getTime() + ambulanceTravelTime * 60000);
-            const rtpaDeadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 60 * 60000) : new Date();
+            if (distance > 450) {
+                summaryContainer.innerHTML += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด');
+                document.querySelector('a.tel-button').classList.add('hidden'); // Hide Sawi call button
+                summaryContainer.insertAdjacentHTML('afterend', `<p style="color:red; font-size:0.9em; text-align:center; margin-top:10px;">ระยะทางของท่านอยู่นอกเขต อ.สวี จ.ชุมพร โปรดโทร 1669</p>`);
+            } else {
+                const travelTimeMinutes = (distance / 40) * 60;
+                const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
+                const selfTravelArrival = new Date(new Date().getTime() + travelTimeMinutes * 60000);
+                const ambulanceArrival = new Date(new Date().getTime() + ambulanceTravelTime * 60000);
+                const rtpaDeadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 60 * 60000) : new Date();
 
-            sessionData.distance = `${distance.toFixed(1)} กม.`;
-            sessionData.duration = formatDuration(travelTimeMinutes);
-            sessionData.selfTravelEstimate = selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
-            sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+                sessionData.distance = `${distance.toFixed(1)} กม.`;
+                sessionData.duration = formatDuration(travelTimeMinutes);
+                sessionData.selfTravelEstimate = selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+                sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
 
-            summaryContainer.innerHTML += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
-            summaryContainer.innerHTML += createInfoCard(icons.car, 'ใช้เวลาเดินทางประมาณ', sessionData.duration);
-            summaryContainer.innerHTML += createInfoCard(icons.ambulance, 'ประมาณการ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate);
-            summaryContainer.innerHTML += createInfoCard(icons.runner, 'ประมาณการ (ออกเดินทางทันที)', sessionData.selfTravelEstimate);
+                summaryContainer.innerHTML += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
+                summaryContainer.innerHTML += createInfoCard(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration);
+                summaryContainer.innerHTML += createInfoCard(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate);
+                summaryContainer.innerHTML += createInfoCard(icons.runner, 'คาดการณ์ (ออกเดินทางทันที)', sessionData.selfTravelEstimate);
+            }
         }
         
-        const gmapsUrl = `http://googleusercontent.com/maps.google.com/7?daddr=${hospitalCoords.lat},${hospitalCoords.lon}`;
-        let routeButtonHtml = `<a href="${gmapsUrl}" target="_blank"><button class="btn-action" style="background-color: #34A853; margin-top: 5px;">เส้นทางไป รพ.สวี</button></a>`;
+        const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=10.2300226,99.10874812?daddr=${hospitalCoords.lat},${hospitalCoords.lon}`;
+        routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button" style="border-color: #34A853; color: #34A853;"><svg class="action-button-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a.75.75 0 01.75.75v.518a24.22 24.22 0 014.232 1.346.75.75 0 11-.634 1.288 22.72 22.72 0 00-3.6-1.222V8.25a.75.75 0 01-1.5 0v-2.13a.75.75 0 011.5 0V8.25v2.336a24.195 24.195 0 01-4.232 1.346.75.75 0 01-.634-1.288 22.695 22.695 0 003.6-1.222V5.44a.75.75 0 011.5 0v.81a.75.75 0 01-1.5 0V5.44v-.922A.75.75 0 0110 2zM5.003 5.003a.75.75 0 01.75-.75h1.597a.75.75 0 010 1.5H5.75a.75.75 0 01-.75-.75zM5.75 7a.75.75 0 000 1.5h2.553a.75.75 0 000-1.5H5.75zM5.003 9.003a.75.75 0 01.75-.75h4.494a.75.75 0 010 1.5H5.75a.75.75 0 01-.75-.75zM12 5.5a.75.75 0 000 1.5h2.25a.75.75 0 000-1.5H12zM12 9.5a.75.75 0 000 1.5h5.25a.75.75 0 000-1.5H12z"/></svg><span class="label">เส้นทางไป รพ.สวี</span></a>`;
         
-        if (distance !== null && distance > 450) {
-            document.getElementById('tel-swe-action').classList.add('hidden');
-            actionGrid.insertAdjacentHTML('afterend', `<p style="color:red; font-size:0.9em; text-align:center; margin-top:10px;">ระยะทางของท่านอยู่นอกเขต อ.สวี จ.ชุมพร โปรดโทร 1669 เพื่อติดต่อรพ.ใกล้ที่สุด</p>`);
-        }
-
         if (sessionData.volunteerContacts) {
             const contacts = sessionData.volunteerContacts;
+            let areaInfo = (sessionData.district && sessionData.village) ? `(ต.${sessionData.district} ม.${sessionData.village})` : '';
             contactContainer.innerHTML = `<h3 style="font-size:1.1em; text-align:center; margin-top: 20px;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h3>`;
             if (contacts.volunteer1_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer1_tel, "โทรหา อสม. คนที่ 1");
             if (contacts.volunteer2_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer2_tel, "โทรหา อสม. คนที่ 2");
-            if (contacts.headman_tel) contactContainer.innerHTML += createContactButton(contacts.headman_tel, "โทรหา ผู้นำชุมชน");
-            if (contacts.pcu_tel) contactContainer.innerHTML += createContactButton(contacts.pcu_tel, "โทรหา รพ.สต.");
+            if (contacts.headman_tel) contactContainer.innerHTML += createContactButton(contacts.headman_tel, `โทรหา ผู้นำชุมชน ${areaInfo}`);
+            if (contacts.pcu_tel) contactContainer.innerHTML += createContactButton(contacts.pcu_tel, `โทรหา ${contacts.pcu_name || 'รพ.สต.'}`);
         }
-        
-        contactContainer.insertAdjacentHTML('afterend', routeButtonHtml);
     }
 
     function createContactButton(tel, label) {
