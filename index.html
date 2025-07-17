@@ -199,40 +199,50 @@
     
     function saveData(key, value) { sessionData[key] = value; }
 
- async function handleFinalSave(button) {
-        button.textContent = 'กำลังบันทึก...'; button.disabled = true;
-        try {
-            const response = await fetch(GAS_URL, {
-                method: 'POST',
-                mode: 'cors',
-                // เปลี่ยน Content-Type เพื่อหลีกเลี่ยง CORS Preflight
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(sessionData)
-            });
-            
-            // ถึงแม้จะส่งแบบ text/plain เรายังคงตรวจสอบการตอบกลับจากเซิร์ฟเวอร์ได้
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error('Server response was not ok: ' + errorText);
-            }
+ // --- [สำคัญ] แก้ไขเฉพาะฟังก์ชันนี้ใน index.html ของคุณ ---
+    async function handleFinalSave(button) {
+        button.textContent = 'กำลังบันทึก...';
+        button.disabled = true;
 
-            const result = await response.json();
-            if (result.status !== 'success') {
-                 throw new Error('Server returned an error: ' + result.message);
-            }
-            
-            // ถ้าทุกอย่างสำเร็จ
-            if (liff.isInClient()) {
-                liff.closeWindow();
+        // 1. สร้างชื่อ callback ที่ไม่ซ้ำกัน
+        const callbackName = 'saveCallback' + Date.now();
+
+        // 2. สร้างฟังก์ชัน callback ไว้รอรับผลลัพธ์จากเซิร์ฟเวอร์
+        window[callbackName] = function(response) {
+            // 5. เมื่อเซิร์ฟเวอร์ตอบกลับ ฟังก์ชันนี้จะทำงาน
+            if (response && response.status === 'success') {
+                if (liff.isInClient()) {
+                    liff.closeWindow();
+                } else {
+                    alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                }
             } else {
-                alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                const errorMessage = response ? response.message : 'Unknown error';
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + errorMessage);
+                button.textContent = 'บันทึกและปิด';
+                button.disabled = false;
             }
 
-        } catch (error) {
-            console.error("Save Error:", error);
-            alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล: " + error.message);
-            button.textContent = 'บันทึกและปิด'; button.disabled = false;
-        }
+            // 6. ล้างฟังก์ชันและ script tag ที่สร้างขึ้น
+            delete window[callbackName];
+            document.head.removeChild(scriptTag);
+        };
+
+        // 3. เตรียมข้อมูลและสร้าง URL สำหรับ JSONP
+        const dataStr = encodeURIComponent(JSON.stringify(sessionData));
+        const url = `${GAS_URL}?callback=${callbackName}&data=${dataStr}`;
+
+        // 4. สร้างและแทรก script tag เพื่อส่ง request
+        const scriptTag = document.createElement('script');
+        scriptTag.src = url;
+        scriptTag.onerror = function() {
+            // จัดการกรณีที่ request ล้มเหลว (เช่น network error)
+            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์บันทึกข้อมูลได้");
+            button.textContent = 'บันทึกและปิด';
+            button.disabled = false;
+            delete window[callbackName];
+        };
+        document.head.appendChild(scriptTag);
     }
 
     function showLayer(layerNumber) {
