@@ -229,7 +229,6 @@
     ];
     const positiveEmojis = ['👍', '🎉', '💪', '✅', '😊'];
 
-    // Updated icons object with Iconify names
     const icons = {
         user: 'mdi:account-circle',
         symptom: 'mdi:account-heart-outline',
@@ -281,10 +280,12 @@
             sessionData.registeredName = data.name;
             sessionData.district = data.district;
             sessionData.village = data.village;
+            // **MODIFIED: Use the timestamp from the server**
+            const riskTimestamp = data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A';
             historyCard.innerHTML = `
                 <h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2>
                 <p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก(${data.risk_group || 'N/A'}): <strong>${data.thai_cv_risk_score}%</strong></p>
-                <p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A'}</p>`;
+                <p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${riskTimestamp}</p>`;
 
             if(sessionData.district && sessionData.village) {
                 fetchVolunteerData(`ต.${sessionData.district} ม.${sessionData.village}`);
@@ -317,8 +318,9 @@
 
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
+            // This function will now be called correctly
             if (response && response.status === 'success') {
-                alert("บันทึกข้อมูลเรียบร้อยแล้ว โปรดอ่านรายละเอียดใน Line");
+                // No alert needed here, just show the modal
                 if (isEmergency) {
                     document.getElementById('how-to-act-modal').style.display = 'flex';
                 } else {
@@ -334,14 +336,25 @@
         const scriptTag = document.createElement('script');
         scriptTag.src = url;
         scriptTag.onerror = function() {
-            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+            // This is the error you were seeing
+            alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ โปรดตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
             if(button) button.disabled = false;
         };
         document.head.appendChild(scriptTag);
     }
     
-    function triggerSave(element, contactLabel = 'ปุ่มบันทึก') {
-        saveData('contactedVia', contactLabel);
+    /**
+     * **MODIFIED**
+     * This function now takes a 'key' to identify which button was pressed.
+     * It adds a timestamp to the sessionData under that key.
+     */
+    function triggerSave(element, key) {
+        if (key.startsWith('tel_')) {
+            // Add the timestamp for the specific call button pressed
+            sessionData[key] = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
+        }
+        // Also keep track of the general action for the summary text
+        sessionData.contactedVia = key; 
         handleFinalSave(element, true);
     }
     
@@ -371,7 +384,7 @@
         container.appendChild(button);
     }
 
-function showLayer2(symptomKey) {
+    function showLayer2(symptomKey) {
         saveData('symptomCategory', symptomKey);
         const symptomTranslations = {'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด'};
         document.getElementById('layer-2-title').textContent = `อาการด้าน${symptomTranslations[symptomKey]}`;
@@ -380,7 +393,6 @@ function showLayer2(symptomKey) {
         const details = symptomDetails[symptomKey];
         details.likely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-likely', () => handleSymptomResult(true, text)));
         details.unlikely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-unlikely', () => handleSymptomResult(false, text)));
-        
         showLayer('layer-2');
     }
 
@@ -433,7 +445,6 @@ function showLayer2(symptomKey) {
                 clearInterval(countdownInterval);
                 return;
             }
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             timerElement.textContent = `เหลือเวลาให้ยาภายใน: ${minutes} นาที ${seconds} วินาที`;
@@ -457,12 +468,16 @@ function showLayer2(symptomKey) {
             createInfoCard(icons.clock, 'เริ่มมีอาการเมื่อ', formatFullDateTime(onset));
                                   
         document.getElementById('time-details-container').innerHTML =
-            createInfoCard(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.หลังมีอาการ)', formatTime(arrivalDeadline) + ' น.') +
-            createInfoCard(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.หลังมีอาการ)', formatTime(rtpaDeadline) + ' น.');
+            createInfoCard(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', formatTime(arrivalDeadline) + ' น.') +
+            createInfoCard(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', formatTime(rtpaDeadline) + ' น.');
 
         buildActionContainer();
     }
     
+    /**
+     * **MODIFIED**
+     * Updated the onclick attributes to pass the correct key to triggerSave.
+     */
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         container.innerHTML = `
@@ -472,13 +487,13 @@ function showLayer2(symptomKey) {
                 </div>
                 <p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
             </div>
-            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'โทร รพ.สวี')">
+            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')">
                 <div class="action-button tel-sawi-button">
                     <span class="iconify" data-icon="${icons.phone}"></span>
                 </div>
                 <p class="action-button-text">โทร รพ.สวี</p>
             </a>
-            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'โทร 1669')">
+            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')">
                 <div class="action-button tel-1669-button">
                     <span class="iconify" data-icon="${icons.phone}"></span>
                 </div>
@@ -513,6 +528,10 @@ function showLayer2(symptomKey) {
         );
     }
     
+    /**
+     * **MODIFIED**
+     * This function now passes the correct key to createContactButton.
+     */
     function updateSummaryAndActions(distance) {
         const timeDetailsContainer = document.getElementById('time-details-container');
         const contactContainer = document.getElementById('contact-buttons');
@@ -525,10 +544,11 @@ function showLayer2(symptomKey) {
         if (distance !== null) {
             if (distance > 450) {
                 extraSummaryHtml = createInfoCard('mdi:alert-circle-outline', 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด');
-                document.querySelector('.tel-sawi-button').parentElement.style.display = 'none'; // Hide Sawi call button
+                const sawiButton = document.querySelector('.tel-sawi-button');
+                if (sawiButton) sawiButton.parentElement.style.display = 'none';
             } else {
-                const travelTimeMinutes = (distance / 40) * 60; // Assume avg speed 40km/h
-                const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15; // Ambulance adds prep time
+                const travelTimeMinutes = (distance / 40) * 60;
+                const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
                 const selfTravelArrival = new Date(Date.now() + travelTimeMinutes * 60000);
                 const ambulanceArrival = new Date(Date.now() + ambulanceTravelTime * 60000);
                 const rtpaDeadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 60 * 60 * 1000) : new Date();
@@ -539,7 +559,7 @@ function showLayer2(symptomKey) {
                 sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
 
                 extraSummaryHtml += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
-                extraSummaryHtml += createInfoCard(icons.car, 'คาดการณ์เวลาเดินทาง (มาเอง)', sessionData.duration);
+                extraSummaryHtml += createInfoCard(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration);
                 extraSummaryHtml += createInfoCard(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate);
                 extraSummaryHtml += createInfoCard(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate);
                 
@@ -553,21 +573,38 @@ function showLayer2(symptomKey) {
             const contacts = sessionData.volunteerContacts;
             let areaInfo = (sessionData.district && sessionData.village) ? `(ต.${sessionData.district} ม.${sessionData.village})` : '';
             contactContainer.innerHTML = `<h3 style="font-size:1.1em; text-align:center; margin-top: 20px; margin-bottom: 10px;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h3>`;
-            if (contacts.volunteer1_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer1_tel, "โทรหา อสม. คนที่ 1");
-            if (contacts.volunteer2_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer2_tel, "โทรหา อสม. คนที่ 2");
-            if (contacts.headman_tel) contactContainer.innerHTML += createContactButton(contacts.headman_tel, `โทรหา ผู้นำชุมชน ${areaInfo}`);
-            if (contacts.pcu_tel) contactContainer.innerHTML += createContactButton(contacts.pcu_tel, `โทรหา ${contacts.pcu_name || 'รพ.สต.'}`);
+            if (contacts.volunteer1_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer1_tel, "โทรหา อสม. คนที่ 1", "tel_asm1");
+            if (contacts.volunteer2_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer2_tel, "โทรหา อสม. คนที่ 2", "tel_asm2");
+            if (contacts.headman_tel) contactContainer.innerHTML += createContactButton(contacts.headman_tel, `โทรหา ผู้นำชุมชน ${areaInfo}`, "tel_header");
+            if (contacts.pcu_tel) contactContainer.innerHTML += createContactButton(contacts.pcu_tel, `โทรหา ${contacts.pcu_name || 'รพ.สต.'}`, "tel_pcu");
         }
     }
 
-    function createContactButton(tel, label) {
-        return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${label}')"><span class="iconify" data-icon="${icons.contact}"></span><span class="label">${label}</span></a>`;
+    /**
+     * **MODIFIED**
+     * This function now accepts a 'key' to pass to the triggerSave function.
+     */
+    function createContactButton(tel, label, key) {
+        return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${key}')"><span class="iconify" data-icon="${icons.contact}"></span><span class="label">${label}</span></a>`;
     }
+function createInfoCard(iconName, label, value) {
+    // ตรวจสอบว่าค่าเป็นเคสเร่งด่วนหรือไม่
+    const isUrgent = value && typeof value === 'string' && value.includes("ไม่ทัน");
+    // กำหนด class ให้กับเนื้อหาตามเงื่อนไข
+    const valueClass = isUrgent ? "value value-urgent" : "value";
 
-    function createInfoCard(iconName, label, value) {
-        const valueColor = (value && typeof value === 'string' && value.includes("ไม่ทัน")) ? 'style="color:red; font-weight:bold;"' : '';
-        return `<div class="info-card"><span class="iconify" data-icon="${iconName}"></span><div class="info-card-text"><p class="label">${label}</p><p class="value" ${valueColor}>${value || 'N/A'}</p></div></div>`;
-    }
+    // สร้าง HTML โดยรวม label และ value ไว้ใน <p> เดียวกัน และคั่นด้วย <br>
+    return `<div class="info-card">
+                <span class="iconify" data-icon="${iconName}"></span>
+                <div class="info-card-text">
+                    <p class="${valueClass}">
+                        <span style="font-size: 0.9em; color: #6C757D; font-weight: normal;">${label}</span>
+                        <br>
+                        ${value || 'N/A'}
+                    </p>
+                </div>
+            </div>`;
+}
 
     function setupTimeOptions() {
         const container = document.getElementById('time-options-container');
@@ -596,8 +633,7 @@ function showLayer2(symptomKey) {
             } else if (opt.chronic) {
                 btn.classList.add("btn-severity-chronic");
             } else {
-                // Gradient logic
-                const ratio = index / (timeOptions.length - 3); // Adjust denominator to get full gradient before chronic
+                const ratio = index / (timeOptions.length - 3);
                 const r = Math.round(startColor.r + (endColor.r - startColor.r) * ratio);
                 const g = Math.round(startColor.g + (endColor.g - startColor.g) * ratio);
                 const b = Math.round(startColor.b + (endColor.b - startColor.b) * ratio);
@@ -610,13 +646,14 @@ function showLayer2(symptomKey) {
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
     
     function formatFullDateTime(date) {
-        if (!date || isNaN(date)) return 'N/A';
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const y = date.getFullYear() + 543;
-        const hh = String(date.getHours()).padStart(2, '0');
-        const mm = String(date.getMinutes()).padStart(2, '0');
-        return `${d}/${m}/${y} ${hh}:${mm} น.`;
+        if (!date || isNaN(new Date(date).getTime())) return 'N/A';
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear() + 543;
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hh}:${mm} น.`;
     }
 
     function formatDuration(minutes) {
