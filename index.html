@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ประเมินอาการสโตรกรายวัน</title>
+    <title>ประเมินอาการสโตรก</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
@@ -13,67 +13,68 @@
             --card-bg-color: #ffffff; --text-color: #333;
             --shadow: 0 4px 12px rgba(0,0,0,0.1); --border-radius: 12px;
             --symptom-red: #D32F2F; --symptom-green: #388E3C;
-            --dark-red: #C0392B; --light-red-bg: #FADBD8;
+            --dark-red: #C0392B; --light-red-bg: #FFF0F0;
         }
-        body { font-family: "Noto Sans Thai", sans-serif; background-color: var(--background-color); margin: 0; padding: 16px; font-size: 1.2em; }
+        body { font-family: "Noto Sans Thai", sans-serif; background-color: var(--background-color); margin: 0; padding: 16px; font-size: 16px; }
         .main-container { max-width: 600px; margin: 0 auto; }
         .section-title { font-size: 1.5em; font-weight: 700; color: var(--text-color); margin-bottom: 0; display: flex; align-items: center; justify-content: center; }
-        .section-subtitle { font-size: 1em; color: #555; margin-top: 4px; margin-bottom: 24px; }
-        .card { padding: 24px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 16px; position: relative; padding-bottom: 70px; }
-        .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .symptom-card { border-radius: var(--border-radius); box-shadow: var(--shadow); text-align: center; padding: 12px; cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
-        .symptom-card:hover { transform: translateY(-5px); }
-        .symptom-card img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
-        .symptom-card p { margin: 0; font-size: 1.1em; font-weight: bold; line-height: 1.3; }
-        .symptom-card .symptom-text-red { color: var(--symptom-red); }
-        .symptom-card .symptom-text-blue { color: #0b5394; }
-        button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; }
-        .options-container { text-align: center; }
-        .options-container button { display: block; width: 100%; padding: 15px; margin: 8px 0; border-radius: 8px; font-size: 1em; font-weight: bold; }
-        .btn-action { width: 90%; margin: 20px auto 0 auto; color: white; }
-        .btn-final-save { background-color: #28a745; }
+        .section-subtitle { font-size: 1em; color: #555; margin-top: 4px; margin-bottom: 24px; text-align: center; }
+        .card { padding: 24px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 16px; position: relative; padding-bottom: 20px; }
+        .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .symptom-card { border-radius: 8px; box-shadow: var(--shadow); text-align: center; padding: 10px; cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100px; }
+        .symptom-card p { margin: 0; font-size: 0.9em; font-weight: bold; line-height: 1.3; }
+        button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; }
+        .options-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .options-container button { padding: 10px 15px; font-size: 0.9em; }
+        .btn-action { width: 100%; padding: 15px; color: white; margin-top: 20px; font-size: 1.1em; }
+        .btn-final-save { background-color: var(--primary-color); }
         .btn-symptom-likely { background-color: var(--symptom-red); color: white; }
         .btn-symptom-unlikely { background-color: var(--symptom-green); color: white; }
-        .btn-severity-acute { background-color: var(--symptom-red); color: white; }
-        .btn-severity-chronic { background-color: #E67E22; color: white; }
-        .emergency-text-container { background-color: var(--light-red-bg); border-radius: var(--border-radius); padding: 20px; text-align: center; margin-bottom: 24px; }
-        .emergency-text-container p { margin: 0; line-height: 1.6; font-size: 1.1em; }
-        .emergency-text-container .highlight-large { font-size: 1.5em; font-weight: bold; color: var(--dark-red); }
-        .blink { animation: blinker 1.2s linear infinite; font-weight: bold; color: var(--symptom-red); }
-        @keyframes blinker { 50% { opacity: 0.2; } }
-        .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 0.9em; position: absolute; bottom: 10px; right: 20px; }
+        .btn-severity-acute { background-color: var(--symptom-red); color: white; width:100%; }
+        .btn-severity-chronic { background-color: #E67E22; color: white; width:100%; }
+        .emergency-text-container { padding: 15px; text-align: center; }
+        .emergency-text-container .highlight-large { font-size: 1.8em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
+        .emergency-text-container .highlight-small { font-size: 1em; color: black; animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0.3; } }
+        .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 0.9em; position: absolute; bottom: 5px; right: 15px; }
         .hidden { display: none; }
-        .info-icon { font-size: 18px; cursor: pointer; color: #007BFF; margin-left: 8px; font-style: normal; border: 1px solid #007BFF; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; }
+        .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; }
+        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
+        .modal-content { background-color: #fff; padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; }
+        .modal-content p { font-size: 0.9em; margin: 10px 0; }
+        .modal-content button { width: 100%; padding: 12px; font-size: 1em; }
         #summary-container p { margin: 10px 0; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 0.9em;}
-        #summary-container p:last-child { border-bottom: none; }
         #summary-container strong { color: var(--dark-red); }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; }
-        .modal-content { background-color: #fefefe; padding: 20px; border-radius: 10px; width: 85%; max-width: 400px; text-align: left; }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <div id="layer-1" data-layer="1">
-            <h1 class="section-title">ประเมินอาการสโตรกรายวัน <span id="info-icon" class="info-icon">i</span></h1>
-            <p class="section-subtitle">วันนี้ท่านมีอาการตามหลัก BEFAST หรือไม่?</p>
+        <div id="user-info-bar" class="card hidden" style="padding:10px; margin-bottom:10px; background-color:#E3F2FD;">
+            <p style="margin:0; font-size:0.9em;"><strong>ผู้ประเมิน:</strong> <span id="user-name-display"></span></p>
+            <p style="margin:0; font-size:0.8em; color:#555;"><strong>ผลประเมินความเสี่ยงล่าสุด:</strong> <span id="user-risk-display"></span></p>
+        </div>
+
+        <div id="layer-1" data-layer="1" class="card">
+            <h1 class="section-title">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1>
+            <p class="section-subtitle">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p>
             <div class="symptom-grid">
-                <div class="symptom-card" onclick="showLayer2('การทรงตัว')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="เซ"><p class="symptom-text-red">การทรงตัว</p></div>
-                <div class="symptom-card" onclick="showLayer2('สายตา')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="ตา"><p class="symptom-text-red">สายตา</p></div>
-                <div class="symptom-card" onclick="showLayer2('ใบหน้า')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="หน้า"><p class="symptom-text-red">ใบหน้า</p></div>
-                <div class="symptom-card" onclick="showLayer2('แขนขา')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="แขน"><p class="symptom-text-red">แขนขา</p></div>
-                <div class="symptom-card" onclick="showLayer2('การพูด')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="พูด"><p class="symptom-text-red">การพูด</p></div>
-                <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="ไม่มีอาการ"><p class="symptom-text-blue">ไม่มีอาการ</p></div>
+                <div class="symptom-card" onclick="showLayer2('การทรงตัว')"><p>เซ/มึนหัว (Balance)</p></div>
+                <div class="symptom-card" onclick="showLayer2('สายตา')"><p>ตามัวมาก (Eye)</p></div>
+                <div class="symptom-card" onclick="showLayer2('ใบหน้า')"><p>มุมปากตก (Face)</p></div>
+                <div class="symptom-card" onclick="showLayer2('แขนขา')"><p>ยกแขนยาก (Arm)</p></div>
+                <div class="symptom-card" onclick="showLayer2('การพูด')"><p>ลำบากพูด (Speech)</p></div>
+                <div class="symptom-card" onclick="handleNoSymptom()"><p style="color:#0b5394;">ไม่มีอาการดังกล่าว</p></div>
             </div>
         </div>
 
-        <div id="layer-2" class="card hidden" data-layer="2">
+        <div id="layer-2" data-layer="2" class="card hidden">
             <h2 id="layer-2-title" class="section-title"></h2>
             <p class="section-subtitle">กรุณาเลือกรายละเอียดอาการที่ใกล้เคียงที่สุด</p>
             <div id="layer-2-buttons" class="options-container"></div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
 
-        <div id="layer-3" class="card hidden" data-layer="3">
+        <div id="layer-3" data-layer="3" class="card hidden">
             <h2 class="section-title">อาการดังกล่าวเกิดขึ้นอย่างไร?</h2>
             <div class="options-container">
                 <button class="btn-severity-acute" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button>
@@ -82,32 +83,38 @@
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
 
-        <div id="layer-4" class="card hidden" data-layer="4">
+        <div id="layer-4" data-layer="4" class="card hidden">
             <h2 class="section-title">อาการเริ่มเป็นเมื่อไหร่?</h2>
+            <p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p>
             <div class="options-container" id="time-options-container"></div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
         
-        <div id="layer-5" class="card hidden" data-layer="5">
-             <div class="emergency-text-container"><p class="highlight-large blink">อาจเป็นอาการสโตรก! โปรดปฏิบัติตามข้อมูลด้านล่าง</p></div>
+        <div id="layer-5" data-layer="5" class="card hidden">
+             <div class="emergency-text-container">
+                 <p class="highlight-large">อาจเป็นอาการสโตรก (Stroke)!</p>
+                 <p class="highlight-small">โปรดโทรเรียกรถพยาบาลทันที</p>
+                 <p style="font-size:0.8em; margin-top:10px;">หลังจากกดส่งพิกัดและกดโทรออกด้วยตัวเอง</p>
+             </div>
              <div id="summary-container"></div>
-             <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกข้อมูลและแจ้งเหตุ</button>
+             <div id="action-container"></div>
+             <button class="btn-action btn-final-save" style="background-color: var(--dark-red);" onclick="handleFinalSave(this, true)">บันทึกข้อมูลและแจ้งเหตุฉุกเฉิน</button>
              <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
         
-        <div id="layer-6" class="card hidden" data-layer="6">
+        <div id="layer-6" data-layer="6" class="card hidden">
              <h2 id="final-title" class="section-title" style="text-align:center;"></h2>
              <p id="final-text" style="text-align:center;"></p>
-             <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกและปิด</button>
+             <button class="btn-action btn-final-save" onclick="handleFinalSave(this, false)">บันทึกและปิด</button>
         </div>
 
-        <div id="disclaimerModal" class="modal hidden">
-            <div class="modal-content">
-                <h2 style="text-align:center;">ข้อจำกัดความรับผิดชอบ</h2>
-                <p>• แอปพลิเคชันนี้ใช้เพื่อ **เสนอข้อมูลและประเมินอาการเบื้องต้น** เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p>
+        <div id="disclaimerModal" class="modal hidden" onclick="this.style.display='none'">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <h2 style="text-align:center; font-size:1.1em;">ข้อจำกัดความรับผิดชอบ</h2>
+                <p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>เสนอข้อมูลและประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p>
                 <p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p>
-                <p>• แอปพลิเคชันนี้ **ไม่ได้โทรออกฉุกเฉินให้ท่าน** หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p>
-                <button onclick="document.getElementById('disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; width:100%; padding:10px; margin-top:15px; border-radius:8px;">ตกลง</button>
+                <p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p>
+                <button onclick="document.getElementById('disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.1em; padding:12px;">ตกลง</button>
             </div>
         </div>
     </div>
@@ -116,17 +123,17 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
     const LIFF_ID = "2005789397-WRm1lYd9";
-    
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
+    
     let currentLayer = 1;
     let sessionData = {};
 
     const symptomDetails = {
-        'การทรงตัว': { likely: ['เดินเซรุนแรง, ทรงตัวไม่ได้', 'เวียนหัวรุนแรง, บ้านหมุน'], unlikely: ['เวียนหัวเล็กน้อยពេលเปลี่ยนท่า', 'อาการของโรคน้ำในหู', 'ทรงตัวลำบาก (เรื้อรัง)'] },
-        'สายตา': { likely: ['ตามัว/มืดบอดหนึ่งข้าง', 'เห็นภาพซ้อน', 'มองไม่เห็นภาพครึ่งซีก'], unlikely: ['ปัญหาสายตาที่เป็นอยู่เดิม', 'เห็นจุดดำลอยไปมา'] },
-        'ใบหน้า': { likely: ['ใบหน้าเบี้ยว/มุมปากตก', 'หลับตาไม่สนิทหนึ่งข้าง'], unlikely: ['อาจเป็น Bell\'s Palsy', 'บวมจากปัญหาในช่องปาก'] },
-        'แขนขา': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่ขึ้น/ของหลุดมือ'], unlikely: ['ชาจากการนอนทับ', 'ปวด/อักเสบกล้ามเนื้อ'] },
-        'การพูด': { likely: ['พูดไม่ชัด, ลิ้นแข็ง, อ้อแอ้', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดผู้อื่น'], unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/ปัญหาการได้ยิน'] }
+        'การทรงตัว': { likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้', 'เวียนหัวรุนแรง (บ้านหมุน)'], unlikely: ['เวียนหัวពេលเปลี่ยนท่า', 'อาการโรคน้ำในหู', 'เมาค้าง/พักผ่อนน้อย'] },
+        'สายตา': { likely: ['ตามัว/มืดหนึ่งข้าง', 'เห็นภาพซ้อน', 'เห็นภาพแค่ครึ่งซีก'], unlikely: ['ปัญหาสายตาเดิม', 'ตาแห้ง/ระคายเคือง', 'เห็นจุดดำลอยไปมา'] },
+        'ใบหน้า': { likely: ['หน้าเบี้ยว/มุมปากตก', 'หลับตาไม่สนิท', 'ชาใบหน้าครึ่งซีก'], unlikely: ['อาจเป็น Bell\'s Palsy', 'บวมจากปัญหาในช่องปาก'] },
+        'แขนขา': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่ขึ้น/ของหลุดมือ', 'เดินลากขา'], unlikely: ['ปวด/อักเสบกล้ามเนื้อ', 'ชาจากการนอนทับ', 'หมอนรองกระดูกทับเส้น'] },
+        'การพูด': { likely: ['พูดไม่ชัด/ลิ้นแข็ง', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดคนอื่น'], unlikely: ['พูดติดขัดเพราะเหนื่อย', 'เสียงแหบ/หวัด'] }
     };
 
     window.onload = async () => {
@@ -136,15 +143,40 @@
                 const profile = await liff.getProfile();
                 sessionData.userID = profile.userId;
                 sessionData.userName = profile.displayName;
+                fetchUserData(profile.userId);
                 setupTimeOptions();
             } else { liff.login(); }
         } catch (err) { alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); }
         document.getElementById('info-icon').onclick = () => { document.getElementById('disclaimerModal').style.display = 'flex'; };
     };
 
-    function saveData(key, value) { sessionData[key] = value; }
+    function fetchUserData(userId) {
+        if (!userId) return;
+        const callbackName = 'userCallback' + Date.now();
+        window[callbackName] = function(response) {
+            const nameDisplay = document.getElementById('user-name-display');
+            const riskDisplay = document.getElementById('user-risk-display');
+            if (response.status === 'found' && response.data) {
+                const data = response.data;
+                sessionData.registeredName = data.name;
+                nameDisplay.textContent = data.name || '(ไม่พบชื่อในระบบ)';
+                riskDisplay.textContent = `${data.thai_cv_risk_score || 'N/A'} (${data.risk_group || 'N/A'})`;
+            } else {
+                nameDisplay.textContent = '(ยังไม่เคยลงทะเบียนกับสวีรู้ทันสโตรก)';
+                riskDisplay.textContent = 'ยังไม่มีข้อมูล';
+            }
+            document.getElementById('user-info-bar').classList.remove('hidden');
+            delete window[callbackName];
+            document.head.removeChild(scriptTag);
+        };
+        const url = `${GAS_URL}?action=getUserData&userId=${userId}&callback=${callbackName}`;
+        const scriptTag = document.createElement('script');
+        scriptTag.src = url;
+        document.head.appendChild(scriptTag);
+    }
 
-    function handleFinalSave(button) {
+    function handleFinalSave(button, isEmergency) {
+        sessionData.isEmergency = isEmergency;
         button.textContent = 'กำลังบันทึก...'; button.disabled = true;
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
@@ -159,7 +191,7 @@
             document.head.removeChild(scriptTag);
         };
         const dataStr = encodeURIComponent(JSON.stringify(sessionData));
-        const url = `${GAS_URL}?callback=${callbackName}&data=${dataStr}`;
+        const url = `${GAS_URL}?action=saveData&callback=${callbackName}&data=${dataStr}`;
         const scriptTag = document.createElement('script');
         scriptTag.src = url;
         scriptTag.onerror = function() {
@@ -174,10 +206,16 @@
         currentLayer = layerNumber;
         document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden'));
         document.getElementById(`layer-${layerNumber}`).classList.remove('hidden');
-        window.scrollTo(0, 0);
     }
     
     function goBack() { if (currentLayer > 1) showLayer(currentLayer - 1); }
+
+    function showFinalMessage(title, text) {
+        saveData('symptomDetail', text);
+        document.getElementById('final-title').textContent = title;
+        document.getElementById('final-text').textContent = text;
+        showLayer(6);
+    }
 
     function createButton(container, text, className, onClick) {
         const button = document.createElement('button');
@@ -200,6 +238,7 @@
 
     function handleNoSymptom() {
         saveData('symptomCategory', 'ไม่มีอาการ');
+        saveData('symptomDetail', 'ไม่มีอาการผิดปกติ');
         showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัย ขอให้มีสุขภาพที่แข็งแรงต่อไปครับ");
     }
 
@@ -212,10 +251,7 @@
         }
     }
     
-    function handleSeveritySelection(frequencyText) {
-        saveData('frequency', frequencyText);
-        showLayer(4);
-    }
+    function handleSeveritySelection(frequencyText) { saveData('frequency', frequencyText); showLayer(4); }
 
     function handleChronicSymptom(frequencyText) {
         saveData('frequency', frequencyText);
@@ -239,45 +275,85 @@
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
 
-        const now = new Date();
-        const elapsedMinutes = Math.floor((now - onset) / 60000);
         const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60000);
         const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60000);
-
-        saveData('arrivalDeadline', formatTime(arrivalDeadline));
+        saveData('arrivalDeadline', formatTime(rtpaDeadline));
         saveData('rtpaDeadline', formatTime(rtpaDeadline));
-        
-        const distance = getDistanceFromLatLonInKm(hospitalCoords.lat, hospitalCoords.lon, 13.7563, 100.5018); // Example user location
-        const travelTimeMinutes = (distance / 40) * 60; // Assume 40 km/h
-        const ambulanceTravelTime = travelTimeMinutes * 2; // Round trip for ambulance
-        
-        const selfTravelArrival = new Date(now.getTime() + travelTimeMinutes * 60000);
-        const ambulanceArrival = new Date(now.getTime() + ambulanceTravelTime * 60000);
 
-        const selfTravelOnTime = selfTravelArrival <= rtpaDeadline;
-        const ambulanceOnTime = ambulanceArrival <= rtpaDeadline;
-
-        saveData('distance', `${distance.toFixed(1)} กม.`);
-        saveData('duration', formatDuration(travelTimeMinutes));
-        saveData('ambulanceEstimate', ambulanceOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)');
-        saveData('selfTravelEstimate', selfTravelOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)');
-
-        let summaryHtml = `
-            <p><strong>ผู้ป่วย:</strong> ${sessionData.userName || 'N/A'}</p>
-            <p><strong>อาการ:</strong> ${sessionData.symptomDetail}</p>
-            <p><strong>เริ่มมีอาการเมื่อ:</strong> ${formatFullDateTime(onset)}</p>
-            <p><strong>ต้องถึง รพ. ก่อน:</strong> ${formatTime(arrivalDeadline)} น.</p>
-            <p><strong>ต้องได้รับยา rT-PA ภายใน:</strong> ${formatTime(rtpaDeadline)} น.</p>
-            <hr>
-            <p><strong>พิกัดผู้ป่วย ห่างจาก รพ.สวี:</strong> ${distance.toFixed(1)} กม.</p>
-            <p><strong>ใช้เวลาเดินทางประมาณ:</strong> ${formatDuration(travelTimeMinutes)}</p>
-            <hr>
-            <p><strong>ประมาณการ (รถ รพ. ไปรับ):</strong> <strong style="color:${ambulanceOnTime ? 'green' : 'red'}">${ambulanceOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)'}</strong></p>
-            <p><strong>ประมาณการ (ออกเดินทางทันที):</strong> <strong style="color:${selfTravelOnTime ? 'green' : 'red'}">${selfTravelOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)'}</strong></p>
-        `;
+        let summaryHtml = `<p><strong>ผู้ป่วย:</strong> ${sessionData.registeredName || sessionData.userName}</p>
+                           <p><strong>อาการ:</strong> ${sessionData.symptomDetail}</p>
+                           <p><strong>เริ่มมีอาการเมื่อ:</strong> ${formatFullDateTime(onset)}</p>
+                           <p><strong>ต้องถึง รพ. ก่อน:</strong> ${formatTime(arrivalDeadline)} น.</p>
+                           <p><strong>ต้องได้รับยา rT-PA ภายใน:</strong> ${formatTime(rtpaDeadline)} น.</p>`;
         document.getElementById('summary-container').innerHTML = summaryHtml;
+        
+        // Actions will be built after getting location
+        buildActionContainer();
     }
     
+    function buildActionContainer() {
+        // Initially show a "Get Location" button
+        const actionContainer = document.getElementById('action-container');
+        actionContainer.innerHTML = `<button onclick="getLocation()" class="btn-action" style="background-color: var(--primary-color);">คำนวณระยะทางและเวลาเดินทาง</button>`;
+    }
+
+    function getLocation() {
+        document.querySelector('#action-container button').textContent = 'กำลังค้นหาตำแหน่ง...';
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const { latitude, longitude } = position.coords;
+                const distance = getDistanceFromLatLonInKm(latitude, longitude, hospitalCoords.lat, hospitalCoords.lon);
+                sessionData.distance = `${distance.toFixed(1)} กม.`;
+
+                const travelTimeMinutes = (distance / 40) * 60; // Assume 40 km/h
+                sessionData.duration = formatDuration(travelTimeMinutes);
+
+                const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15; // Ambulance needs time to get ready and travel both ways
+                const selfTravelArrival = new Date(new Date().getTime() + travelTimeMinutes * 60000);
+                const ambulanceArrival = new Date(new Date().getTime() + ambulanceTravelTime * 60000);
+                
+                const rtpaDeadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 60 * 60000) : new Date();
+                const selfTravelOnTime = selfTravelArrival <= rtpaDeadline;
+                const ambulanceOnTime = ambulanceArrival <= rtpaDeadline;
+
+                sessionData.selfTravelEstimate = selfTravelOnTime ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+                sessionData.ambulanceEstimate = ambulanceOnTime ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
+
+                updateSummaryAndActions(distance);
+            },
+            error => {
+                alert("ไม่สามารถเข้าถึงตำแหน่งได้ โปรดเปิด GPS และอนุญาตให้แอปเข้าถึงตำแหน่ง");
+                updateSummaryAndActions(null); // Update UI even if location fails
+            }
+        );
+    }
+
+    function updateSummaryAndActions(distance) {
+        let summaryHtml = document.getElementById('summary-container').innerHTML;
+        let actionHtml = '';
+
+        if (distance !== null) {
+             summaryHtml += `<hr><p><strong>ระยะทางไป รพ.สวี:</strong> ${sessionData.distance}</p>
+                             <p><strong>ใช้เวลาเดินทางประมาณ:</strong> ${sessionData.duration}</p>
+                             <p><strong>ประมาณการ (รถ รพ. ไปรับ):</strong> <strong style="color:${sessionData.ambulanceEstimate.includes('ไม่ทัน') ? 'red' : 'green'}">${sessionData.ambulanceEstimate}</strong></p>
+                             <p><strong>ประมาณการ (ออกเดินทางทันที):</strong> <strong style="color:${sessionData.selfTravelEstimate.includes('ไม่ทัน') ? 'red' : 'green'}">${sessionData.selfTravelEstimate}</strong></p>`;
+        }
+        
+        const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}`;
+        actionHtml += `<a href="${gmapsUrl}" target="_blank"><button class="btn-action" style="background-color: #34A853;">เส้นทางไป รพ.สวี</button></a>`;
+        
+        if (distance !== null && distance > 450) {
+            actionHtml += `<p style="color:red; font-size:0.8em; text-align:center; margin-top:10px;">ระยะทางของท่านอยู่นอกเขต อ.สวี จ.ชุมพร โปรดโทร 1669 เพื่อติดต่อรพ.ใกล้ที่สุด</p>`;
+            actionHtml += `<a href="tel:1669"><button class="btn-action" style="background-color: var(--dark-red);">โทร 1669</button></a>`;
+        } else {
+            actionHtml += `<a href="tel:0894745523"><button class="btn-action" style="background-color: #E67E22;">โทรฉุกเฉิน รพ.สวี</button></a>`;
+            actionHtml += `<a href="tel:1669"><button class="btn-action" style="background-color: var(--dark-red);">โทร 1669</button></a>`;
+        }
+
+        document.getElementById('summary-container').innerHTML = summaryHtml;
+        document.getElementById('action-container').innerHTML = actionHtml;
+    }
+
     function setupTimeOptions() {
         const container = document.getElementById('time-options-container');
         container.innerHTML = '';
@@ -285,9 +361,8 @@
         const timeOptions = [
             { text: `เพิ่งเกิดตอนนี้ (${formatTime(now)})`, minutes: 0 },
             { text: '10 นาทีที่แล้ว', minutes: 10 }, { text: '30 นาทีที่แล้ว', minutes: 30 },
-            { text: '1 ชั่วโมงที่แล้ว', minutes: 60 }, { text: '2 ชั่วโมงที่แล้ว', minutes: 120 },
-            { text: '3 ชั่วโมงที่แล้ว', minutes: 180 }, { text: '4 ชั่วโมงที่แล้ว', minutes: 240 },
-            { text: '6 ชั่วโมงที่แล้ว', minutes: 360 }, { text: '12 ชั่วโมงที่แล้ว', minutes: 720 },
+            { text: '1 ชั่วโมง', minutes: 60 }, { text: '2 ชั่วโมง', minutes: 120 }, { text: '3 ชั่วโมง', minutes: 180 },
+            { text: '4 ชั่วโมง', minutes: 240 }, { text: '6 ชั่วโมง', minutes: 360 }, { text: '12 ชั่วโมง', minutes: 720 },
             { text: '1 วันก่อนหน้า', minutes: 1440, chronic: true },
             { text: 'หลายวันก่อนหน้า', minutes: 0, chronic: true }
         ];
@@ -298,13 +373,6 @@
             if(opt.chronic) btn.className = "btn-severity-chronic";
             container.appendChild(btn);
         });
-    }
-
-    function showFinalMessage(title, text) {
-        saveData('symptomDetail', text);
-        document.getElementById('final-title').textContent = title;
-        document.getElementById('final-text').textContent = text;
-        showLayer(6);
     }
     
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
@@ -323,7 +391,8 @@
         if (isNaN(minutes) || minutes < 0) return 'N/A';
         const h = Math.floor(minutes / 60);
         const m = Math.round(minutes % 60);
-        return `${h} ชั่วโมง ${m} นาที`;
+        if (h > 0) return `${h} ชั่วโมง ${m} นาที`;
+        return `${m} นาที`;
     }
 
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
