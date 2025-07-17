@@ -15,7 +15,7 @@
             --symptom-red: #D32F2F; --symptom-green: #388E3C;
             --dark-red: #C0392B; --light-red-bg: #FFF0F0;
             --action-blue: #007BFF; --action-green: #28A745;
-            --action-orange: #E67E22; --action-gray: #6C757D;
+            --action-red: #D32F2F; --action-gray: #6C757D;
         }
         body { font-family: "Noto Sans Thai", sans-serif; background-color: var(--background-color); margin: 0; padding: 16px; font-size: 18px; }
         .main-container { max-width: 600px; margin: 0 auto; }
@@ -34,31 +34,29 @@
 
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; }
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; }
+        .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; color: white; }
         .time-options button { width: calc(33.33% - 6px); flex-grow: 0; margin-bottom: 8px; font-size: 0.9em; padding: 10px 5px; color: #333;}
         .btn-action { width: 100%; padding: 15px; color: white; margin-top: 20px; font-size: 1.2em; border-radius: 10px; }
         .btn-final-confirm { background-color: var(--primary-color); font-size: 1.3em !important; padding: 20px !important; }
-        .btn-symptom-likely { background-color: var(--symptom-red); color: white; }
-        .btn-symptom-unlikely { background-color: var(--symptom-green); color: white; }
+        .btn-symptom-likely { background-color: var(--symptom-red); }
+        .btn-symptom-unlikely { background-color: var(--symptom-green); }
         .btn-severity-acute { background-color: var(--symptom-red); color: white; width:100%; }
         .btn-severity-chronic { background-color: #E67E22; color: white; width:100%; }
         .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 1em; margin-top: 20px; text-align: right; width: 100%; display: block; }
-        
+
         .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--symptom-red); }
-        .emergency-text-container .highlight-large { font-size: 1.6em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
-        .emergency-text-container .highlight-small { font-size: 1.0em; color: black; animation: blinker 1.5s linear infinite; }
-        .countdown-timer { font-size: 0.9em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
+        .emergency-text-container .highlight-large { font-size: 1.5em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
+        .emergency-text-container .highlight-small { font-size: 0.9em; color: black; animation: blinker 1.5s linear infinite; }
+        .countdown-timer { font-size: 1.0em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
         @keyframes blinker { 50% { opacity: 0.3; } }
         .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; place-items: center; }
         .action-button { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 15px; cursor: pointer; text-align: center; color: white; text-decoration: none; transition: background-color 0.3s; }
         .action-button-icon { width: 48px; height: 48px; }
-        .action-button-text { font-size: 0.9em; margin-top: 5px; font-weight: bold; color: inherit;}
+        .action-button-text { font-size: 0.9em; margin-top: 5px; font-weight: bold; color: #555;}
         .location-button { background-color: var(--action-blue); }
         .location-button.success { background-color: var(--action-green); }
-        .tel-swe-button { background-color: var(--action-orange); }
-        .tel-1669-button { background-color: var(--dark-red); }
+        .tel-button { background-color: var(--action-red); }
         #summary-container .info-card { display: flex; align-items: center; gap: 15px; padding: 12px 5px; border-bottom: 1px solid #eee; }
-        #summary-container .info-card:last-child { border-bottom: none; }
         .info-card-icon { width: 30px; height: 30px; flex-shrink: 0; color: var(--primary-color);}
         .info-card-text p { margin: 0; }
         .info-card-text .label { font-size: 0.9em; color: #666; }
@@ -70,7 +68,6 @@
         .contact-button .label { flex-grow: 1; }
         .route-button { border-color: #34A853; color: #34A853; background-color: transparent !important; }
         .route-button svg { fill: #34A853; }
-
         .hidden { display: none; }
         .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
@@ -78,6 +75,7 @@
         .modal-content p, .modal-content li { font-size: 0.9em; margin: 10px 0; }
         .modal-content ul { padding-left: 20px; }
         .modal-content button { width: 100%; padding: 15px; font-size: 1.1em; border-radius: 10px; }
+        #history-card { margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -127,28 +125,31 @@
         </div>
         
         <div id="layer-5" data-layer="5" class="card hidden">
-             <div class="emergency-text-container">
-                 <p class="highlight-large">อาจเป็นอาการสโตรก!</p>
-                 <p class="highlight-small">โปรดโทรเรียกรถพยาบาลทันที</p>
-                 <div id="countdown-timer" class="countdown-timer"></div>
-                 <p style="font-size:0.9em; margin-top:8px;">หลังจากกดส่งพิกัดและกดโทรออกด้วยตัวเอง</p>
-             </div>
-             <div id="action-grid-container" class="action-buttons-grid"></div>
-             <hr style="margin-top:20px; border-top: 1px solid #ddd; border-bottom: none;">
-             <div id="summary-container"></div>
-             <div id="contact-buttons" class="contact-buttons"></div>
-             <div id="route-button-container"></div>
-             <button class="btn-action" style="background-color: var(--dark-red); font-size:1.3em; padding: 20px;" onclick="triggerSave(this)">บันทึกข้อมูลและปิดหน้าต่าง</button>
-             <div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div>
+            <div class="card-body">
+                 <div class="emergency-text-container">
+                     <p class="highlight-large">อาจเป็นอาการสโตรก!</p>
+                     <p class="highlight-small">โปรดโทรเรียกรถพยาบาลทันที</p>
+                     <div id="countdown-timer" class="countdown-timer"></div>
+                     <p style="font-size:0.8em; margin-top:8px;">หลังจากกดส่งพิกัดและกดโทรออกด้วยตัวเอง</p>
+                 </div>
+                 <div id="action-grid-container" class="action-buttons-grid"></div>
+                 <hr style="margin-top:20px; border-top: 1px solid #ddd; border-bottom: none;">
+                 <div id="summary-container"></div>
+                 <div id="time-details-container"></div>
+                 <div id="contact-buttons" class="contact-buttons"></div>
+                 <div id="route-button-container"></div>
+                 <button class="btn-action" style="background-color: var(--dark-red); font-size:1.3em; padding: 20px;" onclick="triggerSave(this)">บันทึกข้อมูลและปิดหน้าต่าง</button>
+            </div>
+            <div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div>
         </div>
         
         <div id="layer-6" data-layer="6" class="card hidden">
-             <div class="card-body">
+            <div class="card-body">
                 <div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div>
                 <h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2>
                 <p id="final-text" style="text-align:center; font-size:1.1em;"></p>
                 <button class="btn-action btn-final-confirm" style="font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button>
-             </div>
+            </div>
         </div>
         
         <div id="disclaimerModal" class="modal hidden" onclick="this.style.display='none'">
@@ -162,7 +163,7 @@
             </div>
         </div>
         <div id="how-to-act-modal" class="modal hidden">
-             <div class="modal-content" onclick="event.stopPropagation()">
+             <div class="modal-content">
                 <h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2>
                 <div style="text-align:left; font-size:0.9em;">
                     <strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong>
@@ -267,7 +268,7 @@
                 sessionData.village = data.village;
                 historyCard.innerHTML = `
                     <h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2>
-                    <p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก: <strong>${data.thai_cv_risk_score || 'N/A'} (${data.risk_group || 'N/A'})</strong></p>
+                    <p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก: <strong>${data.thai_cv_risk_score}% (${data.risk_group || 'N/A'})</strong></p>
                     <p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A'}</p>`;
 
                 if(sessionData.district && sessionData.village) {
@@ -304,28 +305,22 @@
     
     function handleFinalSave(button, isEmergency) {
         if(button && button.disabled) return;
-        if(button) {
-            button.textContent = 'กำลังบันทึก...';
-            button.disabled = true;
-        }
-
+        if(button) button.disabled = true;
+        
         sessionData.isEmergency = isEmergency;
 
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
+                alert("บันทึกข้อมูลเรียบร้อยแล้ว โปรดอ่านรายละเอียดใน Line");
                 if (isEmergency) {
                     document.getElementById('how-to-act-modal').style.display = 'flex';
                 } else {
-                    alert("บันทึกข้อมูลเรียบร้อยแล้ว โปรดอ่านรายละเอียดใน Line");
                     if(liff.isInClient()) liff.closeWindow();
                 }
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
-                if(button) {
-                    button.textContent = 'บันทึกและปิด';
-                    button.disabled = false;
-                }
+                if(button) button.disabled = false;
             }
             delete window[callbackName];
             if(document.head.contains(scriptTag)) document.head.removeChild(scriptTag);
@@ -336,17 +331,18 @@
         scriptTag.src = url;
         scriptTag.onerror = function() {
             alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
-            if(button) {
-                button.textContent = 'บันทึกและปิด';
-                button.disabled = false;
-            }
+            if(button) button.disabled = false;
             delete window[callbackName];
         };
         document.head.appendChild(scriptTag);
     }
     
-    function triggerSave(buttonElement, tel = '') {
-        saveData('tel', tel);
+    function triggerSave(buttonElement) {
+        const telLink = buttonElement.closest('a');
+        if (telLink) {
+            const tel = telLink.href.replace('tel:', '');
+            saveData('tel', tel);
+        }
         handleFinalSave(buttonElement, true);
     }
     
@@ -431,7 +427,7 @@
         const updateTimer = () => {
             const distance = deadline - new Date().getTime();
             if (distance < 0) {
-                timerElement.textContent = "หมดเวลาสำหรับให้ยาแล้ว!";
+                timerElement.textContent = "ถ้าได้รับยาหลังจากนี้อาจไม่มีประสิทธิภาพแล้ว";
                 timerElement.style.color = "var(--dark-red)";
                 clearInterval(countdownInterval);
                 return;
@@ -459,9 +455,8 @@
                           
         document.getElementById('summary-container').innerHTML = summaryHtml;
         document.getElementById('time-details-container').innerHTML =
-                          createInfoCard(icons.hourglass, 'ต้องถึง รพ.ภายใน (3.5 ชม.)', formatTime(arrivalDeadline) + ' น.') +
-                          createInfoCard(icons.hourglass, 'ต้องได้รับยาภายใน (4.5 ชม.)', formatTime(rtpaDeadline) + ' น.');
-
+                          createInfoCard(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', formatTime(arrivalDeadline) + ' น.') +
+                          createInfoCard(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', formatTime(rtpaDeadline) + ' น.');
         buildActionContainer();
     }
     
@@ -472,8 +467,12 @@
                 ${icons.pin}
                 <p id="location-text" class="action-button-text" style="color:white;">ส่งพิกัดที่อยู่</p>
             </div>
-            <a class="action-button tel-swe-button" onclick="triggerSave(this, 'รพ.สวี')" href="tel:0894745523">${icons.phone}<p class="action-button-text">โทร รพ.สวี</p></a>
-            <a class="action-button tel-1669-button" onclick="triggerSave(this, '1669')" href="tel:1669">${icons.phone}<p class="action-button-text">โทร 1669 (ฟรี)</p></a>
+            <div class="action-button tel-button" onclick="triggerSave(this, 'รพ.สวี')">
+                <a href="tel:0894745523" style="text-decoration:none; color:white;">${icons.phone}<p class="action-button-text">โทร รพ.สวี</p></a>
+            </div>
+            <div class="action-button tel-button" onclick="triggerSave(this, '1669')">
+                <a href="tel:1669" style="text-decoration:none; color:white;">${icons.phone}<p class="action-button-text">โทร 1669 (ฟรี)</p></a>
+            </div>
         `;
     }
 
@@ -486,7 +485,7 @@
             position => {
                 locButton.classList.add('success');
                 locButton.querySelector('.action-button-icon').innerHTML = icons.check;
-                document.getElementById('location-text').textContent = 'ส่งพิกัดแล้ว';
+                locButton.querySelector('.action-button-text').textContent = 'ส่งพิกัดแล้ว';
                 
                 const { latitude, longitude } = position.coords;
                 saveData('location', `${latitude},${longitude}`);
@@ -504,16 +503,19 @@
     
     function updateSummaryAndActions(distance) {
         let summaryContainer = document.getElementById('summary-container');
+        let timeDetailsContainer = document.getElementById('time-details-container');
         let contactContainer = document.getElementById('contact-buttons');
         let routeContainer = document.getElementById('route-button-container');
+        let callSawiButton = document.querySelector('.action-button.tel-button'); // Assuming first red button is Sawi
         
         contactContainer.innerHTML = '';
         routeContainer.innerHTML = '';
-        
+        let extraSummaryHtml = '';
+
         if (distance !== null) {
             if (distance > 450) {
-                summaryContainer.innerHTML += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด');
-                document.querySelector('.tel-swe-button').classList.add('hidden');
+                extraSummaryHtml = createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', 'โปรดเดินทางไป รพ.ที่ใกล้ที่สุด');
+                if(callSawiButton) callSawiButton.parentElement.classList.add('hidden'); // Hide Sawi call button
                 document.getElementById('action-grid-container').insertAdjacentHTML('afterend', `<p style="color:red; font-size:0.9em; text-align:center; margin-top:10px;">ระยะทางของท่านอยู่นอกเขต อ.สวี จ.ชุมพร โปรดโทร 1669</p>`);
             } else {
                 const travelTimeMinutes = (distance / 40) * 60;
@@ -527,14 +529,15 @@
                 sessionData.selfTravelEstimate = selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
                 sessionData.ambulanceEstimate = ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน (แต่ยังต้องรีบไปรพ.)';
 
-                summaryContainer.innerHTML += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
-                summaryContainer.innerHTML += createInfoCard(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration);
-                summaryContainer.innerHTML += createInfoCard(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate);
-                summaryContainer.innerHTML += createInfoCard(icons.runner, 'คาดการณ์ (ออกเดินทางทันที)', sessionData.selfTravelEstimate);
+                extraSummaryHtml += createInfoCard(icons.map, 'ระยะทางไป รพ.สวี', sessionData.distance);
+                extraSummaryHtml += createInfoCard(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration);
+                extraSummaryHtml += createInfoCard(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate);
+                extraSummaryHtml += createInfoCard(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate);
             }
         }
+        timeDetailsContainer.insertAdjacentHTML('beforeend', extraSummaryHtml);
         
-        const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=10.2300226,99.10874813${hospitalCoords.lat},${hospitalCoords.lon}`;
+        const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=10.2300226,99.10874816{hospitalCoords.lat},${hospitalCoords.lon}`;
         routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button route-button"><svg class="info-card-icon" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a.75.75 0 01.75.75v.518a24.22 24.22 0 014.232 1.346.75.75 0 11-.634 1.288 22.72 22.72 0 00-3.6-1.222V8.25a.75.75 0 01-1.5 0v-2.13a.75.75 0 011.5 0V8.25v2.336a24.195 24.195 0 01-4.232 1.346.75.75 0 01-.634-1.288 22.695 22.695 0 003.6-1.222V5.44a.75.75 0 011.5 0v.81a.75.75 0 01-1.5 0V5.44v-.922A.75.75 0 0110 2zM5.003 5.003a.75.75 0 01.75-.75h1.597a.75.75 0 010 1.5H5.75a.75.75 0 01-.75-.75zM5.75 7a.75.75 0 000 1.5h2.553a.75.75 0 000-1.5H5.75zM5.003 9.003a.75.75 0 01.75-.75h4.494a.75.75 0 010 1.5H5.75a.75.75 0 01-.75-.75zM12 5.5a.75.75 0 000 1.5h2.25a.75.75 0 000-1.5H12zM12 9.5a.75.75 0 000 1.5h5.25a.75.75 0 000-1.5H12z"/></svg><span class="label">เส้นทางไป รพ.สวี</span></a>`;
         
         if (sessionData.volunteerContacts) {
@@ -548,22 +551,22 @@
         }
     }
 
-    function createInfoCard(icon, label, value) {
-        const valueColor = (value.includes && value.includes("ไม่ทัน")) ? 'style="color:red; font-weight:bold;"' : '';
-        return `<div class="info-card"><div class="info-card-icon">${icon}</div><div class="info-card-text"><p class="label">${label}</p><p class="value" ${valueColor}>${value}</p></div></div>`;
-    }
-
     function createContactButton(tel, label) {
         return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${label}')">${icons.contact} <span class="label">${label}</span></a>`;
+    }
+
+    function createInfoCard(icon, label, value) {
+        const valueColor = (value && value.includes && value.includes("ไม่ทัน")) ? 'style="color:red; font-weight:bold;"' : '';
+        return `<div class="info-card"><div class="info-card-icon">${icon}</div><div class="info-card-text"><p class="label">${label}</p><p class="value" ${valueColor}>${value || 'N/A'}</p></div></div>`;
     }
 
     function setupTimeOptions() {
         const container = document.getElementById('time-options-container');
         container.innerHTML = '';
         const now = new Date();
-        const timeColors = ['#f2f2f2', '#f0e6c1', '#eedd90', '#ebd45f', '#e9cb2e', '#e7c200', '#ffc107', '#ffb300', '#ffa500', '#ff9800', '#ff8c00'];
+        const timeColors = ['#E0E0E0', '#E4DCCF', '#E8D8BF', '#ECD4AF', '#F0D19F', '#F4CD8F', '#F8C97F', '#FBC56F', '#FFC15F', '#FFBD4F', '#FFB940'];
         const timeOptions = [
-            { text: `เพิ่งเกิด`, minutes: 0 }, { text: '10 นาที', minutes: 10 }, 
+            { text: `เพิ่งเกิด (${formatTime(now)})`, minutes: 0 }, { text: '10 นาที', minutes: 10 }, 
             { text: '30 นาที', minutes: 30 }, { text: '1 ชม.', minutes: 60 }, 
             { text: '2 ชม.', minutes: 120 }, { text: '3 ชม.', minutes: 180 }, 
             { text: '4 ชม.', minutes: 240 }, { text: '6 ชม.', minutes: 360 }, 
@@ -574,10 +577,10 @@
         timeOptions.forEach((opt, index) => {
             const btn = document.createElement('button');
             btn.textContent = opt.text;
-            if(index === 0) btn.innerHTML = `เพิ่งเกิด<br>(${formatTime(now)})`;
             btn.onclick = () => handleTimeSelection(opt.minutes, opt.chronic);
-            if (opt.yellow) { btn.classList.add("yellow-time"); btn.style.backgroundColor = '#FFC107'; }
-            else if (!opt.chronic) { btn.style.backgroundColor = timeColors[index]; }
+            if (opt.yellow) { btn.style.backgroundColor = '#FFC107'; }
+            else if (!opt.chronic) { btn.style.backgroundColor = timeColors[index] || '#E0E0E0'; }
+            else { btn.classList.add("btn-severity-chronic"); }
             container.appendChild(btn);
         });
     }
@@ -585,6 +588,7 @@
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
     
     function formatFullDateTime(date) {
+        if (!date || isNaN(date)) return 'N/A';
         const d = String(date.getDate()).padStart(2, '0');
         const m = String(date.getMonth() + 1).padStart(2, '0');
         const y = date.getFullYear() + 543;
