@@ -44,6 +44,9 @@
         .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 0.9em; position: absolute; bottom: 10px; right: 20px; }
         .hidden { display: none; }
         .info-icon { font-size: 18px; cursor: pointer; color: #007BFF; margin-left: 8px; font-style: normal; border: 1px solid #007BFF; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; }
+        #summary-container p { margin: 10px 0; text-align: left; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 0.9em;}
+        #summary-container p:last-child { border-bottom: none; }
+        #summary-container strong { color: var(--dark-red); }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; }
         .modal-content { background-color: #fefefe; padding: 20px; border-radius: 10px; width: 85%; max-width: 400px; text-align: left; }
     </style>
@@ -78,8 +81,21 @@
             </div>
             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
         </div>
+
+        <div id="layer-4" class="card hidden" data-layer="4">
+            <h2 class="section-title">อาการเริ่มเป็นเมื่อไหร่?</h2>
+            <div class="options-container" id="time-options-container"></div>
+            <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
+        </div>
         
-        <div id="layer-final" class="card hidden" data-layer="final">
+        <div id="layer-5" class="card hidden" data-layer="5">
+             <div class="emergency-text-container"><p class="highlight-large blink">อาจเป็นอาการสโตรก! โปรดปฏิบัติตามข้อมูลด้านล่าง</p></div>
+             <div id="summary-container"></div>
+             <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกข้อมูลและแจ้งเหตุ</button>
+             <button class="btn-back" onclick="goBack()">ย้อนกลับ</button>
+        </div>
+        
+        <div id="layer-6" class="card hidden" data-layer="6">
              <h2 id="final-title" class="section-title" style="text-align:center;"></h2>
              <p id="final-text" style="text-align:center;"></p>
              <button class="btn-action btn-final-save" onclick="handleFinalSave(this)">บันทึกและปิด</button>
@@ -98,39 +114,21 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-    // --- ค่าจริงของคุณได้ถูกใส่ไว้เรียบร้อยแล้ว ---
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
     const LIFF_ID = "2005789397-WRm1lYd9";
     
-    // --- Global Variables & Data ---
+    const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     let currentLayer = 1;
     let sessionData = {};
 
-    // --- [ปรับปรุงใหม่] รายละเอียดอาการแบบกระชับ ---
     const symptomDetails = {
-        'การทรงตัว': {
-            likely: ['เดินเซรุนแรง, ทรงตัวไม่ได้', 'เวียนหัวรุนแรง, บ้านหมุน'],
-            unlikely: ['เวียนหัวเล็กน้อยពេលเปลี่ยนท่า', 'อาการของโรคน้ำในหู', 'ทรงตัวลำบาก (เรื้อรัง)']
-        },
-        'สายตา': {
-            likely: ['ตามัว/มืดบอดหนึ่งข้าง', 'เห็นภาพซ้อน', 'มองไม่เห็นภาพครึ่งซีก'],
-            unlikely: ['ปัญหาสายตาที่เป็นอยู่เดิม', 'เห็นจุดดำลอยไปมา']
-        },
-        'ใบหน้า': {
-            likely: ['ใบหน้าเบี้ยว/มุมปากตก', 'หลับตาไม่สนิทหนึ่งข้าง'],
-            unlikely: ['อาจเป็น Bell\'s Palsy', 'บวมจากปัญหาในช่องปาก']
-        },
-        'แขนขา': {
-            likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่ขึ้น/ของหลุดมือ'],
-            unlikely: ['ชาจากการนอนทับ', 'ปวด/อักเสบกล้ามเนื้อ']
-        },
-        'การพูด': {
-            likely: ['พูดไม่ชัด, ลิ้นแข็ง, อ้อแอ้', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดผู้อื่น'],
-            unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/ปัญหาการได้ยิน']
-        }
+        'การทรงตัว': { likely: ['เดินเซรุนแรง, ทรงตัวไม่ได้', 'เวียนหัวรุนแรง, บ้านหมุน'], unlikely: ['เวียนหัวเล็กน้อยពេលเปลี่ยนท่า', 'อาการของโรคน้ำในหู', 'ทรงตัวลำบาก (เรื้อรัง)'] },
+        'สายตา': { likely: ['ตามัว/มืดบอดหนึ่งข้าง', 'เห็นภาพซ้อน', 'มองไม่เห็นภาพครึ่งซีก'], unlikely: ['ปัญหาสายตาที่เป็นอยู่เดิม', 'เห็นจุดดำลอยไปมา'] },
+        'ใบหน้า': { likely: ['ใบหน้าเบี้ยว/มุมปากตก', 'หลับตาไม่สนิทหนึ่งข้าง'], unlikely: ['อาจเป็น Bell\'s Palsy', 'บวมจากปัญหาในช่องปาก'] },
+        'แขนขา': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่ขึ้น/ของหลุดมือ'], unlikely: ['ชาจากการนอนทับ', 'ปวด/อักเสบกล้ามเนื้อ'] },
+        'การพูด': { likely: ['พูดไม่ชัด, ลิ้นแข็ง, อ้อแอ้', 'นึกคำพูดไม่ออก/ใช้คำผิด', 'ไม่เข้าใจคำพูดผู้อื่น'], unlikely: ['พูดติดขัดเพราะเหนื่อย/เครียด', 'เสียงแหบ/ปัญหาการได้ยิน'] }
     };
 
-    // --- Core Functions ---
     window.onload = async () => {
         try {
             await liff.init({ liffId: LIFF_ID });
@@ -138,22 +136,16 @@
                 const profile = await liff.getProfile();
                 sessionData.userID = profile.userId;
                 sessionData.userName = profile.displayName;
+                setupTimeOptions();
             } else { liff.login(); }
-        } catch (err) {
-            alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง");
-        }
+        } catch (err) { alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); }
         document.getElementById('info-icon').onclick = () => { document.getElementById('disclaimerModal').style.display = 'flex'; };
     };
 
-    function saveData(key, value) {
-        sessionData[key] = value;
-        console.log("Data Stored:", sessionData);
-    }
-    
-    function handleFinalSave(button) {
-        button.textContent = 'กำลังบันทึก...';
-        button.disabled = true;
+    function saveData(key, value) { sessionData[key] = value; }
 
+    function handleFinalSave(button) {
+        button.textContent = 'กำลังบันทึก...'; button.disabled = true;
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
@@ -161,27 +153,23 @@
                 else alert("บันทึกข้อมูลเรียบร้อยแล้ว");
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
-                button.textContent = 'บันทึกและปิด';
-                button.disabled = false;
+                button.textContent = 'บันทึกและปิด'; button.disabled = false;
             }
             delete window[callbackName];
             document.head.removeChild(scriptTag);
         };
-
         const dataStr = encodeURIComponent(JSON.stringify(sessionData));
         const url = `${GAS_URL}?callback=${callbackName}&data=${dataStr}`;
         const scriptTag = document.createElement('script');
         scriptTag.src = url;
         scriptTag.onerror = function() {
             alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
-            button.textContent = 'บันทึกและปิด';
-            button.disabled = false;
+            button.textContent = 'บันทึกและปิด'; button.disabled = false;
             delete window[callbackName];
         };
         document.head.appendChild(scriptTag);
     }
     
-    // --- UI & Flow Functions ---
     function showLayer(layerNumber) {
         currentLayer = layerNumber;
         document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden'));
@@ -190,12 +178,6 @@
     }
     
     function goBack() { if (currentLayer > 1) showLayer(currentLayer - 1); }
-
-    function showFinalMessage(title, text) {
-        document.getElementById('final-title').textContent = title;
-        document.getElementById('final-text').textContent = text;
-        showLayer('final');
-    }
 
     function createButton(container, text, className, onClick) {
         const button = document.createElement('button');
@@ -211,7 +193,6 @@
         const buttonsContainer = document.getElementById('layer-2-buttons');
         buttonsContainer.innerHTML = '';
         const details = symptomDetails[symptomCategory];
-        
         details.likely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-likely', () => handleSymptomResult(true, text)));
         details.unlikely.forEach(text => createButton(buttonsContainer, text, 'btn-symptom-unlikely', () => handleSymptomResult(false, text)));
         showLayer(2);
@@ -224,9 +205,8 @@
 
     function handleSymptomResult(isLikely, symptomDetail) {
         saveData('symptomDetail', symptomDetail);
-        if (isLikely) { 
-            showLayer(3); 
-        } else {
+        if (isLikely) { showLayer(3); } 
+        else {
             saveData('frequency', 'อาจไม่เข้าข่ายสโตรกเฉียบพลัน');
             showFinalMessage("คำแนะนำเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่อาการของสโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์");
         }
@@ -234,23 +214,101 @@
     
     function handleSeveritySelection(frequencyText) {
         saveData('frequency', frequencyText);
-        // เมื่อเลือก "เฉียบพลัน" ให้ข้ามไปหน้าสรุปฉุกเฉินทันที
-        // โดยตั้งเวลาเป็น "ตอนนี้"
-        const now = new Date();
-        sessionData.onsetTimeObject = now;
-        saveData('onsetTime', formatFullDateTime(now));
-
-        // สร้างหน้าสรุปฉุกเฉิน (จะถูกแทนที่ด้วย app ที่ซับซ้อนกว่าในอนาคต)
-        // สำหรับตอนนี้ เราจะแสดง alert และบันทึกข้อมูล
-        alert("ตรวจพบอาการเฉียบพลันที่เข้าข่ายสโตรก! โปรดโทร 1669 ทันที");
-        handleFinalSave(document.createElement('button')); // ส่งปุ่มจำลองเพื่อบันทึก
+        showLayer(4);
     }
 
     function handleChronicSymptom(frequencyText) {
         saveData('frequency', frequencyText);
         showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรปรึกษาแพทย์เพื่อหาสาเหตุที่แท้จริง");
     }
+    
+    function handleTimeSelection(minutesAgo, isChronic = false) {
+        if (isChronic) {
+            saveData('onsetTime', 'เรื้อรัง/หลายวัน');
+            showFinalMessage("คำแนะนำ", "เนื่องจากอาการเป็นมานานแล้ว อาจไม่ใช่ภาวะฉุกเฉินของสโตรก แต่ควรพบแพทย์เพื่อประเมิน");
+            return;
+        }
+        const onsetTime = new Date(Date.now() - minutesAgo * 60000);
+        sessionData.onsetTimeObject = onsetTime;
+        saveData('onsetTime', formatFullDateTime(onsetTime));
+        buildSummaryPage();
+        showLayer(5);
+    }
 
+    function buildSummaryPage() {
+        const onset = sessionData.onsetTimeObject;
+        if (!onset) return;
+
+        const now = new Date();
+        const elapsedMinutes = Math.floor((now - onset) / 60000);
+        const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60000);
+        const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60000);
+
+        saveData('arrivalDeadline', formatTime(arrivalDeadline));
+        saveData('rtpaDeadline', formatTime(rtpaDeadline));
+        
+        const distance = getDistanceFromLatLonInKm(hospitalCoords.lat, hospitalCoords.lon, 13.7563, 100.5018); // Example user location
+        const travelTimeMinutes = (distance / 40) * 60; // Assume 40 km/h
+        const ambulanceTravelTime = travelTimeMinutes * 2; // Round trip for ambulance
+        
+        const selfTravelArrival = new Date(now.getTime() + travelTimeMinutes * 60000);
+        const ambulanceArrival = new Date(now.getTime() + ambulanceTravelTime * 60000);
+
+        const selfTravelOnTime = selfTravelArrival <= rtpaDeadline;
+        const ambulanceOnTime = ambulanceArrival <= rtpaDeadline;
+
+        saveData('distance', `${distance.toFixed(1)} กม.`);
+        saveData('duration', formatDuration(travelTimeMinutes));
+        saveData('ambulanceEstimate', ambulanceOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)');
+        saveData('selfTravelEstimate', selfTravelOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)');
+
+        let summaryHtml = `
+            <p><strong>ผู้ป่วย:</strong> ${sessionData.userName || 'N/A'}</p>
+            <p><strong>อาการ:</strong> ${sessionData.symptomDetail}</p>
+            <p><strong>เริ่มมีอาการเมื่อ:</strong> ${formatFullDateTime(onset)}</p>
+            <p><strong>ต้องถึง รพ. ก่อน:</strong> ${formatTime(arrivalDeadline)} น.</p>
+            <p><strong>ต้องได้รับยา rT-PA ภายใน:</strong> ${formatTime(rtpaDeadline)} น.</p>
+            <hr>
+            <p><strong>พิกัดผู้ป่วย ห่างจาก รพ.สวี:</strong> ${distance.toFixed(1)} กม.</p>
+            <p><strong>ใช้เวลาเดินทางประมาณ:</strong> ${formatDuration(travelTimeMinutes)}</p>
+            <hr>
+            <p><strong>ประมาณการ (รถ รพ. ไปรับ):</strong> <strong style="color:${ambulanceOnTime ? 'green' : 'red'}">${ambulanceOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)'}</strong></p>
+            <p><strong>ประมาณการ (ออกเดินทางทันที):</strong> <strong style="color:${selfTravelOnTime ? 'green' : 'red'}">${selfTravelOnTime ? 'ทัน' : 'ไม่ทัน (แต่ยังต้องรีบไปรพ.)'}</strong></p>
+        `;
+        document.getElementById('summary-container').innerHTML = summaryHtml;
+    }
+    
+    function setupTimeOptions() {
+        const container = document.getElementById('time-options-container');
+        container.innerHTML = '';
+        const now = new Date();
+        const timeOptions = [
+            { text: `เพิ่งเกิดตอนนี้ (${formatTime(now)})`, minutes: 0 },
+            { text: '10 นาทีที่แล้ว', minutes: 10 }, { text: '30 นาทีที่แล้ว', minutes: 30 },
+            { text: '1 ชั่วโมงที่แล้ว', minutes: 60 }, { text: '2 ชั่วโมงที่แล้ว', minutes: 120 },
+            { text: '3 ชั่วโมงที่แล้ว', minutes: 180 }, { text: '4 ชั่วโมงที่แล้ว', minutes: 240 },
+            { text: '6 ชั่วโมงที่แล้ว', minutes: 360 }, { text: '12 ชั่วโมงที่แล้ว', minutes: 720 },
+            { text: '1 วันก่อนหน้า', minutes: 1440, chronic: true },
+            { text: 'หลายวันก่อนหน้า', minutes: 0, chronic: true }
+        ];
+        timeOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.textContent = opt.text;
+            btn.onclick = () => handleTimeSelection(opt.minutes, opt.chronic);
+            if(opt.chronic) btn.className = "btn-severity-chronic";
+            container.appendChild(btn);
+        });
+    }
+
+    function showFinalMessage(title, text) {
+        saveData('symptomDetail', text);
+        document.getElementById('final-title').textContent = title;
+        document.getElementById('final-text').textContent = text;
+        showLayer(6);
+    }
+    
+    function formatTime(date) { return date.toTimeString().slice(0, 5); }
+    
     function formatFullDateTime(date) {
         const d = String(date.getDate()).padStart(2, '0');
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -259,6 +317,21 @@
         const mm = String(date.getMinutes()).padStart(2, '0');
         const ss = String(date.getSeconds()).padStart(2, '0');
         return `${d}/${m}/${y} ${hh}:${mm}:${ss}`;
+    }
+
+    function formatDuration(minutes) {
+        if (isNaN(minutes) || minutes < 0) return 'N/A';
+        const h = Math.floor(minutes / 60);
+        const m = Math.round(minutes % 60);
+        return `${h} ชั่วโมง ${m} นาที`;
+    }
+
+    function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 </script>
 </body>
