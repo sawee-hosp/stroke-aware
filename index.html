@@ -168,6 +168,9 @@
     let sessionData = {};
     let countdownInterval;
 
+    // --- FIXED: ADDED HOSPITALCOORDS BACK ---
+    const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
+
     const icons = {
         user: 'mdi:account-circle', symptom: 'mdi:account-heart-outline',
         clock: 'mdi:clock-time-three-outline', hourglass: 'mdi:timer-sand',
@@ -296,9 +299,12 @@
 
     function showFinalMessage(title, text) {
         saveData('symptomDetail', text);
-        document.getElementById('final-title').textContent = title;
-        document.getElementById('final-text').textContent = text;
-        document.getElementById('final-emoji').textContent = ['👍', '🎉', '💪', '✅', '😊'][Math.floor(Math.random() * 5)];
+        const finalTitle = document.getElementById('final-title');
+        const finalText = document.getElementById('final-text');
+        const finalEmoji = document.getElementById('final-emoji');
+        if (finalTitle) finalTitle.textContent = title;
+        if (finalText) finalText.textContent = text;
+        if (finalEmoji) finalEmoji.textContent = ['👍', '🎉', '💪', '✅', '😊'][Math.floor(Math.random() * 5)];
         showLayer('layer-6');
     }
     
@@ -342,6 +348,7 @@
 
     function buildNoSymptomReviewPage() {
         const container = document.getElementById('review-container');
+        if (!container) return;
         container.innerHTML = '';
         let reviewHtml = '';
         for (const key in symptomImages) {
@@ -460,7 +467,7 @@
         const routeContainer = document.getElementById('route-button-container');
         routeContainer.innerHTML = '';
         if (distance !== null && distance <= 450) {
-            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}`;
+            const gmapsUrl = `https://www.google.com/maps?q=${hospitalCoords.lat},${hospitalCoords.lon}`;
             routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button route-button"><span class="iconify" data-icon="${icons.route}"></span><span class="label">เส้นทางไป รพ.สวี</span></a>`;
         }
         if (sessionData.volunteerContacts) {
@@ -485,6 +492,7 @@
     
     function setupTimeOptions() {
         const container = document.getElementById('time-options-container');
+        if (!container) return; // Safety check
         container.innerHTML = '';
         const now = new Date();
         const timeOptions = [
