@@ -29,8 +29,6 @@
         .symptom-card:hover { transform: translateY(-5px); }
         .symptom-card img { width: 100%; max-width: 100px; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 8px; }
         .symptom-card p { margin: 0; line-height: 1.3; font-weight: bold; }
-        .symptom-card p.large-red { font-size: 24px; color: var(--symptom-red); }
-        .symptom-card p.large-blue { font-size: 24px; color: var(--primary-color); }
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; }
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
         .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; color: white; }
@@ -38,88 +36,51 @@
         .btn-action { width: 100%; padding: 15px; color: white; margin-top: 20px; font-size: 1.2em; border-radius: 10px; }
         .btn-back-container { padding: 10px 0; border-top: 1px solid #eee; margin-top: 20px; }
         .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 1em; text-align: center; width: 100%; display: block; font-weight: bold; }
-        .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--symptom-red); }
-        .emergency-text-container .highlight-large { font-size: 1.4em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
-        .countdown-timer { font-size: 1.0em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
-        @keyframes blinker { 50% { opacity: 0.3; } }
-        .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; place-items: center; margin-top: 10px; }
-        .action-button-wrapper { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); }
-        .action-button { display: flex; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 15px; cursor: pointer; text-align: center; color: white; transition: background-color 0.3s; box-shadow: var(--shadow); }
-        .action-button .iconify { font-size: 56px; }
-        .action-button-text { font-size: 0.9em; margin-top: 8px; font-weight: bold; }
-        .location-button { background-color: var(--action-blue); }
-        .location-button.success { background-color: var(--action-green); }
-        .tel-sawi-button { background-color: var(--action-orange); }
-        .tel-1669-button { background-color: var(--action-red); }
-        .summary-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .summary-table tr td { padding: 12px 5px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        .summary-table .icon-col { width: 40px; text-align: center; }
-        .summary-table .icon-col .iconify { font-size: 28px; color: var(--primary-color); }
-        .summary-table .label-col { color: #6C757D; font-size: 0.95em; white-space: nowrap; }
-        .summary-table .value-col { font-weight: bold; text-align: right; color: var(--text-color); }
-        .summary-table .value-col.value-urgent { color: var(--dark-red); }
-        .contact-buttons { margin-top: 20px; }
-        .contact-button { display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid var(--action-gray); border-radius: 10px; padding: 12px; margin-bottom: 10px; text-decoration: none; color: var(--text-color); font-weight: bold; transition: background-color 0.2s; }
-        .contact-button .iconify { font-size: 24px; color: var(--action-gray); }
-        .contact-button .label { flex-grow: 1; text-align: center; }
-        .route-button { border-color: #34A853; color: #34A853 !important; }
-        .route-button .iconify { color: #34A853; }
         .hidden { display: none; }
-        .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
-        .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-        .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+
+        /* Styles for Layer 2 Image and New Buttons */
+        .symptom-image-container img { width: 100%; border-radius: var(--border-radius); margin-bottom: 16px; }
+        .general-symptom-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .general-symptom-buttons button { flex: 1; padding: 15px; font-size: 1.1em; }
+        .btn-likely { background-color: var(--symptom-red); color: white; }
+        .btn-unlikely { background-color: var(--symptom-green); color: white; }
+
+        /* Styles for "No Symptom Review" Page */
+        .review-card { display: flex; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: var(--border-radius); margin-bottom: 10px; }
+        .review-image { flex: 0 0 80%; padding-right: 10px; }
+        .review-image img { width: 100%; border-radius: 8px; }
+        .review-action { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .review-action button { width: 100%; font-size: 1em; padding: 15px 5px; }
     </style>
 </head>
 <body>
     <div class="main-container">
         <div id="layer-1" data-layer="1" class="card">
-            <div class="card-body">
-                <h1 class="section-title">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1>
-                <p class="section-subtitle">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p>
-                <div class="symptom-grid">
-                    <div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p class="large-red">เซ/มึนหัว</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p class="large-red">ตามัวมาก</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p class="large-red">มุมปากตก</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p class="large-red">ยกแขนยาก</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p class="large-red">ลำบากพูด</p></div>
-                    <div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p class="large-blue">ไม่มีอาการ</p></div>
-                </div>
             </div>
-        </div>
+
         <div id="layer-2" data-layer="2" class="card hidden">
-            <div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><p class="section-subtitle">กรุณาเลือกรายละเอียดอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div>
+            <div class="card-body">
+                <h2 id="layer-2-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2>
+                <div id="layer-2-new-content"></div>
+                <hr id="layer-2-separator" style="margin: 20px 0;">
+                <p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p>
+                <div id="layer-2-buttons" class="options-container"></div>
+            </div>
             <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>
         </div>
-        <div id="layer-3" data-layer="3" class="card hidden">
-            <div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button style="background-color: var(--symptom-red); color: white; width:100%;" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white; width:100%;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div>
-            <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-2')">ย้อนกลับ</div></div>
-        </div>
-        <div id="layer-4" data-layer="4" class="card hidden">
-            <div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div>
-            <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-3')">ย้อนกลับ</div></div>
-        </div>
-        <div id="layer-5" data-layer="5" class="card hidden">
+        
+        <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden">
             <div class="card-body">
-                <div class="emergency-text-container"><p class="highlight-large">อาจเป็นอาการสโตรก!</p><div id="countdown-timer" class="countdown-timer"></div></div>
-                <div id="action-grid-container" class="action-buttons-grid"></div>
-                <table id="summary-table" class="summary-table"></table>
-                <div id="contact-buttons" class="contact-buttons"></div>
-                <div id="route-button-container"></div>
-                <button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด')">บันทึกข้อมูลและปิดหน้าต่าง</button>
+                <h2 class="section-title" style="text-align:center; font-size:1.4em;">ทบทวนเพื่อความแน่ใจ</h2>
+                <p class="section-subtitle">หากมีอาการใดอาการหนึ่งตรงกับรูปภาพ โปรดกดปุ่ม "มีอาการ"</p>
+                <div id="review-container">
+                    </div>
+                <button class="btn-unlikely" style="width:100%; padding: 20px; font-size: 1.2em; margin-top: 20px;" onclick="handleFinalNoSymptom()">ทดสอบทุกข้อแล้วไม่มีอาการ</button>
             </div>
-            <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>
+             <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>
         </div>
-        <div id="layer-6" data-layer="6" class="card hidden">
-            <div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div><h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><p id="final-text" style="text-align:center; font-size:1.1em;"></p><button class="btn-action" style="background-color: var(--primary-color); font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>
+
         </div>
-        <div id="history-card" class="card hidden"></div>
-        <div id="disclaimerModal" class="modal hidden" onclick="this.style.display='none'">
-            <div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center; font-size:1.2em;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:0.9em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล เช่น ความดันโลหิต หรือเบาหวาน</p><button onclick="document.getElementById('disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">รับทราบ</button></div>
-        </div>
-        <div id="how-to-act-modal" class="modal hidden">
-            <div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left; font-size:0.9em;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.getElementById('how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>
-        </div>
-    </div>
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
@@ -146,6 +107,18 @@
         check: 'mdi:check-circle',
         phone: 'mdi:phone-hangup',
         route: 'mdi:directions'
+    };
+       const symptomImages = {
+        'Balance': 'https://img2.pic.in.th/pic/9262fb61dad1ac59a.png',
+        'Eye': 'https://img2.pic.in.th/pic/116c85596438a20abb.png',
+        'Face': 'https://img5.pic.in.th/file/secure-sv1/816bef53cab08af4c.png',
+        'Arm': 'https://img5.pic.in.th/file/secure-sv1/1085d75ea978c5fa79.png',
+        'Speech': 'https://img5.pic.in.th/file/secure-sv1/120c61160f5b97e541.png'
+    };
+
+    const symptomTranslations = {
+        'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 
+        'Arm': 'แขนขา', 'Speech': 'การพูด'
     };
     
     const symptomDetails = {
@@ -247,11 +220,9 @@
     function showLayer(layerId) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(layerId).classList.remove('hidden'); }
     function goBack(targetLayer) { showLayer(targetLayer); }
 
-    function handleNoSymptom() {
-        sessionData.symptomCategory = 'ไม่มีอาการ';
-        const randomGreeting = ["เยี่ยมมาก! วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย", "ยินดีด้วย! ขอให้คุณสุขภาพดี ปลอดโรคปลอดภัย"][Math.floor(Math.random() * 2)];
-        saveData('randomGreeting', randomGreeting);
-        showFinalMessage("เยี่ยมมาก!", randomGreeting);
+function handleNoSymptom() {
+        buildNoSymptomReviewPage();
+        showLayer('layer-no-symptom-review');
     }
 
     function showFinalMessage(title, text) {
@@ -261,35 +232,79 @@
         document.getElementById('final-emoji').textContent = ['👍', '🎉', '💪', '✅', '😊'][Math.floor(Math.random() * 5)];
         showLayer('layer-6');
     }
+        function handleFinalNoSymptom() {
+        saveData('symptomCategory', 'ไม่มีอาการ');
+        const randomGreeting = ["เยี่ยมมาก! วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย", "ยินดีด้วย! ขอให้คุณสุขภาพดี ปลอดโรคปลอดภัย"][Math.floor(Math.random() * 2)];
+        saveData('randomGreeting', randomGreeting);
+        showFinalMessage("เยี่ยมมาก!", randomGreeting);
+    }
+    
 
-    function showLayer2(symptomKey) {
-        sessionData.symptomCategory = symptomKey;
-        const symptomTranslations = {'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด'};
+   function showLayer2(symptomKey) {
+        saveData('symptomCategory', symptomKey);
         document.getElementById('layer-2-title').textContent = `อาการด้าน${symptomTranslations[symptomKey]}`;
+        
+        const newContentContainer = document.getElementById('layer-2-new-content');
         const buttonsContainer = document.getElementById('layer-2-buttons');
+        newContentContainer.innerHTML = '';
         buttonsContainer.innerHTML = '';
+
+        // Part 1: Create and add the new content (Image and 2 general buttons)
+        let newHtml = `<div class="symptom-image-container"><img src="${symptomImages[symptomKey]}" alt="${symptomTranslations[symptomKey]}"></div>`;
+        newHtml += `<div class="general-symptom-buttons">
+                        <button class="btn-likely" onclick="handleSymptomResult(true, 'อาการเข้าข่าย')">อาการเข้าข่าย</button>
+                        <button class="btn-unlikely" onclick="handleSymptomResult(false, 'อาการไม่เข้าข่าย')">อาการไม่เข้าข่าย</button>
+                    </div>`;
+        newContentContainer.innerHTML = newHtml;
+
+        // Part 2: Create and add the original list of specific buttons
         const details = symptomDetails[symptomKey];
         details.likely.forEach(text => {
             const btn = document.createElement('button');
+            btn.className = 'btn-likely';
             btn.textContent = text;
-            btn.style.backgroundColor = 'var(--symptom-red)';
             btn.onclick = () => handleSymptomResult(true, text);
             buttonsContainer.appendChild(btn);
         });
         details.unlikely.forEach(text => {
             const btn = document.createElement('button');
+            btn.className = 'btn-unlikely';
             btn.textContent = text;
-            btn.style.backgroundColor = 'var(--symptom-green)';
             btn.onclick = () => handleSymptomResult(false, text);
             buttonsContainer.appendChild(btn);
         });
+        
         showLayer('layer-2');
     }
+function buildNoSymptomReviewPage() {
+        const container = document.getElementById('review-container');
+        container.innerHTML = '';
+        let reviewHtml = '';
 
-    function handleSymptomResult(isLikely, symptomDetail) {
+        for (const key in symptomImages) {
+            reviewHtml += `
+                <div class="review-card">
+                    <div class="review-image">
+                        <img src="${symptomImages[key]}" alt="${symptomTranslations[key]}">
+                    </div>
+                    <div class="review-action">
+                        <button class="btn-likely" onclick="handleSymptomResult(true, 'มีอาการ ${symptomTranslations[key]} จากหน้าทบทวน', '${key}')">มีอาการ</button>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = reviewHtml;
+    }
+
+     function handleSymptomResult(isLikely, symptomDetail, symptomCategory = null) {
+        if (symptomCategory) {
+            saveData('symptomCategory', symptomCategory);
+        }
         saveData('symptomDetail', symptomDetail);
-        if (isLikely) { showLayer('layer-3'); }
-        else {
+
+        if (isLikely) {
+            showLayer('layer-3');
+        } else {
             saveData('frequency', 'อาจไม่เข้าข่ายสโตรกเฉียบพลัน');
             showFinalMessage("คำแนะนำเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่อาการของสโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์");
         }
@@ -314,27 +329,28 @@
         buildSummaryPage();
     }
 
-    
- /**
+    /**
      * FIXED
      * This function now correctly calculates the deadline and passes it to the countdown.
+     * It also creates the eventId.
      */
     function buildSummaryPage() {
+        // --- ADD THIS LINE TO CREATE EVENT ID ---
+        if (!sessionData.eventId) {
+            sessionData.eventId = sessionData.userID + '-' + Date.now();
+        }
+
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
 
-        // 1. Calculate the two deadlines
         const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
         const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
         
-        // 2. Save the formatted times to the session data for logging
         sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
 
-        // 3. Pass the raw millisecond timestamp of the deadline to the countdown function
         startCountdown(rtpaDeadline.getTime());
         
-        // 4. Build the summary table with all information
         let tableHtml = '<tbody>';
         tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
         tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
@@ -358,7 +374,6 @@
         if (!timerElement) return;
 
         const updateTimer = () => {
-            // Calculate the distance between the deadline and the current time
             const distance = deadlineMillis - new Date().getTime();
 
             if (distance < 0) {
@@ -375,7 +390,7 @@
         countdownInterval = setInterval(updateTimer, 1000);
     }
 
-function updateSummaryAndActions(distance) {
+    function updateSummaryAndActions(distance) {
         const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
         document.querySelectorAll('.distance-row').forEach(row => row.remove());
 
@@ -387,8 +402,6 @@ function updateSummaryAndActions(distance) {
                 if (sawiButtonWrapper) sawiButtonWrapper.style.display = 'none';
             } else {
                 if (sawiButtonWrapper) sawiButtonWrapper.style.display = 'flex';
-                
-                // --- ส่วนที่แก้ไข ---
                 const travelTimeMinutes = (distance / 40) * 60;
                 const ambulanceTravelTime = travelTimeMinutes * 1.5 + 15;
                 const selfTravelArrival = new Date(Date.now() + travelTimeMinutes * 60000);
@@ -398,7 +411,6 @@ function updateSummaryAndActions(distance) {
                 sessionData.distance = `${distance.toFixed(1)} กม.`;
                 sessionData.duration = formatDuration(travelTimeMinutes);
                 
-                // สร้างข้อความแสดงผลแบบใหม่
                 const selfTravelText = `${formatTime(selfTravelArrival)} น. (${selfTravelArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน'})`;
                 const ambulanceTravelText = `${formatTime(ambulanceArrival)} น. (${ambulanceArrival <= rtpaDeadline ? 'ทัน' : 'อาจไม่ทัน'})`;
 
