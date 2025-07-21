@@ -383,7 +383,6 @@
             showFinalMessage("คำแนะนำ", "เนื่องจากอาการเป็นมานานแล้ว อาจไม่ใช่ภาวะฉุกเฉินของสโตรก แต่ควรพบแพทย์เพื่อประเมิน");
             return;
         }
-        // Step 1: Calculate the exact onset time and store it.
         const onsetTime = new Date(Date.now() - minutesAgo * 60000);
         sessionData.onsetTimeObject = onsetTime;
         saveData('onsetTime', formatFullDateTime(onsetTime));
