@@ -398,14 +398,12 @@
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
 
-        // Step 2: Calculate the exact deadline by adding 4.5 hours to the onset time.
         const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
         const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
         
         sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
 
-        // Pass the final, correct deadline (in milliseconds) to the countdown function.
         startCountdown(rtpaDeadline.getTime());
         
         let tableHtml = '<tbody>';
