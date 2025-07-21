@@ -76,10 +76,8 @@
         <div id="layer-6" data-layer="6" class="card hidden"></div>
         <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden"></div>
         <div id="history-card" class="card hidden"></div>
-
         <div id="disclaimerModal" class="modal"></div>
         <div id="how-to-act-modal" class="modal"></div>
-        
         <div id="confirmLocationModal" class="modal">
             <div class="modal-content">
                 <span class="iconify" data-icon="mdi:map-marker-alert" style="font-size: 64px; color: var(--action-orange);"></span>
@@ -95,9 +93,9 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
-    const LIFF_ID = "2005789397-WRm1lYd9";
-    const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
+    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL";
+    const LIFF_ID = "YOUR_LIFF_ID";
+    const REGISTRATION_LIFF_URL = "YOUR_REGISTRATION_LIFF_URL";
     
     let sessionData = {};
     let countdownInterval;
@@ -105,7 +103,6 @@
     let currentActionKey = '';
 
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
-    
     const icons = {
         user: 'mdi:account-circle', symptom: 'mdi:account-heart-outline',
         clock: 'mdi:clock-time-three-outline', hourglass: 'mdi:timer-sand',
@@ -114,7 +111,6 @@
         contact: 'mdi:phone', pin: 'mdi:map-marker', check: 'mdi:check-circle',
         phone: 'mdi:phone-hangup', route: 'mdi:directions'
     };
-    
     const symptomImages = {
         'Balance': 'https://img2.pic.in.th/pic/9262fb61dad1ac59a.png',
         'Eye': 'https://img2.pic.in.th/pic/116c85596438a20abb.png',
@@ -122,12 +118,10 @@
         'Arm': 'https://img5.pic.in.th/file/secure-sv1/1085d75ea978c5fa79.png',
         'Speech': 'https://img5.pic.in.th/file/secure-sv1/120c61160f5b97e541.png'
     };
-
     const symptomTranslations = {
         'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 
         'Arm': 'แขนขา', 'Speech': 'การพูด'
     };
-    
     const symptomDetails = {
         'Balance': { likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้'], unlikely: ['เวียนหัวตอนเปลี่ยนท่า', 'น้ำในหูไม่เท่ากัน'] },
         'Eye': { likely: ['ตามัวหรือมองไม่เห็น', 'เห็นภาพซ้อน', 'เสียการมองเห็นครึ่งซีก'], unlikely: ['ปัญหาสายตาเดิม', 'ตาแห้ง/ระคายเคือง'] },
@@ -168,7 +162,7 @@
         document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div><h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><p id="final-text" style="text-align:center; font-size:1.1em;"></p><button class="btn-action" style="background-color: var(--primary-color); font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         document.getElementById('layer-no-symptom-review').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">ทบทวนเพื่อความแน่ใจ</h2><p class="section-subtitle">หากมีอาการใดอาการหนึ่งตรงกับรูปภาพ โปรดกดปุ่ม "มีอาการ"</p><div id="review-container"></div><button class="btn-unlikely" style="width:100%; padding: 20px; font-size: 1.2em; margin-top: 20px;" onclick="handleFinalNoSymptom()">ทดสอบทุกข้อแล้วไม่มีอาการ</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center; font-size:1.2em;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:0.9em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">รับทราบ</button></div>`;
-        document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left; font-size:0.9em;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. เมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>`;
+        document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left; font-size:0.9em;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>`;
     }
 
     function fetchUserData(userId) {
@@ -186,6 +180,7 @@
             sessionData.registeredName = data.name;
             sessionData.district = data.district;
             sessionData.village = data.village;
+            sessionData.risk_group = data.risk_group; // Store risk group for Flex
             const riskTimestamp = data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A';
             historyCard.innerHTML = `<h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2><p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก(${data.risk_group || 'N/A'}): <strong>${data.thai_cv_risk_score}%</strong></p><p style="font-size: 0.8em; text-align: center; color: #666;">ประเมินเมื่อ: ${riskTimestamp}</p>`;
             if(sessionData.district && sessionData.village) {
@@ -218,9 +213,7 @@
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
-                if (isEmergency) {
-                    document.getElementById('how-to-act-modal').style.display = 'flex';
-                } else { if(liff.isInClient()) liff.closeWindow(); }
+                // The modal is now shown AFTER the Flex has been sent successfully
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
                 if(button) button.disabled = false;
@@ -253,6 +246,12 @@
         }
         sessionData.contactedVia = currentActionKey; 
         handleFinalSave(currentActionElement, true);
+        
+        // Open the phone dialer if it's a tel link
+        const telLink = currentActionElement.href;
+        if (telLink && telLink.startsWith('tel:')) {
+            window.location.href = telLink;
+        }
     }
 
     function getLocation(andThenSave = false) {
@@ -262,7 +261,7 @@
         navigator.geolocation.getCurrentPosition(
             position => {
                 locButton.classList.add('success');
-                locButton.innerHTML = `<span class="iconify" data-icon="${icons.check}"></span>`;
+                locButton.innerHTML = `<span class="iconify" data-icon="mdi:check"></span>`;
                 locText.textContent = 'ส่งพิกัดแล้ว';
                 const { latitude, longitude } = position.coords;
                 saveData('location', `${latitude},${longitude}`);
