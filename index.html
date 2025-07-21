@@ -424,7 +424,6 @@
         if (!timerElement) return;
 
         const updateTimer = () => {
-            // Step 3: Continuously calculate remaining time using the fixed deadline.
             const distance = deadlineMillis - new Date().getTime();
 
             if (distance < 0) {
