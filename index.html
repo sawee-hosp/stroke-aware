@@ -229,7 +229,15 @@
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
                 if (isEmergency && response.notificationSent) {
-                    document.getElementById('how-to-act-modal').style.display = 'flex';
+                    // --- ส่วนที่แก้ไข ---
+                    // ตรวจสอบว่าผู้ใช้กดปุ่มไหนมา
+                    if (currentActionKey === 'บันทึกและปิด') {
+                        // ถ้ากด "บันทึกและปิด" ให้ปิดหน้าต่างเลย
+                        if(liff.isInClient()) liff.closeWindow();
+                    } else {
+                        // ถ้ากดปุ่มโทร ให้แสดง Modal วิธีปฏิบัติตัว
+                        document.getElementById('how-to-act-modal').style.display = 'flex';
+                    }
                 } else if (!isEmergency) {
                     if(liff.isInClient()) liff.closeWindow();
                 }
@@ -248,6 +256,7 @@
         };
         document.head.appendChild(scriptTag);
     }
+
     
     function triggerSave(element, key, isFinalSave = false) {
         currentActionElement = element;
@@ -271,21 +280,31 @@
         } else {
             sessionData.sendNotification = false;
         }
+        
+        // --- ส่วนที่แก้ไข ---
+        // เรียก handleFinalSave อย่างเดียว ไม่ต้องทำอย่างอื่น
         handleFinalSave(currentActionElement, true);
-        const telLink = currentActionElement.href;
-        if (telLink && telLink.startsWith('tel:')) {
-            window.location.href = telLink;
-        }
+
+        // **ไม่ต้อง** มี window.location.href = telLink; ในนี้อีกต่อไป
     }
 
-    function getLocation(andThenSave = false) {
+function getLocation(andThenSave = false) {
         const locButton = document.getElementById('location-action');
         const locText = document.getElementById('location-text');
-        locButton.onclick = null; locText.textContent = 'กำลังค้นหา...';
+
+        // ตรวจสอบก่อนว่าหา element เจหรือไม่
+        if (!locButton || !locText) {
+            console.error("Location button or text element not found.");
+            return;
+        }
+
+        locButton.onclick = null; 
+        locText.textContent = 'กำลังค้นหา...';
+        
         navigator.geolocation.getCurrentPosition(
             position => {
                 locButton.classList.add('success');
-                locButton.innerHTML = `<span class="iconify" data-icon="mdi:check"></span>`;
+                locButton.innerHTML = `<span class="iconify" data-icon="${icons.check}"></span>`;
                 locText.textContent = 'ส่งพิกัดแล้ว';
                 const { latitude, longitude } = position.coords;
                 saveData('location', `${latitude},${longitude}`);
@@ -537,12 +556,29 @@
 
     function createContactButton(tel, label, key) { return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${key}')"><span class="iconify" data-icon="${icons.contact}"></span><span class="label">${label}</span></a>`; }
     
-    function buildActionContainer() {
+function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
+        if (!container) return;
         container.innerHTML = `
-            <div class="action-button-wrapper"><div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="mdi:map-marker"></span></div><p class="action-button-text">ส่งพิกัดที่อยู่</p></div>
-            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')"><div class="action-button tel-sawi-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร รพ.สวี</p></a>
-            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')"><div class="action-button tel-1669-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร 1669</p></a>`;
+            <div class="action-button-wrapper">
+                <div id="location-action" class="action-button location-button" onclick="getLocation()">
+                    <span class="iconify" data-icon="${icons.pin}"></span>
+                </div>
+                // --- จุดสำคัญคือ id="location-text" ในบรรทัดนี้ ---
+                <p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
+            </div>
+            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')">
+                <div class="action-button tel-sawi-button">
+                    <span class="iconify" data-icon="${icons.phone}"></span>
+                </div>
+                <p class="action-button-text">โทร รพ.สวี</p>
+            </a>
+            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')">
+                <div class="action-button tel-1669-button">
+                    <span class="iconify" data-icon="${icons.phone}"></span>
+                </div>
+                <p class="action-button-text">โทร 1669</p>
+            </a>`;
     }
     
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
