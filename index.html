@@ -76,8 +76,25 @@
         .route-button { border-color: #34A853; color: #34A853 !important; }
         .route-button .iconify { color: #34A853; }
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
-        .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; text-align: center; }
-        .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            /* --- ADD/MODIFY THESE LINES --- */
+            max-height: 80vh; /*จำกัดความสูงไม่ให้เกิน 80% ของหน้าจอ*/
+            overflow-y: auto; /*ทำให้ scroll ได้ในแนวตั้ง*/
+            text-align: left; /*จัดข้อความชิดซ้ายให้อ่านง่าย*/
+        }
+        .modal-content p, .modal-content li {
+            font-size: 1em; /*เพิ่มขนาดตัวอักษร*/
+            margin: 10px 0;
+        }
+        .modal-content ul {
+            padding-left: 20px;
+        }        .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -177,6 +194,7 @@
         document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div><h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><p id="final-text" style="text-align:center; font-size:1.1em;"></p><button class="btn-action" style="background-color: var(--primary-color); font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         document.getElementById('layer-no-symptom-review').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">ทบทวนเพื่อความแน่ใจ</h2><p class="section-subtitle">หากมีอาการใดอาการหนึ่งตรงกับรูปภาพ โปรดกดปุ่ม "มีอาการ"</p><div id="review-container"></div><button class="btn-unlikely" style="width:100%; padding: 20px; font-size: 1.2em; margin-top: 20px;" onclick="handleFinalNoSymptom()">ทดสอบทุกข้อแล้วไม่มีอาการ</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center; font-size:1.2em;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:0.9em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">รับทราบ</button></div>`;
+        document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left; font-size:0.9em;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="this.closest('.modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบและปิด</button></div>`;
         document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left; font-size:0.9em;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>`;
     }
 
@@ -562,20 +580,19 @@ function buildActionContainer() {
         container.innerHTML = `
             <div class="action-button-wrapper">
                 <div id="location-action" class="action-button location-button" onclick="getLocation()">
-                    <span class="iconify" data-icon="${icons.pin}"></span>
+                    <span class="iconify" data-icon="mdi:map-marker"></span>
                 </div>
-                // --- จุดสำคัญคือ id="location-text" ในบรรทัดนี้ ---
                 <p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
             </div>
             <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')">
                 <div class="action-button tel-sawi-button">
-                    <span class="iconify" data-icon="${icons.phone}"></span>
+                    <span class="iconify" data-icon="mdi:phone"></span>
                 </div>
                 <p class="action-button-text">โทร รพ.สวี</p>
             </a>
             <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')">
                 <div class="action-button tel-1669-button">
-                    <span class="iconify" data-icon="${icons.phone}"></span>
+                    <span class="iconify" data-icon="mdi:phone"></span>
                 </div>
                 <p class="action-button-text">โทร 1669</p>
             </a>`;
