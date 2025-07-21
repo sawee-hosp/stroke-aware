@@ -439,7 +439,6 @@
         updateTimer();
         countdownInterval = setInterval(updateTimer, 1000);
     }
-    //index.html
     function updateSummaryAndActions(distance) {
         const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
         document.querySelectorAll('.distance-row').forEach(row => row.remove());
