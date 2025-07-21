@@ -26,8 +26,13 @@
         .section-subtitle { font-size: 1.1em; color: #555; margin-top: 4px; margin-bottom: 24px; text-align: center; }
         .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .symptom-card { border-radius: var(--border-radius); box-shadow: var(--shadow); text-align: center; padding: 12px; cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 150px; }
+        .symptom-card:hover { transform: translateY(-5px); }
+        .symptom-card img { width: 100%; max-width: 100px; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 8px; }
+        .symptom-card p { margin: 0; line-height: 1.3; font-weight: bold; }
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; }
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; color: white; }
+        .time-options button { width: calc(33.33% - 6px); flex-grow: 0; margin-bottom: 8px; font-size: 0.9em; padding: 10px 5px; color: #333;}
         .btn-action { width: 100%; padding: 15px; color: white; margin-top: 20px; font-size: 1.2em; border-radius: 10px; }
         .btn-back-container { padding: 10px 0; border-top: 1px solid #eee; margin-top: 20px; }
         .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 1em; text-align: center; width: 100%; display: block; font-weight: bold; }
@@ -41,6 +46,7 @@
         .review-image { flex: 0 0 80%; padding-right: 10px; }
         .review-image img { width: 100%; border-radius: 8px; }
         .review-action { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .review-action button { width: 100%; font-size: 1em; padding: 15px 5px; }
         .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--symptom-red); }
         .emergency-text-container .highlight-large { font-size: 1.4em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
         .countdown-timer { font-size: 1.0em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
@@ -70,10 +76,8 @@
         <div id="layer-6" data-layer="6" class="card hidden"></div>
         <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden"></div>
         <div id="history-card" class="card hidden"></div>
-
         <div id="disclaimerModal" class="modal"></div>
         <div id="how-to-act-modal" class="modal"></div>
-        
         <div id="confirmLocationModal" class="modal">
             <div class="modal-content">
                 <span class="iconify" data-icon="mdi:map-marker-alert" style="font-size: 64px; color: var(--action-orange);"></span>
@@ -89,9 +93,10 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
-const LIFF_ID = "2005789397-WRm1lYd9";
-const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
+    const LIFF_ID = "2005789397-WRm1lYd9";
+    const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
+    
     let sessionData = {};
     let countdownInterval;
     let currentActionElement = null;
@@ -150,7 +155,6 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
     };
 
     function buildInitialHTML() {
-        // This function builds the static content of all layers to prevent "element not found" errors.
         document.getElementById('layer-1').innerHTML = `<div class="card-body"><h1 class="section-title">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1><p class="section-subtitle">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p><div class="symptom-grid"><div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p>เซ/มึนหัว</p></div><div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p>ตามัวมาก</p></div><div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p>มุมปากตก</p></div><div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p>ยกแขนยาก</p></div><div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p>ลำบากพูด</p></div><div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p>ไม่มีอาการ</p></div></div></div>`;
         document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 20px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-2')">ย้อนกลับ</div></div>`;
@@ -210,15 +214,15 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
-                if (isEmergency) {
-                    if (response.notificationSent) { // Check the flag from the server
-                        document.getElementById('how-to-act-modal').style.display = 'flex';
-                    }
-                } else { if(liff.isInClient()) liff.closeWindow(); }
+                if (isEmergency && response.notificationSent) {
+                    document.getElementById('how-to-act-modal').style.display = 'flex';
+                } else if (!isEmergency) {
+                    if(liff.isInClient()) liff.closeWindow();
+                }
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
             }
-            if(button) button.disabled = false; // Re-enable button after operation
+            if(button) button.disabled = false;
         };
         const dataStr = encodeURIComponent(JSON.stringify(sessionData));
         const url = `${GAS_URL}?action=saveData&callback=${callbackName}&data=${dataStr}`;
@@ -234,10 +238,7 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
     function triggerSave(element, key, isFinalSave = false) {
         currentActionElement = element;
         currentActionKey = key;
-        
-        // Add a flag for the final save button
         sessionData.isFinalSave = isFinalSave;
-
         if (key.startsWith('tel_') && !sessionData.location) {
             document.getElementById('confirmLocationModal').style.display = 'flex';
         } else {
@@ -250,16 +251,13 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
             sessionData[currentActionKey] = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
         }
         sessionData.contactedVia = currentActionKey;
-        
         if (!notificationSent || sessionData.isFinalSave) {
             sessionData.sendNotification = true;
             notificationSent = true;
         } else {
             sessionData.sendNotification = false;
         }
-        
         handleFinalSave(currentActionElement, true);
-        
         const telLink = currentActionElement.href;
         if (telLink && telLink.startsWith('tel:')) {
             window.location.href = telLink;
@@ -385,6 +383,7 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
             showFinalMessage("คำแนะนำ", "เนื่องจากอาการเป็นมานานแล้ว อาจไม่ใช่ภาวะฉุกเฉินของสโตรก แต่ควรพบแพทย์เพื่อประเมิน");
             return;
         }
+        // Step 1: Calculate the exact onset time and store it.
         const onsetTime = new Date(Date.now() - minutesAgo * 60000);
         sessionData.onsetTimeObject = onsetTime;
         saveData('onsetTime', formatFullDateTime(onsetTime));
@@ -398,11 +397,17 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
         }
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
+
+        // Step 2: Calculate the exact deadline by adding 4.5 hours to the onset time.
         const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
         const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
+        
         sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
+
+        // Pass the final, correct deadline (in milliseconds) to the countdown function.
         startCountdown(rtpaDeadline.getTime());
+        
         let tableHtml = '<tbody>';
         tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
         tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
@@ -410,6 +415,7 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
         tableHtml += createTableRow(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', sessionData.arrivalDeadline + ' น.');
         tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
         tableHtml += '</tbody>';
+        
         document.getElementById('summary-table').innerHTML = tableHtml;
         buildActionContainer();
         updateSummaryAndActions(null);
@@ -419,8 +425,11 @@ const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
         if (countdownInterval) clearInterval(countdownInterval);
         const timerElement = document.getElementById('countdown-timer');
         if (!timerElement) return;
+
         const updateTimer = () => {
+            // Step 3: Continuously calculate remaining time using the fixed deadline.
             const distance = deadlineMillis - new Date().getTime();
+
             if (distance < 0) {
                 timerElement.textContent = "ถ้าได้รับยาหลังจากนี้อาจไม่มีประสิทธิภาพแล้ว";
                 timerElement.style.color = "var(--dark-red)";
