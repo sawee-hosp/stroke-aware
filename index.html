@@ -48,12 +48,20 @@
         .review-action { flex: 1; display: flex; justify-content: center; align-items: center; }
         .review-action button { width: 100%; font-size: 1em; padding: 15px 5px; }
         .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--symptom-red); }
-        .emergency-text-container .highlight-large { font-size: 1.4em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
-        .countdown-timer { font-size: 1.0em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
+        .emergency-text-container p { margin: 4px 0; }
+        .emergency-text-container .large-red-blink { font-size: 1.5em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
+        .emergency-text-container .small-black-blink { font-size: 0.9em; color: black; animation: blinker 1.5s linear infinite; }
+        .countdown-timer { font-size: 1.1em; color: var(--primary-color); font-weight: bold; margin-top: 12px; }
         @keyframes blinker { 50% { opacity: 0.3; } }
         .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; place-items: center; margin-top: 10px; }
         .action-button-wrapper { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); }
         .action-button { display: flex; align-items: center; justify-content: center; width: 100px; height: 100px; border-radius: 15px; cursor: pointer; text-align: center; color: white; transition: background-color 0.3s; box-shadow: var(--shadow); }
+        .action-button .iconify { font-size: 56px; }
+        .action-button-text { font-size: 0.9em; margin-top: 8px; font-weight: bold; }
+        .location-button { background-color: var(--action-blue); }
+        .location-button.success { background-color: var(--action-green); }
+        .tel-sawi-button { background-color: var(--action-orange); }
+        .tel-1669-button { background-color: var(--action-red); }
         .summary-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .summary-table tr td { padding: 12px 5px; border-bottom: 1px solid #eee; vertical-align: middle; }
         .summary-table .icon-col { width: 40px; text-align: center; }
@@ -61,6 +69,12 @@
         .summary-table .label-col { color: #6C757D; font-size: 0.95em; white-space: nowrap; }
         .summary-table .value-col { font-weight: bold; text-align: right; color: var(--text-color); }
         .summary-table .value-col.value-urgent { color: var(--dark-red); }
+        .contact-buttons { margin-top: 20px; }
+        .contact-button { display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid var(--action-gray); border-radius: 10px; padding: 12px; margin-bottom: 10px; text-decoration: none; color: var(--text-color); font-weight: bold; transition: background-color 0.2s; }
+        .contact-button .iconify { font-size: 24px; color: var(--action-gray); }
+        .contact-button .label { flex-grow: 1; text-align: center; }
+        .route-button { border-color: #34A853; color: #34A853 !important; }
+        .route-button .iconify { color: #34A853; }
         .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; text-align: center; }
         .info-icon { font-size: 16px; cursor: pointer; color: var(--primary-color); margin-left: 8px; font-style: normal; border: 1px solid var(--primary-color); border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; }
@@ -159,7 +173,7 @@
         document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 20px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-2')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-4').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-3')">ย้อนกลับ</div></div>`;
-        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p class="highlight-large">อาจเป็นอาการสโตรก!</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p>อาการของท่าน เข้าข่าย</p><p class="large-red-blink">เป็นอาการของสโตรก</p><p class="small-black-blink">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div><h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><p id="final-text" style="text-align:center; font-size:1.1em;"></p><button class="btn-action" style="background-color: var(--primary-color); font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         document.getElementById('layer-no-symptom-review').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">ทบทวนเพื่อความแน่ใจ</h2><p class="section-subtitle">หากมีอาการใดอาการหนึ่งตรงกับรูปภาพ โปรดกดปุ่ม "มีอาการ"</p><div id="review-container"></div><button class="btn-unlikely" style="width:100%; padding: 20px; font-size: 1.2em; margin-top: 20px;" onclick="handleFinalNoSymptom()">ทดสอบทุกข้อแล้วไม่มีอาการ</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center; font-size:1.2em;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:0.9em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">รับทราบ</button></div>`;
@@ -289,7 +303,7 @@
             }
         );
     }
-    //test
+    
     function saveData(key, value) { sessionData[key] = value; }
     function showLayer(layerId) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(layerId).classList.remove('hidden'); }
     function goBack(targetLayer) { showLayer(targetLayer); }
@@ -396,15 +410,11 @@
         }
         const onset = sessionData.onsetTimeObject;
         if (!onset) return;
-
         const arrivalDeadline = new Date(onset.getTime() + 3.5 * 60 * 60 * 1000);
         const rtpaDeadline = new Date(onset.getTime() + 4.5 * 60 * 60 * 1000);
-        
         sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
-
         startCountdown(rtpaDeadline.getTime());
-        
         let tableHtml = '<tbody>';
         tableHtml += createTableRow(icons.user, 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
         tableHtml += createTableRow(icons.symptom, 'อาการ', sessionData.symptomDetail);
@@ -412,7 +422,6 @@
         tableHtml += createTableRow(icons.hourglass, 'ต้องถึง รพ. ภายใน (3.5ชม.)', sessionData.arrivalDeadline + ' น.');
         tableHtml += createTableRow(icons.hourglass, 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
         tableHtml += '</tbody>';
-        
         document.getElementById('summary-table').innerHTML = tableHtml;
         buildActionContainer();
         updateSummaryAndActions(null);
@@ -422,26 +431,29 @@
         if (countdownInterval) clearInterval(countdownInterval);
         const timerElement = document.getElementById('countdown-timer');
         if (!timerElement) return;
-
         const updateTimer = () => {
             const distance = deadlineMillis - new Date().getTime();
-
             if (distance < 0) {
-                timerElement.textContent = "ถ้าได้รับยาหลังจากนี้อาจไม่มีประสิทธิภาพแล้ว";
+                timerElement.textContent = "หมดเวลาการให้ยาแล้ว";
                 timerElement.style.color = "var(--dark-red)";
                 clearInterval(countdownInterval);
                 return;
             }
+            const hours = Math.floor(distance / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            timerElement.textContent = `เหลือเวลาให้ยาภายใน: ${String(minutes).padStart(2, '0')} นาที ${String(seconds).padStart(2, '0')} วินาที`;
+            timerElement.textContent = `ท่านต้องได้รับยาภายใน ${String(hours)} ชั่วโมง ${String(minutes).padStart(2, '0')} นาที`;
         };
         updateTimer();
         countdownInterval = setInterval(updateTimer, 1000);
     }
+
     function updateSummaryAndActions(distance) {
         const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
         document.querySelectorAll('.distance-row').forEach(row => row.remove());
+        const contactContainer = document.getElementById('contact-buttons');
+        contactContainer.innerHTML = '';
+        const routeContainer = document.getElementById('route-button-container');
+        routeContainer.innerHTML = '';
         if (distance !== null) {
             let extraHtml = '';
             const sawiButtonWrapper = document.querySelector('.tel-sawi-button').closest('.action-button-wrapper');
@@ -465,16 +477,10 @@
                 extraHtml += createTableRow(icons.car, 'คาดการณ์เวลาเดินทาง', sessionData.duration, false, 'distance-row');
                 extraHtml += createTableRow(icons.runner, 'คาดการณ์ (เดินทางมาเอง)', sessionData.selfTravelEstimate, selfTravelText.includes('ไม่ทัน'), 'distance-row');
                 extraHtml += createTableRow(icons.ambulance, 'คาดการณ์ (รถ รพ. ไปรับ)', sessionData.ambulanceEstimate, ambulanceTravelText.includes('ไม่ทัน'), 'distance-row');
+                const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}`;
+                routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button route-button"><span class="iconify" data-icon="${icons.route}"></span><span class="label">เส้นทางไป รพ.สวี</span></a>`;
             }
             table.insertAdjacentHTML('beforeend', extraHtml);
-        }
-        const contactContainer = document.getElementById('contact-buttons');
-        contactContainer.innerHTML = '';
-        const routeContainer = document.getElementById('route-button-container');
-        routeContainer.innerHTML = '';
-        if (distance !== null && distance <= 450) {
-            const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}`;
-            routeContainer.innerHTML = `<a href="${gmapsUrl}" target="_blank" class="contact-button route-button"><span class="iconify" data-icon="${icons.route}"></span><span class="label">เส้นทางไป รพ.สวี</span></a>`;
         }
         if (sessionData.volunteerContacts) {
             const contacts = sessionData.volunteerContacts;
@@ -530,12 +536,13 @@
     }
 
     function createContactButton(tel, label, key) { return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${key}')"><span class="iconify" data-icon="${icons.contact}"></span><span class="label">${label}</span></a>`; }
+    
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         container.innerHTML = `
-            <div class="action-button-wrapper"><div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="${icons.pin}"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p></div>
-            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')"><div class="action-button tel-sawi-button"><span class="iconify" data-icon="${icons.phone}"></span></div><p class="action-button-text">โทร รพ.สวี</p></a>
-            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')"><div class="action-button tel-1669-button"><span class="iconify" data-icon="${icons.phone}"></span></div><p class="action-button-text">โทร 1669</p></a>`;
+            <div class="action-button-wrapper"><div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="mdi:map-marker"></span></div><p class="action-button-text">ส่งพิกัดที่อยู่</p></div>
+            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')"><div class="action-button tel-sawi-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร รพ.สวี</p></a>
+            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')"><div class="action-button tel-1669-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร 1669</p></a>`;
     }
     
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
