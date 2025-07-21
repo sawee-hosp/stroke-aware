@@ -26,13 +26,8 @@
         .section-subtitle { font-size: 1.1em; color: #555; margin-top: 4px; margin-bottom: 24px; text-align: center; }
         .symptom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .symptom-card { border-radius: var(--border-radius); box-shadow: var(--shadow); text-align: center; padding: 12px; cursor: pointer; transition: transform 0.2s ease; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 150px; }
-        .symptom-card:hover { transform: translateY(-5px); }
-        .symptom-card img { width: 100%; max-width: 100px; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 8px; }
-        .symptom-card p { margin: 0; line-height: 1.3; font-weight: bold; }
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; }
         .options-container { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .options-container button { padding: 12px 18px; font-size: 1em; flex-grow: 1; color: white; }
-        .time-options button { width: calc(33.33% - 6px); flex-grow: 0; margin-bottom: 8px; font-size: 0.9em; padding: 10px 5px; color: #333;}
         .btn-action { width: 100%; padding: 15px; color: white; margin-top: 20px; font-size: 1.2em; border-radius: 10px; }
         .btn-back-container { padding: 10px 0; border-top: 1px solid #eee; margin-top: 20px; }
         .btn-back { background: none; color: var(--primary-color); padding: 10px; font-size: 1em; text-align: center; width: 100%; display: block; font-weight: bold; }
@@ -46,7 +41,6 @@
         .review-image { flex: 0 0 80%; padding-right: 10px; }
         .review-image img { width: 100%; border-radius: 8px; }
         .review-action { flex: 1; display: flex; justify-content: center; align-items: center; }
-        .review-action button { width: 100%; font-size: 1em; padding: 15px 5px; }
         .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--symptom-red); }
         .emergency-text-container .highlight-large { font-size: 1.4em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
         .countdown-timer { font-size: 1.0em; color: var(--primary-color); font-weight: bold; margin-top: 8px; }
@@ -76,8 +70,10 @@
         <div id="layer-6" data-layer="6" class="card hidden"></div>
         <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden"></div>
         <div id="history-card" class="card hidden"></div>
+
         <div id="disclaimerModal" class="modal"></div>
         <div id="how-to-act-modal" class="modal"></div>
+        
         <div id="confirmLocationModal" class="modal">
             <div class="modal-content">
                 <span class="iconify" data-icon="mdi:map-marker-alert" style="font-size: 64px; color: var(--action-orange);"></span>
@@ -93,14 +89,14 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
-    const LIFF_ID = "2005789397-WRm1lYd9";
-    const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
-    
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
+const LIFF_ID = "2005789397-WRm1lYd9";
+const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-WRm1lYd9";
     let sessionData = {};
     let countdownInterval;
     let currentActionElement = null;
     let currentActionKey = '';
+    let notificationSent = false;
 
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     const icons = {
@@ -154,11 +150,12 @@
     };
 
     function buildInitialHTML() {
+        // This function builds the static content of all layers to prevent "element not found" errors.
         document.getElementById('layer-1').innerHTML = `<div class="card-body"><h1 class="section-title">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1><p class="section-subtitle">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p><div class="symptom-grid"><div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p>เซ/มึนหัว</p></div><div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p>ตามัวมาก</p></div><div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p>มุมปากตก</p></div><div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p>ยกแขนยาก</p></div><div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p>ลำบากพูด</p></div><div class="symptom-card" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p>ไม่มีอาการ</p></div></div></div>`;
         document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 20px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-2')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-4').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-3')">ย้อนกลับ</div></div>`;
-        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p class="highlight-large">อาจเป็นอาการสโตรก!</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด')">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p class="highlight-large">อาจเป็นอาการสโตรก!</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 4em; margin-bottom: 10px;"></div><h2 id="final-title" class="section-title" style="text-align:center; font-size:1.4em;"></h2><p id="final-text" style="text-align:center; font-size:1.1em;"></p><button class="btn-action" style="background-color: var(--primary-color); font-size:1.3em; padding: 20px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         document.getElementById('layer-no-symptom-review').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center; font-size:1.4em;">ทบทวนเพื่อความแน่ใจ</h2><p class="section-subtitle">หากมีอาการใดอาการหนึ่งตรงกับรูปภาพ โปรดกดปุ่ม "มีอาการ"</p><div id="review-container"></div><button class="btn-unlikely" style="width:100%; padding: 20px; font-size: 1.2em; margin-top: 20px;" onclick="handleFinalNoSymptom()">ทดสอบทุกข้อแล้วไม่มีอาการ</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center; font-size:1.2em;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:0.9em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.2em; padding:15px; border-radius: 10px;">รับทราบ</button></div>`;
@@ -213,11 +210,15 @@
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
-                // The modal is now shown AFTER the Flex has been sent successfully
+                if (isEmergency) {
+                    if (response.notificationSent) { // Check the flag from the server
+                        document.getElementById('how-to-act-modal').style.display = 'flex';
+                    }
+                } else { if(liff.isInClient()) liff.closeWindow(); }
             } else {
                 alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error'));
-                if(button) button.disabled = false;
             }
+            if(button) button.disabled = false; // Re-enable button after operation
         };
         const dataStr = encodeURIComponent(JSON.stringify(sessionData));
         const url = `${GAS_URL}?action=saveData&callback=${callbackName}&data=${dataStr}`;
@@ -230,10 +231,14 @@
         document.head.appendChild(scriptTag);
     }
     
-    function triggerSave(element, key) {
+    function triggerSave(element, key, isFinalSave = false) {
         currentActionElement = element;
         currentActionKey = key;
-        if ((key.startsWith('tel_') || key === 'บันทึกและปิด') && !sessionData.location) {
+        
+        // Add a flag for the final save button
+        sessionData.isFinalSave = isFinalSave;
+
+        if (key.startsWith('tel_') && !sessionData.location) {
             document.getElementById('confirmLocationModal').style.display = 'flex';
         } else {
             proceedWithSave();
@@ -244,10 +249,17 @@
         if (currentActionKey.startsWith('tel_')) {
             sessionData[currentActionKey] = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
         }
-        sessionData.contactedVia = currentActionKey; 
+        sessionData.contactedVia = currentActionKey;
+        
+        if (!notificationSent || sessionData.isFinalSave) {
+            sessionData.sendNotification = true;
+            notificationSent = true;
+        } else {
+            sessionData.sendNotification = false;
+        }
+        
         handleFinalSave(currentActionElement, true);
         
-        // Open the phone dialer if it's a tel link
         const telLink = currentActionElement.href;
         if (telLink && telLink.startsWith('tel:')) {
             window.location.href = telLink;
