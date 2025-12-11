@@ -12,80 +12,91 @@
         :root {
             --primary-color: #007BFF; --background-color: #f0f2f5;
             --card-bg-color: #ffffff; --text-color: #333;
-            --shadow: 0 4px 12px rgba(0,0,0,0.1); --border-radius: 16px; /* เพิ่ม Radius */
+            --shadow: 0 4px 12px rgba(0,0,0,0.1); --border-radius: 16px;
             --symptom-red: #D32F2F; --symptom-green: #388E3C;
             --dark-red: #C0392B; --light-red-bg: #FFF0F0;
             --action-blue: #007BFF; --action-green: #28A745;
             --action-red: #D32F2F; --action-orange: #f39c12; --action-gray: #6C757D;
         }
 
-        /* --- Global Font Size Increase for Elderly --- */
+        /* --- Global Font Size (Large for Elderly) --- */
         body { 
             font-family: "Noto Sans Thai", sans-serif; 
             background-color: var(--background-color); 
             margin: 0; padding: 16px; 
-            font-size: 24px; /* ขยายจาก 18px เป็น 24px */
-            line-height: 1.6;
+            font-size: 24px; /* Base size ใหญ่ */
+            line-height: 1.5;
         }
 
-        /* --- Loading Screen Styles (Black BG + Spin) --- */
+        /* --- Specific Class for Summary Page (Normal Font Size) --- */
+        .normal-font-mode {
+            font-size: 18px !important; /* บังคับกลับมาเป็นขนาดปกติ */
+        }
+        .normal-font-mode .btn-action { font-size: 1.2em; padding: 15px; } /* ปรับปุ่มในหน้านี้ให้เล็กลงหน่อย */
+        .normal-font-mode .action-button .iconify { font-size: 48px; } /* ปรับไอคอนให้สมดุล */
+        .normal-font-mode .emergency-text-container .large-red-blink { font-size: 1.5em; }
+
+        /* --- Loading Screen Styles --- */
         #loading { 
-            position: fixed; top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: #000; 
-            display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; 
-            z-index: 2000; color: white; text-align: center; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 2000; color: white; text-align: center; 
         }
         .spinner {
-            border: 8px solid #333; 
-            border-top: 8px solid #ffc107; 
-            border-radius: 50%;
-            width: 80px; height: 80px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 30px;
+            border: 8px solid #333; border-top: 8px solid #ffc107; 
+            border-radius: 50%; width: 80px; height: 80px; 
+            animation: spin 1s linear infinite; margin-bottom: 30px;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #loading-text { font-size: 2rem; font-weight: bold; margin-bottom: 10px; color: #fff; }
         .loading-prefix { font-size: 1.2rem; margin-bottom: 5px; color: #aaa; }
         #loading-subtext { 
-            font-size: 4rem; font-weight: 800; color: #ffc107; 
-            min-height: 100px; line-height: 1.2; 
-            text-shadow: 2px 2px 10px rgba(255,193,7,0.5); 
+            font-size: 3rem; font-weight: 800; color: #ffc107; 
+            min-height: 80px; line-height: 1.2; text-shadow: 2px 2px 10px rgba(255,193,7,0.5); 
             opacity: 1; transition: opacity 0.5s ease-in-out; 
         }
 
+        /* --- Image Viewer Modal (Lightbox) --- */
+        #image-viewer-modal {
+            display: none; position: fixed; z-index: 5000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.95);
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        #full-image {
+            max-width: 90%; max-height: 80vh; object-fit: contain; border-radius: 10px;
+        }
+        .close-img-btn {
+            position: absolute; top: 20px; right: 20px;
+            color: #f1f1f1; font-size: 50px; font-weight: bold; cursor: pointer;
+            z-index: 5001; background: none; border: none;
+        }
+        .img-instruction { color: #ccc; margin-top: 10px; font-size: 18px; }
+
         /* --- Layout & Card Styles --- */
         .main-container { max-width: 600px; margin: 0 auto; }
-        .card { padding: 30px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 16px; }
-        .card-body { padding-bottom: 20px; }
+        .card { padding: 20px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 10px; }
+        .card-body { padding-bottom: 10px; }
         
-        .section-title { font-size: 1.8em; font-weight: 700; color: var(--text-color); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
-        .section-subtitle { font-size: 1.2em; color: #555; margin-top: 4px; margin-bottom: 30px; text-align: center; }
+        .section-title { font-size: 1.6em; font-weight: 700; color: var(--text-color); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .section-subtitle { font-size: 1.1em; color: #555; margin-top: 0px; margin-bottom: 20px; text-align: center; }
 
-        /* --- Symptom Grid (2 Columns) --- */
-        .symptom-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); /* เปลี่ยนเป็น 2 คอลัมน์ */
-            gap: 20px; 
-        }
+        /* Compact Header for Home Screen to fit 6 buttons */
+        .home-title { font-size: 1.4em; margin-bottom: 5px; } 
+        .home-subtitle { font-size: 1em; margin-bottom: 15px; }
+
+        /* --- Symptom Grid --- */
+        .symptom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .symptom-card { 
             border-radius: var(--border-radius); box-shadow: var(--shadow); 
-            text-align: center; padding: 20px; cursor: pointer; 
-            transition: transform 0.2s ease; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; 
-            min-height: 180px; /* เพิ่มความสูง */
-            border: 2px solid transparent;
+            text-align: center; padding: 15px; cursor: pointer; 
+            transition: transform 0.2s ease; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; min-height: 160px; 
+            border: 2px solid transparent; background: #fff;
         }
         .symptom-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
-        .symptom-card img { width: 100%; max-width: 120px; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 15px; }
-        .symptom-card p { margin: 0; line-height: 1.3; font-weight: bold; font-size: 1.2em; }
-
-        /* --- No Symptom Button Style --- */
-        .symptom-card.no-symptom {
-            background-color: #E8F5E9; /* สีเขียวอ่อน */
-            border: 2px solid #C8E6C9;
-        }
+        .symptom-card img { width: 100%; max-width: 100px; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 10px; }
+        .symptom-card p { margin: 0; line-height: 1.2; font-weight: bold; font-size: 1.1em; }
+        .symptom-card.no-symptom { background-color: #E8F5E9; border: 2px solid #C8E6C9; }
 
         /* --- Buttons & Inputs --- */
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 12px; font-weight: bold; transition: 0.2s; }
@@ -99,66 +110,65 @@
         .btn-back { background: none; color: var(--primary-color); padding: 15px; font-size: 1.2em; text-align: center; width: 100%; display: block; font-weight: bold; border: 2px solid var(--primary-color); border-radius: 10px; }
         
         .hidden { display: none; }
-        .symptom-image-container img { width: 100%; border-radius: var(--border-radius); margin-bottom: 20px; }
+        
+        /* Clickable Image Style */
+        .symptom-image-container { position: relative; }
+        .symptom-image-container img { width: 100%; border-radius: var(--border-radius); margin-bottom: 20px; cursor: zoom-in; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .zoom-hint { position: absolute; bottom: 25px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8em; pointer-events: none; }
+
         .general-symptom-buttons { display: flex; gap: 15px; margin-bottom: 25px; }
         .general-symptom-buttons button { flex: 1; padding: 20px; font-size: 1.2em; }
-        
         .btn-likely { background-color: var(--symptom-red); color: white; }
         .btn-unlikely { background-color: var(--symptom-green); color: white; }
         
+        /* Review Card Image also Clickable */
         .review-card { display: flex; align-items: center; padding: 15px; border: 1px solid #ddd; border-radius: var(--border-radius); margin-bottom: 15px; }
-        .review-image { flex: 0 0 70%; padding-right: 15px; }
+        .review-image { flex: 0 0 40%; padding-right: 15px; cursor: zoom-in; } 
         .review-image img { width: 100%; border-radius: 12px; }
         .review-action { flex: 1; display: flex; justify-content: center; align-items: center; }
         .review-action button { width: 100%; font-size: 1.1em; padding: 20px 5px; }
         
-        .emergency-text-container { padding: 20px; text-align: center; background: var(--light-red-bg); border-radius: 15px; margin-bottom: 25px; border: 2px solid var(--symptom-red); }
-        .emergency-text-container p { margin: 8px 0; font-size: 1.1em;}
-        .emergency-text-container .large-red-blink { font-size: 1.8em; font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
-        .emergency-text-container .small-black-blink { font-size: 1.1em; color: black; animation: blinker 1.5s linear infinite; font-weight: bold; }
-        .countdown-timer { font-size: 1.3em; color: var(--primary-color); font-weight: bold; margin-top: 15px; }
+        /* Summary Page Styles (Normal Font Mode) */
+        .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 15px; margin-bottom: 20px; border: 2px solid var(--symptom-red); }
+        .emergency-text-container p { margin: 5px 0; }
+        .emergency-text-container .large-red-blink { font-weight: bold; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
+        .emergency-text-container .small-black-blink { color: black; animation: blinker 1.5s linear infinite; font-weight: bold; }
+        .countdown-timer { color: var(--primary-color); font-weight: bold; margin-top: 10px; }
         @keyframes blinker { 50% { opacity: 0.3; } }
         
-        .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; place-items: center; margin-top: 15px; }
+        .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; place-items: center; margin-top: 15px; }
         .action-button-wrapper { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-color); width: 100%; }
-        .action-button { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; border-radius: 20px; cursor: pointer; text-align: center; color: white; transition: background-color 0.3s; box-shadow: var(--shadow); }
-        .action-button .iconify { font-size: 64px; }
-        .action-button-text { font-size: 1em; margin-top: 10px; font-weight: bold; }
+        .action-button { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; border-radius: 15px; cursor: pointer; text-align: center; color: white; transition: background-color 0.3s; box-shadow: var(--shadow); }
+        .action-button-text { margin-top: 8px; font-weight: bold; }
         
         .location-button { background-color: var(--action-blue); }
         .location-button.success { background-color: var(--action-green); }
         .tel-sawi-button { background-color: var(--action-orange); }
         .tel-1669-button { background-color: var(--action-red); }
         
-        .summary-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1em; }
-        .summary-table tr td { padding: 15px 5px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        .summary-table .icon-col { width: 50px; text-align: center; }
-        .summary-table .icon-col .iconify { font-size: 32px; color: var(--primary-color); }
-        .summary-table .label-col { color: #6C757D; font-size: 1em; white-space: nowrap; }
-        .summary-table .value-col { font-weight: bold; text-align: right; color: var(--text-color); font-size: 1.1em;}
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .summary-table tr td { padding: 10px 5px; border-bottom: 1px solid #eee; vertical-align: middle; }
+        .summary-table .icon-col { width: 40px; text-align: center; }
+        .summary-table .icon-col .iconify { color: var(--primary-color); }
+        .summary-table .label-col { color: #6C757D; white-space: nowrap; }
+        .summary-table .value-col { font-weight: bold; text-align: right; color: var(--text-color); }
         .summary-table .value-col.value-urgent { color: var(--dark-red); }
         
-        .contact-buttons { margin-top: 25px; }
-        .contact-button { display: flex; align-items: center; justify-content: center; gap: 15px; border: 2px solid var(--action-gray); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-decoration: none; color: var(--text-color); font-weight: bold; transition: background-color 0.2s; font-size: 1.1em; }
-        .contact-button .iconify { font-size: 30px; color: var(--action-gray); }
+        .contact-buttons { margin-top: 20px; }
+        .contact-button { display: flex; align-items: center; justify-content: center; gap: 10px; border: 2px solid var(--action-gray); border-radius: 12px; padding: 10px; margin-bottom: 10px; text-decoration: none; color: var(--text-color); font-weight: bold; transition: background-color 0.2s; }
         .contact-button .label { flex-grow: 1; text-align: center; }
         .route-button { border-color: #34A853; color: #34A853 !important; }
-        .route-button .iconify { color: #34A853; }
         
+        /* Modals */
         .modal { position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 550px;
-            text-align: left;
-            max-height: 80vh;
-            overflow-y: auto;
+            background-color: #fff; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 550px; text-align: left;
+            max-height: 80vh; overflow-y: auto;
         }
-        .modal-content h2 { font-size: 1.6em; margin-bottom: 20px; }
-        .modal-content p, .modal-content li { font-size: 1.2em; margin: 12px 0; }
-        .info-icon { font-size: 24px; cursor: pointer; color: var(--primary-color); margin-left: 10px; border: 2px solid var(--primary-color); border-radius: 50%; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; font-weight: bold;}
+        .modal-content h2 { font-size: 1.4em; margin-bottom: 20px; }
+        .modal-content p, .modal-content li { font-size: 1.1em; margin: 10px 0; }
+        .info-icon { font-size: 20px; cursor: pointer; color: var(--primary-color); margin-left: 5px; border: 2px solid var(--primary-color); border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; font-weight: bold;}
     </style>
 </head>
 <body>
@@ -170,26 +180,38 @@
         <div id="loading-subtext"></div>
     </div>
 
+    <div id="image-viewer-modal" onclick="closeImageViewer()">
+        <button class="close-img-btn">&times;</button>
+        <img id="full-image">
+        <div class="img-instruction">แตะที่ว่างเพื่อปิด</div>
+    </div>
+
     <div class="main-container">
         <div id="layer-1" data-layer="1" class="card"></div>
+        
         <div id="layer-2" data-layer="2" class="card hidden"></div>
+        
         <div id="layer-3" data-layer="3" class="card hidden"></div>
         <div id="layer-4" data-layer="4" class="card hidden"></div>
-        <div id="layer-5" data-layer="5" class="card hidden"></div>
+        
+        <div id="layer-5" data-layer="5" class="card hidden normal-font-mode"></div>
+        
         <div id="layer-6" data-layer="6" class="card hidden"></div>
+        
         <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden"></div>
-        <div id="history-card" class="card hidden"></div>
+        
+        <div id="history-card" class="card hidden normal-font-mode"></div>
         
         <div id="disclaimerModal" class="modal"></div>
-        <div id="how-to-act-modal" class="modal"></div>
-        <div id="confirmLocationModal" class="modal">
+        <div id="how-to-act-modal" class="modal normal-font-mode"></div>
+        <div id="confirmLocationModal" class="modal normal-font-mode">
             <div class="modal-content" style="text-align: center;">
-                <span class="iconify" data-icon="mdi:map-marker-alert" style="font-size: 80px; color: var(--action-orange);"></span>
+                <span class="iconify" data-icon="mdi:map-marker-alert" style="font-size: 60px; color: var(--action-orange);"></span>
                 <h2 style="margin-top: 15px;">ยังไม่ได้ส่งพิกัด</h2>
                 <p style="color: #555;">เพื่อให้ทีมแพทย์ช่วยเหลือได้รวดเร็วและแม่นยำ<br>กรุณากด "ส่งพิกัด" ก่อนโทร</p>
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 25px;">
-                    <button id="modal-send-location-btn" class="btn-action" style="background-color: var(--action-blue); margin-top:0;">ส่งพิกัดก่อนโทร</button>
-                    <button id="modal-call-anyway-btn" class="btn-action" style="background-color: var(--action-gray); margin-top:0;">โทรเลยไม่ส่งพิกัด</button>
+                    <button id="modal-send-location-btn" class="btn-action" style="background-color: var(--action-blue); margin-top:0; font-size:1.1em; padding:15px;">ส่งพิกัดก่อนโทร</button>
+                    <button id="modal-call-anyway-btn" class="btn-action" style="background-color: var(--action-gray); margin-top:0; font-size:1.1em; padding:15px;">โทรเลยไม่ส่งพิกัด</button>
                 </div>
             </div>
         </div>
@@ -206,7 +228,7 @@
     let currentActionElement = null;
     let currentActionKey = '';
     let notificationSent = false;
-    let loadingInterval; // For animation
+    let loadingInterval; 
 
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     const icons = {
@@ -260,8 +282,20 @@
         if(loader) loader.style.display = 'none';
     }
 
+    // --- Image Viewer (Lightbox) Logic ---
+    function viewImage(src) {
+        const modal = document.getElementById('image-viewer-modal');
+        const img = document.getElementById('full-image');
+        img.src = src;
+        modal.style.display = "flex";
+    }
+
+    function closeImageViewer() {
+        document.getElementById('image-viewer-modal').style.display = "none";
+    }
+
     window.onload = async () => {
-        startLoadingAnimation(); // Start Loading
+        startLoadingAnimation(); 
         buildInitialHTML();
         try {
             await liff.init({ liffId: LIFF_ID });
@@ -273,7 +307,7 @@
             setupTimeOptions();
         } catch (err) { 
             console.error(err); 
-            stopLoadingAnimation(); // Stop if error
+            stopLoadingAnimation(); 
             alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); 
         }
         document.getElementById('info-icon').onclick = () => { document.querySelector('#disclaimerModal').style.display = 'flex'; };
@@ -289,12 +323,25 @@
     };
 
     function buildInitialHTML() {
-        // Adjusted Grid HTML, added class to "No Symptom" button
-        document.getElementById('layer-1').innerHTML = `<div class="card-body"><h1 class="section-title">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1><p class="section-subtitle">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p><div class="symptom-grid"><div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p>เซ/มึนหัว</p></div><div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p>ตามัวมาก</p></div><div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p>มุมปากตก</p></div><div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p>ยกแขนยาก</p></div><div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p>ลำบากพูด</p></div><div class="symptom-card no-symptom" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p>ไม่มีอาการ</p></div></div></div>`;
+        // [Modified] Adjusted Header Styles specifically for Home Layer
+        document.getElementById('layer-1').innerHTML = `
+            <div class="card-body">
+                <h1 class="section-title home-title" style="font-size: 1.4em;">ประเมินอาการสโตรก <span id="info-icon" class="info-icon">i</span></h1>
+                <p class="section-subtitle home-subtitle" style="font-size: 1em;">วันนี้ท่านมีอาการผิดปกติหรือไม่?</p>
+                <div class="symptom-grid">
+                    <div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://i.ibb.co/GMvMmZV/ezgif-2-563a5d8327-apng.png" alt="Balance"><p>เซ/มึนหัว</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://i.ibb.co/9r0cMc2/ezgif-2-5374788704.png" alt="Eye"><p>ตามัวมาก</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p>มุมปากตก</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p>ยกแขนยาก</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p>ลำบากพูด</p></div>
+                    <div class="symptom-card no-symptom" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p>ไม่มีอาการ</p></div>
+                </div>
+            </div>`;
         
         document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 25px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-2')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-4').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-3')">ย้อนกลับ</div></div>`;
+        // Layer 5: Summary (Wrapped content to ensure styles apply if needed)
         document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p>อาการของท่าน เข้าข่าย</p><p class="large-red-blink">เป็นอาการของสโตรก</p><p class="small-black-blink">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 5em; margin-bottom: 15px;"></div><h2 id="final-title" class="section-title" style="text-align:center;"></h2><p id="final-text" style="text-align:center; font-size:1.3em;"></p><button class="btn-action" style="background-color: var(--primary-color); padding: 25px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         document.getElementById('layer-no-symptom-review').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">ทบทวนเพื่อความแน่ใจ</h2><p class="section-subtitle">หากมีอาการใดอาการหนึ่งตรงกับรูปภาพ โปรดกดปุ่ม "มีอาการ"</p><div id="review-container"></div><button class="btn-unlikely" style="width:100%; padding: 25px; font-size: 1.4em; margin-top: 25px;" onclick="handleFinalNoSymptom()">ทดสอบทุกข้อแล้วไม่มีอาการ</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>`;
@@ -311,23 +358,22 @@
     }
     
     window.processUserData = function(response) {
-        // Stop loading animation when data arrives
         stopLoadingAnimation();
-
         const historyCard = document.getElementById('history-card');
         if (response.status === 'found' && response.data) {
             const data = response.data;
             sessionData.registeredName = data.name;
             sessionData.district = data.district;
             sessionData.village = data.village;
-            sessionData.risk_group = data.risk_group; // Store risk group for Flex
+            sessionData.risk_group = data.risk_group; 
             const riskTimestamp = data.timestamp ? formatFullDateTime(new Date(data.timestamp)) : 'N/A';
-            historyCard.innerHTML = `<h2 style="text-align: center; font-size: 1.4em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2><p style="font-size: 1.2em; text-align: center;">ประวัติความเสี่ยงสโตรก(${data.risk_group || 'N/A'}): <strong>${data.thai_cv_risk_score}%</strong></p><p style="font-size: 1em; text-align: center; color: #666;">ประเมินเมื่อ: ${riskTimestamp}</p>`;
+            // Adjusted History Card font size
+            historyCard.innerHTML = `<h2 style="text-align: center; font-size: 1.2em;">ประเมินอาการของคุณ ${data.name || sessionData.userName}</h2><p style="font-size: 1em; text-align: center;">ประวัติความเสี่ยงสโตรก(${data.risk_group || 'N/A'}): <strong>${data.thai_cv_risk_score}%</strong></p><p style="font-size: 0.9em; text-align: center; color: #666;">ประเมินเมื่อ: ${riskTimestamp}</p>`;
             if(sessionData.district && sessionData.village) {
                 fetchVolunteerData(`ต.${sessionData.district} ม.${sessionData.village}`);
             }
         } else {
-            historyCard.innerHTML = `<p style="text-align:center; font-size:1.2em;">คุณยังไม่ได้ลงทะเบียนกับแอปประเมินความเสี่ยง <a href="${REGISTRATION_LIFF_URL}">คลิกที่นี่เพื่อลงทะเบียน</a></p>`;
+            historyCard.innerHTML = `<p style="text-align:center; font-size:1.1em;">คุณยังไม่ได้ลงทะเบียนกับแอปประเมินความเสี่ยง <a href="${REGISTRATION_LIFF_URL}">คลิกที่นี่เพื่อลงทะเบียน</a></p>`;
         }
         historyCard.classList.remove('hidden');
     }
@@ -470,7 +516,13 @@
         const buttonsContainer = document.getElementById('layer-2-buttons');
         newContentContainer.innerHTML = '';
         buttonsContainer.innerHTML = '';
-        let newHtml = `<div class="symptom-image-container"><img src="${symptomImages[symptomKey]}" alt="${symptomTranslations[symptomKey]}"></div>`;
+        
+        // [Modified] Added onclick to viewImage for the main symptom image
+        let newHtml = `<div class="symptom-image-container">
+            <img src="${symptomImages[symptomKey]}" alt="${symptomTranslations[symptomKey]}" onclick="viewImage('${symptomImages[symptomKey]}')">
+            <div class="zoom-hint">แตะเพื่อขยายรูป</div>
+        </div>`;
+        
         newHtml += `<div class="general-symptom-buttons">
                         <button class="btn-likely" onclick="handleSymptomResult(true, 'อาการเข้าข่าย')">อาการเข้าข่าย</button>
                         <button class="btn-unlikely" onclick="handleSymptomResult(false, 'อาการไม่เข้าข่าย')">อาการไม่เข้าข่าย</button>
@@ -500,8 +552,11 @@
         container.innerHTML = '';
         let reviewHtml = '';
         for (const key in symptomImages) {
+            // [Modified] Added onclick to viewImage for review images
             reviewHtml += `<div class="review-card">
-                    <div class="review-image"><img src="${symptomImages[key]}" alt="${symptomTranslations[key]}"></div>
+                    <div class="review-image" onclick="viewImage('${symptomImages[key]}')">
+                        <img src="${symptomImages[key]}" alt="${symptomTranslations[key]}">
+                    </div>
                     <div class="review-action"><button class="btn-likely" onclick="handleSymptomResult(true, 'มีอาการ ${symptomTranslations[key]} จากหน้าทบทวน', '${key}')">มีอาการ</button></div>
                 </div>`;
         }
@@ -618,7 +673,7 @@
         if (sessionData.volunteerContacts) {
             const contacts = sessionData.volunteerContacts;
             let areaInfo = (sessionData.district && sessionData.village) ? `(ต.${sessionData.district} ม.${sessionData.village})` : '';
-            contactContainer.innerHTML = `<h3 style="font-size:1.3em; text-align:center; margin-top:30px; margin-bottom:15px;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h3>`;
+            contactContainer.innerHTML = `<h3 style="font-size:1.1em; text-align:center; margin-top:20px; margin-bottom:10px;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h3>`;
             if (contacts.volunteer1_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer1_tel, "โทรหา อสม. 1", "tel_asm1");
             if (contacts.volunteer2_tel) contactContainer.innerHTML += createContactButton(contacts.volunteer2_tel, "โทรหา อสม. 2", "tel_asm2");
             if (contacts.headman_tel) contactContainer.innerHTML += createContactButton(contacts.headman_tel, `โทรหา ผู้นำชุมชน ${areaInfo}`, "tel_header");
