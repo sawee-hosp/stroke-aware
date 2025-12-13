@@ -30,18 +30,10 @@
             color: var(--text-color);
         }
 
-        /* --- Global Button Style --- */
         button, .btn-action, .file-upload-btn, #btn-record, .btn-likely, .btn-unlikely, .btn-back {
-            font-family: "Noto Sans Thai", sans-serif !important;
-            border-radius: 50px !important;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-align: center;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; box-sizing: border-box; font-size: 1.1em; padding: 15px;
+            font-family: "Noto Sans Thai", sans-serif !important; border-radius: 50px !important; border: none; cursor: pointer; font-weight: bold;
+            transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;
+            display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; box-sizing: border-box; font-size: 1.1em; padding: 15px;
         }
         button:active, .btn-action:active { transform: scale(0.98); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
@@ -57,15 +49,8 @@
 
         /* Karaoke Animation */
         .karaoke-text {
-            background: linear-gradient(to right, #D32F2F 50%, #333 50%);
-            background-size: 200% 100%;
-            background-position: 100% 0;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: karaoke 3s linear infinite;
-            font-size: 1.4em;
-            font-weight: 800;
-            display: inline-block;
+            background: linear-gradient(to right, #D32F2F 50%, #333 50%); background-size: 200% 100%; background-position: 100% 0;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: karaoke 3s linear infinite; font-size: 1.4em; font-weight: 800; display: inline-block;
         }
         @keyframes karaoke { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 
@@ -82,30 +67,31 @@
 
         .assessor-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; flex-wrap: nowrap; }
         .modern-select { flex-grow: 0; width: auto; padding: 10px 15px; font-size: 1em; border-radius: 50px; border: 2px solid #ddd; background-color: #fff; font-family: "Noto Sans Thai", sans-serif; color: #333; min-width: 120px; }
+        
+        /* Phone Input Style */
+        .phone-input-wrapper { display: none; margin-bottom: 20px; }
+        .phone-input { width: 100%; padding: 15px; border-radius: 50px; border: 2px solid #ddd; font-size: 1em; font-family: "Noto Sans Thai", sans-serif; text-align: center; }
 
         .symptom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .symptom-card { 
-            border-radius: 20px; box-shadow: var(--shadow); text-align: center; padding: 8px; cursor: pointer; background: #fff; min-height: 160px; 
-            display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; 
-        }
+        .symptom-card { border-radius: 20px; box-shadow: var(--shadow); text-align: center; padding: 8px; cursor: pointer; background: #fff; min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; }
         .symptom-card img { width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 5px; border-radius: 15px; }
         .symptom-card p { margin: 0; line-height: 1.1; font-weight: 800; font-size: 1.1em; color: #2c3e50; }
+        
+        /* Updated AI Button Style (Smaller Text) */
         .symptom-card.ai-test { 
             background-color: var(--ai-yellow); border: 2px solid #F1C40F; color: var(--ai-text); 
-            flex-direction: row; gap: 15px; padding: 15px; min-height: 80px; align-items: center;
+            flex-direction: row; gap: 10px; padding: 15px; min-height: 70px; align-items: center;
         }
+        .symptom-card.ai-test h3 { margin: 0; font-size: 1em; font-weight: bold; } /* Smaller Font */
         
-        .ai-input-row {
-            display: flex; align-items: center; gap: 10px; margin-top: 10px;
-        }
-        .ai-thumb-wrapper {
-            width: 80px; height: 80px; flex-shrink: 0; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; cursor: zoom-in;
-        }
-        .ai-thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        /* AI Input Layout: 25% Image | 75% Content */
+        .ai-input-row { display: flex; align-items: flex-start; gap: 15px; margin-top: 10px; }
+        .ai-example-img { width: 25%; min-width: 80px; border-radius: 10px; cursor: zoom-in; object-fit: cover; aspect-ratio: 1/1; border: 1px solid #ddd; align-self: center;}
+        .ai-action-col { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         
         .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
         .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-        .file-upload-btn { background-color: #eee; color: #333; padding: 15px; width: 100%; font-size: 1.1em; }
+        .file-upload-btn { background-color: #eee; color: #333; padding: 10px; width: 100%; font-size: 1em; border-radius: 50px; text-align: center; margin-top: 10px; }
         .file-upload-wrapper:hover .file-upload-btn { background-color: #ddd; }
 
         .result-image-wrapper { position: relative; margin-bottom: 15px; border-radius: 10px; overflow: hidden; display: inline-block; max-width: 100%; }
@@ -125,7 +111,6 @@
         .options-container button { padding: 20px; font-size: 1.1em; flex-grow: 1; color: white; }
         .time-options button { width: calc(33.33% - 8px); flex-grow: 0; margin-bottom: 10px; font-size: 1em; padding: 15px 5px; color: #333; border: 1px solid #ddd; background-color: #f8f9fa;}
         
-        /* Summary Page */
         .emergency-text-container { padding: 20px; text-align: center; background: var(--light-red-bg); border-radius: 20px; margin-bottom: 20px; border: 3px solid var(--symptom-red); }
         .emergency-text-container p { margin: 5px 0; font-size: 1.2em; }
         .emergency-text-container .large-red-blink { font-weight: 800; font-size: 1.8em; color: var(--dark-red); animation: blinker 1.2s linear infinite; }
@@ -148,8 +133,6 @@
         .contact-button { border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; }
         
         .global-footer-hint { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); color: white; text-align: center; padding: 10px; font-size: 0.9em; z-index: 3500; }
-
-        /* Modal Content */
         .modal { position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; text-align: left; max-height: 80vh; overflow-y: auto; }
     </style>
@@ -184,7 +167,7 @@
         <!-- Layer 1: Home -->
         <div id="layer-1" data-layer="1" class="card"></div>
         
-        <!-- Manual Flow Layers (Restored) -->
+        <!-- Other Layers -->
         <div id="layer-2" data-layer="2" class="card hidden"></div>
         <div id="layer-3" data-layer="3" class="card hidden"></div>
         <div id="layer-4" data-layer="4" class="card hidden"></div>
@@ -222,7 +205,6 @@
             </div>
         </div>
         <div id="how-to-act-modal" class="modal normal-font-mode"></div>
-        <!-- Image Viewer -->
         <div id="image-viewer-modal" class="modal" style="background-color: rgba(0,0,0,0.95); flex-direction: column;" onclick="document.getElementById('image-viewer-modal').style.display='none'">
             <img id="full-image" style="max-width: 90%; max-height: 80vh; object-fit: contain; border-radius: 10px;">
             <div style="color: #ccc; margin-top: 10px; font-size: 18px;">แตะที่ว่างเพื่อปิด</div>
@@ -314,17 +296,23 @@
                 
                 <div class="assessor-row">
                     <p style="margin:0; font-size:1em; white-space: nowrap;">ท่านประเมินอาการให้ใคร</p>
-                    <select id="assessor-select" class="modern-select">
+                    <select id="assessor-select" class="modern-select" onchange="handleAssessorChange(this)">
                         <option value="myself">ตัวฉันเอง</option>
                         <option value="others">ผู้อื่น</option>
                     </select>
                 </div>
+                <!-- Phone Input for Others -->
+                <div id="patient-phone-wrapper" class="phone-input-wrapper">
+                    <input type="tel" id="patient-phone" class="phone-input" placeholder="กรอกเบอร์โทรผู้ป่วย (ถ้ามี)" onblur="fetchUserDataByPhone(this.value)">
+                    <p style="font-size:0.8em; color:#666; margin-top:5px; text-align:center;">*เพื่อดึงข้อมูลความเสี่ยงของผู้ป่วย</p>
+                </div>
                 
-                <div class="symptom-card ai-test" onclick="handleAiTest()" style="margin-bottom: 15px; min-height: 80px; flex-direction: row; gap: 15px; padding: 15px;">
-                    <span class="iconify" data-icon="mdi:robot-happy" style="font-size: 40px;"></span>
+                <!-- AI Button (Compact Font) -->
+                <div class="symptom-card ai-test" onclick="handleAiTest()" style="margin-bottom: 15px; min-height: 70px; flex-direction: row; gap: 10px; padding: 15px;">
+                    <span class="iconify" data-icon="mdi:robot-happy" style="font-size: 36px;"></span>
                     <div style="text-align:left;">
-                        <h3 style="margin:0; font-size: 1.2em;">ทดสอบอาการด้วย AI</h3>
-                        <span style="font-size:0.8em;">วิเคราะห์ใบหน้า แขน และเสียง</span>
+                        <h3 style="margin:0; font-size: 0.95em;">ทดสอบอาการด้วย AI</h3>
+                        <span style="font-size:0.7em;">วิเคราะห์ใบหน้า แขน และเสียง</span>
                     </div>
                 </div>
 
@@ -338,7 +326,7 @@
                 </div>
             </div>`;
             
-        // Init other layers (Fixed: Must populate innerHTML for all layers initially)
+        // Init other layers
         document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 25px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-4').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</div></div>`;
@@ -353,13 +341,12 @@
                 <h2 class="section-title"><span class="iconify" data-icon="mdi:brain"></span> ทดสอบด้วย AI</h2>
                 <div style="text-align: left; margin-bottom: 20px;">
                     <p>ระบบ AI เป็นส่วนหนึ่งของการศึกษา ผลลัพธ์อาจมีความคลาดเคลื่อน <strong>หากมีอาการผิดปกติ ควรรีบพบแพทย์</strong></p>
-                    <p style="color:var(--symptom-red); font-weight:bold;">* ต้องส่งรูปหรือเสียงอย่างน้อย 1 อย่าง *</p>
                 </div>
                 
                 <div class="pdpa-box">
                     <label style="display:flex; gap:10px; align-items:start;">
                         <input type="checkbox" id="pdpa-consent">
-                        <span>ข้าพเจ้ายินยอมให้นำข้อมูลไปประมวลผลด้วย AI เพื่อประเมินความเสี่ยงเบื้องต้น</span>
+                        <span>ข้าพเจ้ายินยอมให้นำรูปภาพและเสียงไปประมวลผลด้วย AI เพื่อประเมินความเสี่ยงเบื้องต้น</span>
                     </label>
                 </div>
 
@@ -368,49 +355,54 @@
             <div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</div></div>
         `;
 
+        // Updated AI Input: Move Examples here & Warning text position
         document.getElementById('layer-ai-input').innerHTML = `
             <div class="card-body">
                 <h2 class="section-title">เก็บข้อมูลวิเคราะห์</h2>
                 
                 <div class="ai-input-box">
                     <h3>1. ใบหน้า (Face)</h3>
-                    <p style="font-size:0.8em; color:#666;">ถอดหน้ากาก ยิ้มกว้างๆ ให้เห็นฟัน เพื่อดูมุมปาก</p>
                     <div class="ai-input-row">
-                        <div class="ai-thumb-wrapper" onclick="if(aiInputs.face) viewImage('data:image/jpeg;base64,'+aiInputs.face)">
-                            <img id="preview-face" src="https://img2.pic.in.th/pic/-19b938acd92f7035f5.png" style="opacity:0.6">
-                        </div>
-                        <div class="file-upload-wrapper" style="flex-grow:1;">
-                            <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป</div>
-                            <input type="file" accept="image/*" capture="user" onchange="handleImageInput(this, 'face')">
+                        <img class="ai-example-img" src="https://img2.pic.in.th/pic/-19b938acd92f7035f5.png" onclick="viewImage(this.src)">
+                        <div class="ai-action-col">
+                            <p style="font-size:0.8em; color:#666; margin:0;">ถอดหน้ากาก ยิ้มกว้างๆ ให้เห็นฟัน เพื่อดูมุมปาก</p>
+                            <div class="file-upload-wrapper">
+                                <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป</div>
+                                <input type="file" accept="image/*" capture="user" onchange="handleImageInput(this, 'face')">
+                            </div>
                         </div>
                     </div>
+                    <img id="preview-face" style="width:100%; display:none; margin-top:10px; border-radius:10px;">
                 </div>
 
                 <div class="ai-input-box">
                     <h3>2. แขน (Arm)</h3>
-                    <p style="font-size:0.8em; color:#666;">ยกแขน 2 ข้างมาข้างหน้า (ระดับไหล่)</p>
                     <div class="ai-input-row">
-                        <div class="ai-thumb-wrapper" onclick="if(aiInputs.arm) viewImage('data:image/jpeg;base64,'+aiInputs.arm)">
-                            <img id="preview-arm" src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" style="opacity:0.6">
-                        </div>
-                        <div class="file-upload-wrapper" style="flex-grow:1;">
-                            <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป</div>
-                            <input type="file" accept="image/*" capture="environment" onchange="handleImageInput(this, 'arm')">
+                        <img class="ai-example-img" src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" onclick="viewImage(this.src)">
+                        <div class="ai-action-col">
+                            <p style="font-size:0.8em; color:#666; margin:0;">ยกแขน 2 ข้างมาข้างหน้า (ระดับไหล่) ให้คนช่วยถ่าย หรือตั้งเวลา</p>
+                            <div class="file-upload-wrapper">
+                                <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป</div>
+                                <input type="file" accept="image/*" capture="environment" onchange="handleImageInput(this, 'arm')">
+                            </div>
                         </div>
                     </div>
+                    <img id="preview-arm" style="width:100%; display:none; margin-top:10px; border-radius:10px;">
                 </div>
 
                 <div class="ai-input-box">
                     <h3>3. เสียง (Speech)</h3>
                     <p style="font-size:0.9em; text-align:center;">พูดว่า: <span class="karaoke-text">"ยายกินลำไย น้ำลายยายไหลย้อย"</span></p>
-                    <button onclick="toggleRecording()" id="btn-record" style="background:#d9534f; color:white; padding:15px;">
-                        <span class="iconify" data-icon="mdi:microphone"></span> กดเพื่ออัดเสียง
+                    <button onclick="toggleRecording()" id="btn-record" style="background:#d9534f; color:white; padding:15px; width:100%; font-size: 1.1em;">
+                        <span class="iconify" data-icon="mdi:microphone" style="margin-right:5px;"></span> กดเพื่ออัดเสียง
                     </button>
                     <div id="audio-controls-container" style="display:none; margin-top:10px; text-align:center;">
                         <audio id="audio-playback" controls style="width:100%;"></audio>
                         <div style="color:green; font-weight:bold;">บันทึกเสียงแล้ว</div>
                     </div>
                 </div>
+                
+                <p style="color:var(--symptom-red); font-weight:bold; text-align:center; font-size:0.9em; margin-top:20px;">* ต้องส่งรูปหรือเสียงอย่างน้อย 1 อย่าง *</p>
 
                 <button class="btn-action" style="background-color: var(--ai-yellow); color:black;" onclick="analyzeWithGemini()">ส่งวิเคราะห์</button>
             </div>
@@ -427,6 +419,24 @@
 
         document.getElementById('layer-ai-result').innerHTML = `<div class="card-body" id="ai-result-content"></div>`;
     }
+
+    // --- New Logic for Assessor Change ---
+    window.handleAssessorChange = function(select) {
+        const phoneWrapper = document.getElementById('patient-phone-wrapper');
+        if (select.value === 'others') {
+            phoneWrapper.style.display = 'block';
+        } else {
+            phoneWrapper.style.display = 'none';
+            // Revert to current user data
+            fetchUserData(sessionData.userID);
+        }
+    };
+
+    window.fetchUserDataByPhone = function(phone) {
+        if (!phone || phone.length < 9) return;
+        const url = `${GAS_URL}?action=getUserDataByPhone&phone=${phone}&callback=processUserData`;
+        const scriptTag = document.createElement('script'); scriptTag.src = url; document.head.appendChild(scriptTag);
+    };
 
     // --- MANUAL FLOW LOGIC (RESTORED) ---
     window.showLayer2 = function(symptomKey) {
@@ -637,7 +647,7 @@
                     const resizedData = canvas.toDataURL('image/jpeg', 0.7);
                     aiInputs[type] = resizedData.split(',')[1];
                     const preview = document.getElementById(`preview-${type}`);
-                    preview.src = resizedData; preview.style.opacity = '1';
+                    preview.src = resizedData; preview.style.display = 'block';
                 };
                 img.src = e.target.result;
             };
@@ -701,20 +711,30 @@
             if (aiInputs.arm) { html += `<div class="result-image-wrapper"><img src="data:image/jpeg;base64,${aiInputs.arm}"><div class="grid-overlay"></div><p style="font-size:0.8em; color:#fff; background:rgba(0,0,0,0.5); position:absolute; bottom:0; width:100%;">Arm Analysis</p></div>`; }
             html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
             
+            // Connect to Manual Flow (Acute check)
             html += `<button class="btn-action" style="background-color:var(--symptom-red);" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
+            
+            // Allow exit even if no risk
+            if (!result.isRisk) {
+                 html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px;" onclick="saveData('isFinalSave', true); saveData('symptomDetail', 'AI: No significant risk found'); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
+            }
         }
         container.innerHTML = html;
         showLayer('layer-ai-result');
     }
 
+    // --- Core Navigation & Utilities ---
     window.showLayer = function(id) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); };
     window.saveData = function(key, value) { sessionData[key] = value; };
     window.viewImage = function(src) { const modal = document.getElementById('image-viewer-modal'); document.getElementById('full-image').src = src; modal.style.display = "flex"; };
     
+    // Database & Final Save Logic
     window.handleFinalSave = function(button, isEmergency) {
         if(button && button.disabled) return;
         if(button) button.disabled = true;
         sessionData.isEmergency = isEmergency;
+        sessionData.isFinalSave = true; // Ensure logic triggers flex
+        
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
