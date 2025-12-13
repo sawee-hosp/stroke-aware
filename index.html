@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ประเมินอาการสโตรก</title>
+    <title>ประเมินอาการสโตรก (AI)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;700&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
             --dark-red: #C0392B; --light-red-bg: #FFF0F0;
             --action-blue: #007BFF; --action-green: #28A745;
             --action-red: #D32F2F; --action-orange: #f39c12; --action-gray: #6C757D;
+            --ai-yellow: #FFD700; --ai-text: #000;
         }
 
         /* --- Global Font Size (Large for Elderly) --- */
@@ -95,7 +96,16 @@
         .symptom-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
         .symptom-card img { width: 100%; max-width: 100px; aspect-ratio: 1 / 1; object-fit: contain; margin-bottom: 10px; }
         .symptom-card p { margin: 0; line-height: 1.2; font-weight: bold; font-size: 1.1em; }
-        .symptom-card.no-symptom { background-color: #E8F5E9; border: 2px solid #C8E6C9; }
+        
+        /* New AI Button Style */
+        .symptom-card.ai-test { 
+            background-color: var(--ai-yellow); 
+            border: 2px solid #F1C40F; 
+            color: var(--ai-text);
+        }
+        .symptom-card.ai-test:hover {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
 
         /* --- Buttons & Inputs --- */
         button { font-family: "Noto Sans Thai", sans-serif; cursor: pointer; border: none; border-radius: 12px; font-weight: bold; transition: 0.2s; }
@@ -123,12 +133,12 @@
         /* --- [UPDATED] Review Card Styles --- */
         .review-card { 
             display: flex; 
-            flex-direction: column; /* เรียงแนวตั้ง */
-            padding: 0; /* ลบ padding เพื่อให้รูปชนขอบ */
+            flex-direction: column; 
+            padding: 0; 
             border: 1px solid #ddd; 
             border-radius: var(--border-radius); 
             margin-bottom: 30px; 
-            overflow: hidden; /* ตัดมุมรูปให้โค้งตามการ์ด */
+            overflow: hidden; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .review-image { 
@@ -140,8 +150,8 @@
         .review-image img { 
             width: 100%; 
             height: auto;
-            display: block; /* ลบช่องว่างใต้รูป */
-            border-radius: 0; /* ไม่ต้องโค้งเพราะ card โค้งแล้ว */
+            display: block; 
+            border-radius: 0; 
         }
         .review-action { 
             display: flex; 
@@ -150,10 +160,23 @@
             background: #fff;
         }
         .review-action button { 
-            flex: 1; /* ปุ่มขยายเต็มพื้นที่เท่ากัน */
+            flex: 1; 
             font-size: 1.1em; 
             padding: 15px 5px; 
         }
+
+        /* --- AI Styles --- */
+        .ai-input-group { margin-bottom: 25px; border: 2px dashed #ccc; padding: 15px; border-radius: 12px; text-align: center; }
+        .ai-input-group.active { border-color: var(--primary-color); background-color: #f9f9ff; }
+        .ai-input-group h3 { margin-top: 0; font-size: 1.2em; color: #555; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .ai-preview-img { max-width: 100%; max-height: 250px; border-radius: 8px; margin-top: 10px; display: none; }
+        .ai-upload-btn { background-color: #eee; color: #333; padding: 10px 20px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 1em; cursor: pointer; }
+        .ai-upload-btn:hover { background-color: #ddd; }
+        .audio-controls { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .btn-record { background-color: #d9534f; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        .btn-record.recording { animation: pulse 1.5s infinite; background-color: #c9302c; }
+        .btn-stop { background-color: #333; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         
         /* Summary Page Styles */
         .emergency-text-container { padding: 15px; text-align: center; background: var(--light-red-bg); border-radius: 15px; margin-bottom: 20px; border: 2px solid var(--symptom-red); }
@@ -226,6 +249,12 @@
         <div id="layer-6" data-layer="6" class="card hidden"></div>
         
         <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden"></div>
+
+        <!-- AI Layers -->
+        <div id="layer-ai-intro" data-layer="ai-intro" class="card hidden"></div>
+        <div id="layer-ai-input" data-layer="ai-input" class="card hidden"></div>
+        <div id="layer-ai-processing" data-layer="ai-processing" class="card hidden"></div>
+        <div id="layer-ai-result" data-layer="ai-result" class="card hidden"></div>
         
         <div id="history-card" class="card hidden normal-font-mode"></div>
         
@@ -246,7 +275,9 @@
 
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec";
+    // ** เปลี่ยน URL นี้เป็น Web App URL ที่ได้จากการ Deploy ไฟล์ Code.gs **
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec"; 
+    
     const LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
     
@@ -256,6 +287,11 @@
     let currentActionKey = '';
     let notificationSent = false;
     let loadingInterval; 
+    
+    // AI Variables
+    let aiInputs = { face: null, arm: null, audio: null };
+    let mediaRecorder;
+    let audioChunks = [];
 
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
     const icons = {
@@ -264,7 +300,8 @@
         map: 'mdi:map-marker-distance', car: 'mdi:car-clock',
         ambulance: 'mdi:ambulance', runner: 'mdi:run-fast',
         contact: 'mdi:phone', pin: 'mdi:map-marker', check: 'mdi:check-circle',
-        phone: 'mdi:phone-hangup', route: 'mdi:directions'
+        phone: 'mdi:phone-hangup', route: 'mdi:directions',
+        camera: 'mdi:camera', mic: 'mdi:microphone', brain: 'mdi:brain'
     };
     const symptomImages = {
         'Balance': 'https://img2.pic.in.th/pic/9262fb61dad1ac59a.png',
@@ -327,14 +364,12 @@
         const currentIndex = keys.indexOf(currentKey);
         
         if (currentIndex < keys.length - 1) {
-            // Scroll to next card
             const nextKey = keys[currentIndex + 1];
             const nextElement = document.getElementById(`review-card-${nextKey}`);
             if (nextElement) {
                 nextElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         } else {
-            // Last item, scroll to the final button
             const finalBtn = document.getElementById('final-review-btn');
             if (finalBtn) {
                 finalBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -345,6 +380,7 @@
     window.onload = async () => {
         startLoadingAnimation(); 
         buildInitialHTML();
+        buildAILayers(); // Build new AI UI
         try {
             await liff.init({ liffId: LIFF_ID });
             if (!liff.isLoggedIn()) { liff.login(); return; }
@@ -356,7 +392,7 @@
         } catch (err) { 
             console.error(err); 
             stopLoadingAnimation(); 
-            alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); 
+            // alert("ไม่สามารถเชื่อมต่อกับ LINE ได้ โปรดลองเปิดใหม่อีกครั้ง"); 
         }
         document.getElementById('info-icon').onclick = () => { document.querySelector('#disclaimerModal').style.display = 'flex'; };
         
@@ -381,7 +417,11 @@
                     <div class="symptom-card" onclick="showLayer2('Face')"><img src="https://i.ibb.co/nRJc4MX/ezgif-2-8b010716d3.png" alt="Face"><p>มุมปากตก</p></div>
                     <div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://i.ibb.co/G7Vbn9V/ezgif-2-b6c57b3b00.png" alt="Arm"><p>ยกแขนยาก</p></div>
                     <div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://i.ibb.co/gVYy8Nf/ezgif-2-01c5ed2695.png" alt="Speech"><p>ลำบากพูด</p></div>
-                    <div class="symptom-card no-symptom" onclick="handleNoSymptom()"><img src="https://i.ibb.co/yVP6CGv/image.png" alt="No Symptom"><p>ไม่มีอาการ</p></div>
+                    <!-- CHANGED: No Symptom to AI Test -->
+                    <div class="symptom-card ai-test" onclick="handleAiTest()">
+                        <span class="iconify" data-icon="mdi:brain" style="font-size: 50px; margin-bottom: 10px; color: var(--text-color);"></span>
+                        <p>ทดสอบอาการ (AI)</p>
+                    </div>
                 </div>
             </div>`;
         
@@ -391,7 +431,6 @@
         document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p>อาการของท่าน เข้าข่าย</p><p class="large-red-blink">เป็นอาการของสโตรก</p><p class="small-black-blink">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-4')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 5em; margin-bottom: 15px;"></div><h2 id="final-title" class="section-title" style="text-align:center;"></h2><p id="final-text" style="text-align:center; font-size:1.3em;"></p><button class="btn-action" style="background-color: var(--primary-color); padding: 25px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         
-        // [Modified] Review Page Structure
         document.getElementById('layer-no-symptom-review').innerHTML = `
             <div class="card-body">
                 <h2 class="section-title" style="text-align:center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.4em;">ทบทวนเพื่อความแน่ใจ</h2>
@@ -404,6 +443,245 @@
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:1em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.4em; padding:15px; border-radius: 10px; width:100%; margin-top:15px;">รับทราบ</button></div>`;
         document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>`;
     }
+
+    // --- AI Functionality ---
+    function buildAILayers() {
+        document.getElementById('layer-ai-intro').innerHTML = `
+            <div class="card-body">
+                <h2 class="section-title"><span class="iconify" data-icon="mdi:robot" style="margin-right:10px;"></span> ทดสอบด้วย AI</h2>
+                <p class="section-subtitle">ระบบจะวิเคราะห์ความเสี่ยงจาก 3 อาการหลัก (F-A-S)</p>
+                <div style="margin: 20px 0; font-size: 1.1em;">
+                    <div style="margin-bottom: 10px;"><strong>F - Face (ใบหน้า):</strong> ยิ้มกว้างๆ ให้เห็นฟัน</div>
+                    <div style="margin-bottom: 10px;"><strong>A - Arm (แขน):</strong> ยกแขนทั้งสองข้างมาข้างหน้า</div>
+                    <div style="margin-bottom: 10px;"><strong>S - Speech (พูด):</strong> พูดประโยคสั้นๆ</div>
+                </div>
+                <button class="btn-action" style="background-color: var(--primary-color);" onclick="startAiTestFlow()">เริ่มการทดสอบ</button>
+            </div>
+            <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-1')">ย้อนกลับ</div></div>
+        `;
+
+        document.getElementById('layer-ai-input').innerHTML = `
+            <div class="card-body">
+                <h2 class="section-title">เก็บข้อมูลเพื่อวิเคราะห์</h2>
+                
+                <!-- 1. FACE -->
+                <div class="ai-input-group active" id="group-face">
+                    <h3><span class="iconify" data-icon="mdi:face-recognition"></span> 1. ถ่ายรูปใบหน้าตอนยิ้ม</h3>
+                    <p style="font-size:0.9em; color:#666;">ยิ้มให้กว้างที่สุด เพื่อดูมุมปาก</p>
+                    <label class="ai-upload-btn">
+                        <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป/อัปโหลด
+                        <input type="file" accept="image/*" capture="user" hidden onchange="handleImageInput(this, 'face')">
+                    </label>
+                    <img id="preview-face" class="ai-preview-img">
+                </div>
+
+                <!-- 2. ARM -->
+                <div class="ai-input-group" id="group-arm">
+                    <h3><span class="iconify" data-icon="mdi:human-handsup"></span> 2. ถ่ายรูปตอนยกแขน</h3>
+                    <p style="font-size:0.9em; color:#666;">ยกแขน 2 ข้างมาข้างหน้าในระดับเดียวกัน</p>
+                    <label class="ai-upload-btn">
+                        <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป/อัปโหลด
+                        <input type="file" accept="image/*" capture="environment" hidden onchange="handleImageInput(this, 'arm')">
+                    </label>
+                    <img id="preview-arm" class="ai-preview-img">
+                </div>
+
+                <!-- 3. SPEECH -->
+                <div class="ai-input-group" id="group-speech">
+                    <h3><span class="iconify" data-icon="mdi:microphone"></span> 3. พูดประโยคสั้นๆ</h3>
+                    <p style="font-size:0.9em; color:#666;">พูดว่า "กิน กิน กิน" หรือบอกชื่อตัวเอง</p>
+                    <div class="audio-controls">
+                        <div id="btn-record" class="btn-record" onclick="toggleRecording()"><span class="iconify" data-icon="mdi:microphone"></span></div>
+                    </div>
+                    <div id="audio-status" style="margin-top:10px; font-weight:bold; color: var(--action-green); display:none;">บันทึกเสียงเรียบร้อย</div>
+                    <audio id="audio-playback" controls style="display:none; width:100%; margin-top:10px;"></audio>
+                </div>
+
+                <button class="btn-action" style="background-color: var(--ai-yellow); color:black;" onclick="analyzeWithGemini()">ให้ AI วิเคราะห์ผล</button>
+            </div>
+            <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-ai-intro')">ย้อนกลับ</div></div>
+        `;
+
+        document.getElementById('layer-ai-processing').innerHTML = `
+            <div class="card-body" style="text-align: center; padding: 40px 20px;">
+                <div class="spinner" style="margin: 0 auto 30px auto;"></div>
+                <h2>กำลังให้ AI วิเคราะห์...</h2>
+                <p>กรุณารอสักครู่ ระบบกำลังตรวจสอบ<br>ใบหน้า แขน และเสียงของคุณ</p>
+            </div>
+        `;
+
+        document.getElementById('layer-ai-result').innerHTML = `
+            <div class="card-body">
+                <h2 class="section-title">ผลการวิเคราะห์จาก AI</h2>
+                <div id="ai-result-content" style="text-align:center; margin-bottom: 20px;"></div>
+                <div id="ai-next-steps"></div>
+            </div>
+            <div class="btn-back-container"><div class="btn-back" onclick="goBack('layer-ai-input')">ทดสอบใหม่</div></div>
+        `;
+    }
+
+    function handleAiTest() {
+        showLayer('layer-ai-intro');
+    }
+
+    function startAiTestFlow() {
+        showLayer('layer-ai-input');
+        aiInputs = { face: null, arm: null, audio: null };
+        document.getElementById('preview-face').style.display = 'none';
+        document.getElementById('preview-arm').style.display = 'none';
+        document.getElementById('audio-status').style.display = 'none';
+        document.getElementById('audio-playback').style.display = 'none';
+    }
+
+    function handleImageInput(input, type) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            // Resize logic to prevent payload too large
+            resizeImage(file, 800, (resizedBase64) => {
+                aiInputs[type] = resizedBase64.split(',')[1]; // Remove data:image/jpeg;base64,
+                const preview = document.getElementById(`preview-${type}`);
+                preview.src = resizedBase64;
+                preview.style.display = 'block';
+            });
+        }
+    }
+
+    function resizeImage(file, maxWidth, callback) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', 0.7)); // Compress quality 0.7
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Audio Recording Logic
+    function toggleRecording() {
+        const btn = document.getElementById('btn-record');
+        if (btn.classList.contains('recording')) {
+            // Stop
+            mediaRecorder.stop();
+            btn.classList.remove('recording');
+            btn.innerHTML = '<span class="iconify" data-icon="mdi:microphone"></span>';
+        } else {
+            // Start
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    audioChunks = [];
+                    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' }); // Use webm for simplicity
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audioPlayback = document.getElementById('audio-playback');
+                        audioPlayback.src = audioUrl;
+                        audioPlayback.style.display = 'block';
+                        document.getElementById('audio-status').style.display = 'block';
+                        
+                        // Convert to Base64
+                        const reader = new FileReader();
+                        reader.readAsDataURL(audioBlob);
+                        reader.onloadend = () => {
+                            aiInputs.audio = reader.result.split(',')[1];
+                        }
+                    };
+                    btn.classList.add('recording');
+                    btn.innerHTML = '<span class="iconify" data-icon="mdi:stop"></span>';
+                })
+                .catch(err => {
+                    alert("ไม่สามารถเข้าถึงไมโครโฟนได้: " + err);
+                });
+        }
+    }
+
+    function analyzeWithGemini() {
+        if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) {
+            alert("กรุณาใส่ข้อมูลอย่างน้อย 1 อย่าง (รูปหรือเสียง)");
+            return;
+        }
+
+        showLayer('layer-ai-processing');
+
+        // Prepare payload for GAS
+        const payload = {
+            action: 'analyzeStroke',
+            faceImage: aiInputs.face,
+            armImage: aiInputs.arm,
+            speechAudio: aiInputs.audio
+        };
+
+        // Send to GAS
+        fetch(GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                displayAiResult(data.data);
+            } else {
+                alert("เกิดข้อผิดพลาดในการวิเคราะห์: " + data.message);
+                goBack('layer-ai-input');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+            goBack('layer-ai-input');
+        });
+    }
+
+    function displayAiResult(result) {
+        const contentDiv = document.getElementById('ai-result-content');
+        const nextStepsDiv = document.getElementById('ai-next-steps');
+        
+        let html = '';
+        if (result.isRisk) {
+            html += `<div style="color: var(--symptom-red); font-size: 5em;"><span class="iconify" data-icon="mdi:alert-circle"></span></div>`;
+            html += `<h3 style="color: var(--symptom-red); font-size: 1.5em;">AI ตรวจพบความเสี่ยง</h3>`;
+            html += `<p style="font-size: 1.1em; margin-bottom: 20px;">${result.analysis}</p>`;
+            html += `<div style="text-align: left; background: #fff0f0; padding: 15px; border-radius: 10px; border: 1px solid #ffcccc;"><strong>อาการที่พบ:</strong><ul>`;
+            (result.detectedSymptoms || []).forEach(sym => {
+                html += `<li>${sym}</li>`;
+            });
+            html += `</ul></div>`;
+            
+            // Button to continue to Acute check
+            nextStepsDiv.innerHTML = `<button class="btn-action" style="background-color: var(--symptom-red);" onclick="saveData('symptomDetail', 'AI: ${result.analysis}'); showLayer('layer-3');">ทำรายการต่อ (ตรวจสอบระยะเวลา)</button>`;
+        } else {
+            html += `<div style="color: var(--symptom-green); font-size: 5em;"><span class="iconify" data-icon="mdi:check-circle"></span></div>`;
+            html += `<h3 style="color: var(--symptom-green); font-size: 1.5em;">AI ไม่พบความเสี่ยงชัดเจน</h3>`;
+            html += `<p style="font-size: 1.1em;">${result.analysis}</p>`;
+            
+            // Button to manual check or finish
+            nextStepsDiv.innerHTML = `
+                <button class="btn-action" style="background-color: var(--primary-color);" onclick="handleNoSymptom()">ทดสอบแบบกดเลือกเอง (Manual)</button>
+                <button class="btn-action" style="background-color: var(--action-gray); margin-top: 10px;" onclick="if(liff.isInClient()){liff.closeWindow();}">ปิดหน้าต่าง</button>
+            `;
+        }
+        
+        contentDiv.innerHTML = html;
+        showLayer('layer-ai-result');
+    }
+
+    // --- End AI Functionality ---
 
     function fetchUserData(userId) {
         if (!userId) return;
@@ -606,7 +884,6 @@
         container.innerHTML = '';
         let reviewHtml = '';
         for (const key in symptomImages) {
-            // [Modified] New Layout for Review Cards (Full Image + Buttons Below)
             reviewHtml += `<div class="review-card" id="review-card-${key}">
                     <div class="review-image" onclick="viewImage('${symptomImages[key]}')">
                         <img src="${symptomImages[key]}" alt="${symptomTranslations[key]}">
