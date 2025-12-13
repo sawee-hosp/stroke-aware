@@ -84,12 +84,26 @@
         .modern-select { flex-grow: 0; width: auto; padding: 10px 15px; font-size: 1em; border-radius: 50px; border: 2px solid #ddd; background-color: #fff; font-family: "Noto Sans Thai", sans-serif; color: #333; min-width: 120px; }
 
         .symptom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .symptom-card { border-radius: 20px; box-shadow: var(--shadow); text-align: center; padding: 8px; cursor: pointer; background: #fff; min-height: 160px; display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; }
+        .symptom-card { 
+            border-radius: 20px; box-shadow: var(--shadow); text-align: center; padding: 8px; cursor: pointer; background: #fff; min-height: 160px; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; overflow: hidden; 
+        }
         .symptom-card img { width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; margin-bottom: 5px; border-radius: 15px; }
         .symptom-card p { margin: 0; line-height: 1.1; font-weight: 800; font-size: 1.1em; color: #2c3e50; }
-        .symptom-card.ai-test { background-color: var(--ai-yellow); border: 2px solid #F1C40F; color: var(--ai-text); flex-direction: row; gap: 15px; padding: 15px; min-height: 80px; }
+        .symptom-card.ai-test { 
+            background-color: var(--ai-yellow); border: 2px solid #F1C40F; color: var(--ai-text); 
+            flex-direction: row; gap: 15px; padding: 15px; min-height: 80px; align-items: center;
+        }
         
-        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; margin-top: 10px; }
+        .ai-input-row {
+            display: flex; align-items: center; gap: 10px; margin-top: 10px;
+        }
+        .ai-thumb-wrapper {
+            width: 80px; height: 80px; flex-shrink: 0; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; cursor: zoom-in;
+        }
+        .ai-thumb-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
         .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
         .file-upload-btn { background-color: #eee; color: #333; padding: 15px; width: 100%; font-size: 1.1em; }
         .file-upload-wrapper:hover .file-upload-btn { background-color: #ddd; }
@@ -101,7 +115,7 @@
         .pdpa-box { background: #f9f9f9; padding: 15px; border-radius: 15px; border: 1px solid #ddd; margin: 15px 0; font-size: 0.8em; text-align: left; }
         .btn-action { width: 100%; padding: 20px; color: white; margin-top: 25px; font-size: 1.4em; }
         .hidden { display: none; }
-        .ai-input-box { border: 1px solid #ddd; padding: 20px; border-radius: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .ai-input-box { border: 1px solid #ddd; padding: 15px; border-radius: 20px; margin-bottom: 15px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .btn-likely { background-color: var(--symptom-red); color: white; margin-bottom: 10px;}
         .btn-unlikely { background-color: var(--symptom-green); color: white; margin-bottom: 10px;}
@@ -133,6 +147,8 @@
         .contact-buttons { margin-top: 25px; }
         .contact-button { border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; }
         
+        .global-footer-hint { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); color: white; text-align: center; padding: 10px; font-size: 0.9em; z-index: 3500; }
+
         /* Modal Content */
         .modal { position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; text-align: left; max-height: 80vh; overflow-y: auto; }
@@ -161,9 +177,14 @@
             </div>
         </div>
     </div>
+    
+    <div class="global-footer-hint">ฉุกเฉินเร่งด่วน กดปุ่มโทรออกมุมขวาล่างได้ทันที</div>
 
     <div class="main-container">
+        <!-- Layer 1: Home -->
         <div id="layer-1" data-layer="1" class="card"></div>
+        
+        <!-- Manual Flow Layers (Restored) -->
         <div id="layer-2" data-layer="2" class="card hidden"></div>
         <div id="layer-3" data-layer="3" class="card hidden"></div>
         <div id="layer-4" data-layer="4" class="card hidden"></div>
@@ -171,6 +192,7 @@
         <div id="layer-6" data-layer="6" class="card hidden"></div>
         <div id="layer-no-symptom-review" data-layer="no-symptom-review" class="card hidden"></div>
 
+        <!-- AI Layers -->
         <div id="layer-ai-intro" data-layer="ai-intro" class="card hidden"></div>
         <div id="layer-ai-input" data-layer="ai-input" class="card hidden"></div>
         <div id="layer-ai-processing" data-layer="ai-processing" class="card hidden"></div>
@@ -178,6 +200,7 @@
         
         <div id="history-card" class="card hidden normal-font-mode"></div>
         
+        <!-- Modals -->
         <div id="disclaimerModal" class="modal" style="display:none;"></div>
         <div id="confirmLocationModal" class="modal normal-font-mode" style="display:none;">
              <div class="modal-content" style="text-align: center;">
@@ -199,6 +222,7 @@
             </div>
         </div>
         <div id="how-to-act-modal" class="modal normal-font-mode"></div>
+        <!-- Image Viewer -->
         <div id="image-viewer-modal" class="modal" style="background-color: rgba(0,0,0,0.95); flex-direction: column;" onclick="document.getElementById('image-viewer-modal').style.display='none'">
             <img id="full-image" style="max-width: 90%; max-height: 80vh; object-fit: contain; border-radius: 10px;">
             <div style="color: #ccc; margin-top: 10px; font-size: 18px;">แตะที่ว่างเพื่อปิด</div>
@@ -296,10 +320,10 @@
                     </select>
                 </div>
                 
-                <div class="symptom-card ai-test" onclick="handleAiTest()" style="margin-bottom: 15px; min-height: 100px; flex-direction: row; gap: 15px;">
-                    <span class="iconify" data-icon="mdi:robot-happy" style="font-size: 50px;"></span>
+                <div class="symptom-card ai-test" onclick="handleAiTest()" style="margin-bottom: 15px; min-height: 80px; flex-direction: row; gap: 15px; padding: 15px;">
+                    <span class="iconify" data-icon="mdi:robot-happy" style="font-size: 40px;"></span>
                     <div style="text-align:left;">
-                        <h3 style="margin:0;">ทดสอบอาการด้วย AI</h3>
+                        <h3 style="margin:0; font-size: 1.2em;">ทดสอบอาการด้วย AI</h3>
                         <span style="font-size:0.8em;">วิเคราะห์ใบหน้า แขน และเสียง</span>
                     </div>
                 </div>
@@ -313,6 +337,14 @@
                     <div style="min-height: 160px;"></div>
                 </div>
             </div>`;
+            
+        // Init other layers (Fixed: Must populate innerHTML for all layers initially)
+        document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 25px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-4').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p>อาการของท่าน เข้าข่าย</p><p class="large-red-blink">เป็นอาการของสโตรก</p><p class="small-black-blink">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 5em; margin-bottom: 15px;"></div><h2 id="final-title" class="section-title" style="text-align:center;"></h2><p id="final-text" style="text-align:center; font-size:1.3em;"></p><button class="btn-action" style="background-color: var(--primary-color); padding: 25px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
+        setupTimeOptions();
     }
 
     function buildAILayers() {
@@ -320,24 +352,14 @@
             <div class="card-body">
                 <h2 class="section-title"><span class="iconify" data-icon="mdi:brain"></span> ทดสอบด้วย AI</h2>
                 <div style="text-align: left; margin-bottom: 20px;">
-                    <p>ระบบ AI เป็นส่วนหนึ่งของการศึกษาและทดลองใช้เพื่อช่วยคัดกรองเบื้องต้นเท่านั้น ผลลัพธ์อาจมีความคลาดเคลื่อน <strong>หากท่านมีอาการผิดปกติ ควรรีบพบแพทย์ทันที</strong></p>
-                    <p style="color:var(--symptom-red); font-weight:bold;">* ต้องส่งรูปหรือเสียงอย่างน้อย 1 อย่างเพื่อประเมิน *</p>
-                </div>
-
-                <div style="text-align:center; margin-bottom:15px;">
-                    <img src="https://img2.pic.in.th/pic/-19b938acd92f7035f5.png" style="width:100%; border-radius:15px; margin-bottom:5px;">
-                    <p style="font-size:0.9em; font-weight:bold;">📸 การถ่ายรูปใบหน้า: ถอดหน้ากาก ยิ้มกว้างๆ ให้เห็นฟัน เพื่อดูมุมปาก</p>
-                </div>
-
-                <div style="text-align:center; margin-bottom:15px;">
-                    <img src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" style="width:100%; border-radius:15px; margin-bottom:5px;">
-                    <p style="font-size:0.9em; font-weight:bold;">💪 การถ่ายรูปแขน: ยกแขน 2 ข้างมาข้างหน้า (ระดับไหล่) ให้คนช่วยถ่าย หรือใช้การตั้งเวลา</p>
+                    <p>ระบบ AI เป็นส่วนหนึ่งของการศึกษา ผลลัพธ์อาจมีความคลาดเคลื่อน <strong>หากมีอาการผิดปกติ ควรรีบพบแพทย์</strong></p>
+                    <p style="color:var(--symptom-red); font-weight:bold;">* ต้องส่งรูปหรือเสียงอย่างน้อย 1 อย่าง *</p>
                 </div>
                 
                 <div class="pdpa-box">
                     <label style="display:flex; gap:10px; align-items:start;">
                         <input type="checkbox" id="pdpa-consent">
-                        <span>ข้าพเจ้ายินยอมให้นำรูปภาพและเสียงไปประมวลผลด้วยระบบปัญญาประดิษฐ์ (AI) เพื่อการประเมินความเสี่ยงโรคหลอดเลือดสมองเบื้องต้นเท่านั้น ข้อมูลจะถูกเก็บเป็นความลับ</span>
+                        <span>ข้าพเจ้ายินยอมให้นำข้อมูลไปประมวลผลด้วย AI เพื่อประเมินความเสี่ยงเบื้องต้น</span>
                     </label>
                 </div>
 
@@ -353,32 +375,40 @@
                 <div class="ai-input-box">
                     <h3>1. ใบหน้า (Face)</h3>
                     <p style="font-size:0.8em; color:#666;">ถอดหน้ากาก ยิ้มกว้างๆ ให้เห็นฟัน เพื่อดูมุมปาก</p>
-                    <div class="file-upload-wrapper">
-                        <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera" style="margin-right:5px;"></span> ถ่ายรูปใบหน้า</div>
-                        <input type="file" accept="image/*" capture="user" onchange="handleImageInput(this, 'face')">
+                    <div class="ai-input-row">
+                        <div class="ai-thumb-wrapper" onclick="if(aiInputs.face) viewImage('data:image/jpeg;base64,'+aiInputs.face)">
+                            <img id="preview-face" src="https://img2.pic.in.th/pic/-19b938acd92f7035f5.png" style="opacity:0.6">
+                        </div>
+                        <div class="file-upload-wrapper" style="flex-grow:1;">
+                            <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป</div>
+                            <input type="file" accept="image/*" capture="user" onchange="handleImageInput(this, 'face')">
+                        </div>
                     </div>
-                    <img id="preview-face" style="width:100%; display:none; margin-top:10px; border-radius:10px;">
                 </div>
 
                 <div class="ai-input-box">
                     <h3>2. แขน (Arm)</h3>
-                    <p style="font-size:0.8em; color:#666;">ตั้งกล้อง หรือให้ญาติถ่าย ยกแขน 2 ข้างมาข้างหน้า (ระดับไหล่)</p>
-                    <div class="file-upload-wrapper">
-                        <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera" style="margin-right:5px;"></span> ถ่ายรูปแขน</div>
-                        <input type="file" accept="image/*" capture="environment" onchange="handleImageInput(this, 'arm')">
+                    <p style="font-size:0.8em; color:#666;">ยกแขน 2 ข้างมาข้างหน้า (ระดับไหล่)</p>
+                    <div class="ai-input-row">
+                        <div class="ai-thumb-wrapper" onclick="if(aiInputs.arm) viewImage('data:image/jpeg;base64,'+aiInputs.arm)">
+                            <img id="preview-arm" src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" style="opacity:0.6">
+                        </div>
+                        <div class="file-upload-wrapper" style="flex-grow:1;">
+                            <div class="file-upload-btn"><span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป</div>
+                            <input type="file" accept="image/*" capture="environment" onchange="handleImageInput(this, 'arm')">
+                        </div>
                     </div>
-                    <img id="preview-arm" style="width:100%; display:none; margin-top:10px; border-radius:10px;">
                 </div>
 
                 <div class="ai-input-box">
                     <h3>3. เสียง (Speech)</h3>
                     <p style="font-size:0.9em; text-align:center;">พูดว่า: <span class="karaoke-text">"ยายกินลำไย น้ำลายยายไหลย้อย"</span></p>
-                    <button onclick="toggleRecording()" id="btn-record" style="background:#d9534f; color:white; padding:15px; width:100%; font-size: 1.1em;">
-                        <span class="iconify" data-icon="mdi:microphone" style="margin-right:5px;"></span> กดเพื่ออัดเสียง
+                    <button onclick="toggleRecording()" id="btn-record" style="background:#d9534f; color:white; padding:15px;">
+                        <span class="iconify" data-icon="mdi:microphone"></span> กดเพื่ออัดเสียง
                     </button>
                     <div id="audio-controls-container" style="display:none; margin-top:10px; text-align:center;">
                         <audio id="audio-playback" controls style="width:100%;"></audio>
-                        <div style="color:green; font-weight:bold; margin-top:5px;">บันทึกเสียงแล้ว</div>
+                        <div style="color:green; font-weight:bold;">บันทึกเสียงแล้ว</div>
                     </div>
                 </div>
 
@@ -398,7 +428,7 @@
         document.getElementById('layer-ai-result').innerHTML = `<div class="card-body" id="ai-result-content"></div>`;
     }
 
-    // --- MANUAL FLOW LOGIC ---
+    // --- MANUAL FLOW LOGIC (RESTORED) ---
     window.showLayer2 = function(symptomKey) {
         saveData('symptomCategory', symptomKey);
         document.getElementById('layer-2-title').textContent = `อาการด้าน${symptomTranslations[symptomKey]}`;
@@ -412,7 +442,6 @@
             <div class="zoom-hint">แตะเพื่อขยายรูป</div>
         </div>`;
         
-        // Add Symptom Description
         const detail = symptomDetails[symptomKey];
         if (detail.desc) {
             newHtml += `<div style="background:#f0faff; border-left: 5px solid var(--primary-color); padding: 15px; margin: 20px 0; text-align: left; border-radius: 5px;">
@@ -420,7 +449,6 @@
             </div>`;
         }
 
-        // Add AI Shortcut Link if applicable
         if (detail.hasAi) {
             newHtml += `<button onclick="handleAiTest()" style="background-color: var(--ai-yellow); color: black; margin-bottom: 20px; font-size: 1em;">
                 <span class="iconify" data-icon="mdi:robot-happy"></span> ใช้ AI ช่วยตรวจอาการนี้
@@ -609,7 +637,7 @@
                     const resizedData = canvas.toDataURL('image/jpeg', 0.7);
                     aiInputs[type] = resizedData.split(',')[1];
                     const preview = document.getElementById(`preview-${type}`);
-                    preview.src = resizedData; preview.style.display = 'block';
+                    preview.src = resizedData; preview.style.opacity = '1';
                 };
                 img.src = e.target.result;
             };
@@ -673,31 +701,27 @@
             if (aiInputs.arm) { html += `<div class="result-image-wrapper"><img src="data:image/jpeg;base64,${aiInputs.arm}"><div class="grid-overlay"></div><p style="font-size:0.8em; color:#fff; background:rgba(0,0,0,0.5); position:absolute; bottom:0; width:100%;">Arm Analysis</p></div>`; }
             html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
             
-            // Connect to Manual Flow (Acute check)
             html += `<button class="btn-action" style="background-color:var(--symptom-red);" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
         }
         container.innerHTML = html;
         showLayer('layer-ai-result');
     }
 
-    // --- Core Navigation & Utilities ---
     window.showLayer = function(id) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); };
     window.saveData = function(key, value) { sessionData[key] = value; };
     window.viewImage = function(src) { const modal = document.getElementById('image-viewer-modal'); document.getElementById('full-image').src = src; modal.style.display = "flex"; };
     
-    // Database & Final Save Logic
     window.handleFinalSave = function(button, isEmergency) {
         if(button && button.disabled) return;
         if(button) button.disabled = true;
         sessionData.isEmergency = isEmergency;
-        // Mock fetch user data just in case
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
             if (response && response.status === 'success') {
-                if (isEmergency && response.notificationSent) {
+                if (isEmergency || response.notificationSent) {
                     if (currentActionKey === 'บันทึกและปิด') { if(liff.isInClient()) liff.closeWindow(); } 
                     else { document.getElementById('how-to-act-modal').style.display = 'flex'; }
-                } else if (!isEmergency) { if(liff.isInClient()) liff.closeWindow(); }
+                } else { if(liff.isInClient()) liff.closeWindow(); }
             } else { alert("เกิดข้อผิดพลาดในการบันทึก: " + (response ? response.message : 'Unknown error')); }
             if(button) button.disabled = false;
         };
