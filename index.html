@@ -179,9 +179,9 @@
         .modal { position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; text-align: left; max-height: 80vh; overflow-y: auto; }
         
-        /* New Help Button Style */
+        /* New Help Button Style - Compact */
         .help-btn {
-            font-size: 0.7em; 
+            font-size: 0.65em; 
             background-color: var(--primary-color); 
             color: white; 
             padding: 4px 10px; 
@@ -191,6 +191,7 @@
             display: inline-block; 
             vertical-align: middle;
             border: 1px solid rgba(255,255,255,0.3);
+            white-space: nowrap;
         }
 
         /* AI Result Styles */
@@ -352,8 +353,6 @@
         document.getElementById('modal-send-location-btn').onclick = () => { 
             document.getElementById('confirmLocationModal').style.display = 'none'; 
             getLocation(false, true, () => {
-                // After location is obtained (and saved via sessionData update), if this was triggered by "Save & Close", we proceed.
-                // But wait, the button calls getLocation(false, true). The 'true' is 'callAfter'.
                 // If we are reusing this modal for Final Save, we need to handle that.
                 if (currentActionKey === 'บันทึกและปิด') {
                     handleFinalSave(currentActionElement, true);
@@ -647,8 +646,6 @@
         sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
         startCountdown(rtpaDeadline.getTime());
-        
-        // Update Table
         let tableHtml = '<tbody>';
         tableHtml += createTableRow('mdi:account-circle', 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
         tableHtml += createTableRow('mdi:account-heart-outline', 'อาการ', sessionData.symptomDetail);
@@ -657,28 +654,8 @@
         tableHtml += createTableRow('mdi:timer-sand', 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
         tableHtml += '</tbody>';
         document.getElementById('summary-table').innerHTML = tableHtml;
-        
         buildActionContainer();
-        
-        // Auto check location button state if location already exists
-        if(sessionData.location) {
-             const locButton = document.getElementById('location-action'); 
-             const locText = document.getElementById('location-text');
-             if (locButton) {
-                 locButton.classList.add('success'); 
-                 locButton.innerHTML = `<span class="iconify" data-icon="mdi:check-circle"></span>`; 
-                 locText.textContent = 'ส่งพิกัดแล้ว';
-                 
-                 // If loc exists, calc distance immediately
-                 const coords = sessionData.location.split(',');
-                 if(coords.length === 2) {
-                     const distance = getDistanceFromLatLonInKm(parseFloat(coords[0]), parseFloat(coords[1]), hospitalCoords.lat, hospitalCoords.lon);
-                     updateSummaryAndActions(distance);
-                 }
-             }
-        } else {
-            updateSummaryAndActions(null);
-        }
+        updateSummaryAndActions(null);
     }
 
     function startCountdown(deadlineMillis) {
@@ -742,17 +719,11 @@
         }
     }
 
-    function createContactButton(tel, label, key) { 
-        return `<div class="contact-button" onclick="handleCallClick(this, '${key}', '${tel}')">
-                    <span class="iconify" data-icon="mdi:phone"></span><span class="label">${label}</span>
-                </div>`; 
-    }
-    
+    function createContactButton(tel, label, key) { return `<div class="contact-button" onclick="handleCallClick(this, '${key}', '${tel}')"><span class="iconify" data-icon="mdi:phone"></span><span class="label">${label}</span></div>`; }
     function createTableRow(iconName, label, value, isUrgent = false, rowClass = '') {
         const valueClass = isUrgent ? 'value-col value-urgent' : 'value-col';
         return `<tr class="${rowClass}"><td class="icon-col"><span class="iconify" data-icon="${iconName}"></span></td><td class="label-col">${label}</td><td class="${valueClass}">${value || 'N/A'}</td></tr>`;
     }
-    
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         if (!container) return;
@@ -769,6 +740,22 @@
     }
 
     // --- AI & Global Helper Functions ---
+    // NEW: Friendly Error Function
+    function showAiError(msg) {
+        const container = document.getElementById('layer-ai-processing');
+        container.innerHTML = `
+            <div class="card-body" style="text-align:center; padding:30px 0;">
+                <span class="iconify" data-icon="mdi:robot-confused" style="font-size: 60px; color: #999;"></span>
+                <h3 style="color: #555; margin-top: 10px;">AI วิเคราะห์ไม่ได้</h3>
+                <p style="color: #777; font-size: 0.9em; margin-bottom: 20px;">${msg}</p>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn-action" style="background-color: var(--ai-yellow); color:black;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>
+                    <button class="btn-action" style="background-color: var(--primary-color); color:white;" onclick="analyzeWithGemini()">ลองส่งอีกครั้ง</button>
+                </div>
+            </div>
+        `;
+    }
+
     window.handleAiTest = function() { showLayer('layer-ai-intro'); };
     window.startAiTestFlow = function() {
         if (!document.getElementById('pdpa-consent').checked) { alert("กรุณายอมรับเงื่อนไขการใช้งานข้อมูลก่อน"); return; }
@@ -834,6 +821,13 @@
         .then(res => res.json()).then(data => { 
             if (data.status === 'success') { 
                 currentAnalysisResult = data.data; 
+                
+                // Handle fallback result from backend safely (Restored)
+                if (!data.data.isValid) {
+                     showAiError(data.data.refusalReason || "ข้อมูลไม่เพียงพอ หรือระบบขัดข้องชั่วคราว");
+                     return;
+                }
+
                 if (data.data.fileUrls) {
                      sessionData.fileUrls = data.data.fileUrls;
                      sessionData.isAiAssessment = true;
@@ -843,13 +837,13 @@
 
                 displayAiResult(data.data); 
             } else { 
-                alert("การวิเคราะห์ขัดข้อง โปรดลองใหม่อีกครั้ง (" + data.message + ")");
-                showLayer('layer-ai-input'); 
+                // Restored: Use friendly error UI instead of alert
+                showAiError(data.message || "เกิดข้อผิดพลาดในการเชื่อมต่อ");
             } 
         })
         .catch(err => { 
-            alert("การเชื่อมต่อขัดข้อง โปรดตรวจสอบอินเทอร์เน็ต (" + err.message + ")"); 
-            showLayer('layer-ai-input'); 
+            // Restored: Use friendly error UI instead of alert
+            showAiError("การเชื่อมต่อขัดข้อง โปรดตรวจสอบอินเทอร์เน็ต (" + err.message + ")");
         });
     };
     window.requestSummary = function() {
@@ -865,7 +859,7 @@
     };
     window.copySummary = function() { const copyText = document.getElementById("aiSummaryText"); copyText.select(); copyText.setSelectionRange(0, 99999); document.execCommand("copy"); alert("คัดลอกข้อความแล้ว"); };
     
-    // --- NEW: Client-side Flex Message Creation ---
+    // --- NEW: Client-side Flex Message Creation (Restored) ---
     function createFlexMessage(data) {
         const altText = "ผลประเมินสวีรู้ทันสโตรก";
         
@@ -886,10 +880,8 @@
         // --- HERO IMAGE (AI ONLY) ---
         let heroImage = null;
         if (data.isAiAssessment && data.fileUrls) {
-            // Prefer Face URL, then Arm URL
             let imgUrl = data.fileUrls.face || data.fileUrls.arm;
             if (imgUrl) {
-                // Ensure URL is valid string
                 heroImage = {
                     type: "image",
                     url: imgUrl,
@@ -958,18 +950,15 @@
         // 2. Call Buttons (Grid Layout)
         if (data.isEmergency) {
             let callButtons = [];
-            // Emergency 1669
             callButtons.push({
                 type: "button", style: "primary", color: "#D32F2F", height: "sm", margin: "sm",
                 action: { type: "uri", label: "📞 1669", uri: "tel:1669" }
             });
-            // Hospital
             callButtons.push({
                 type: "button", style: "primary", color: "#F57C00", height: "sm", margin: "sm",
                 action: { type: "uri", label: "📞 รพ.สวี", uri: "tel:0894745523" }
             });
             
-            // Volunteers (if available)
             if (data.volunteerContacts) {
                 const c = data.volunteerContacts;
                 if (c.pcu_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 รพ.สต.", uri: `tel:${c.pcu_tel}` } });
@@ -977,7 +966,6 @@
                 if (c.volunteer1_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 อสม.1", uri: `tel:${c.volunteer1_tel}` } });
             }
 
-            // Add buttons to footer in chunks if too many, but vertical stack is safer for mobile
             callButtons.forEach(btn => footerContents.push(btn));
         }
 
@@ -1001,7 +989,6 @@
             margin: "sm" 
         });
 
-        // Assemble Final JSON
         let flexContainer = {
             type: "bubble",
             header: {
@@ -1078,7 +1065,6 @@
         // --- FORCE LOCATION FOR EMERGENCY CASES ---
         if (isEmergency && !sessionData.location) {
             if(confirm("สำหรับเคสฉุกเฉิน จำเป็นต้องระบุพิกัดเพื่อความช่วยเหลือที่แม่นยำ\nกด 'ตกลง' เพื่อส่งพิกัด")) {
-                 // Reuse existing location logic but callback to save again
                  getLocation(false, true, () => {
                      handleFinalSave(button, isEmergency);
                  });
@@ -1254,4 +1240,3 @@
 </script>
 </body>
 </html>
-</script>
