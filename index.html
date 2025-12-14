@@ -147,14 +147,27 @@
         .summary-table .icon-col { width: 50px; text-align: center; font-size: 1.5em; }
         
         .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; place-items: center; margin-top: 25px; }
-        .action-button { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; border-radius: 20px; font-size: 2em; }
+        /* UPDATED: Improved Action Button Style */
+        .action-button { 
+            display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; 
+            border-radius: 20px; font-size: 2.2em; color: white; /* Force White Icon */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid white;
+        }
         .location-button { background-color: var(--action-blue); }
         .location-button.success { background-color: var(--action-green); }
         .tel-sawi-button { background-color: var(--action-orange); }
         .tel-1669-button { background-color: var(--action-red); }
+        .action-button-text { font-size: 0.9em; font-weight: bold; color: #555; margin-top: 8px; }
         
         .contact-buttons { margin-top: 25px; }
-        .contact-button { border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; }
+        /* UPDATED: Contact Buttons to be White Text on Color */
+        .contact-button { 
+            border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; 
+            background-color: var(--primary-color); color: white !important; /* Force White Text */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; text-decoration: none;
+        }
+        .contact-button .iconify { font-size: 1.4em; margin-right: 10px; }
+        .route-button { background-color: #17a2b8; }
         
         .global-footer-hint { 
             position: fixed; bottom: 0; left: 0; width: 100%; 
@@ -259,8 +272,8 @@
                 <h2 style="margin-top: 15px;">ยังไม่ได้ส่งพิกัด</h2>
                 <p style="color: #555;">เพื่อให้ทีมแพทย์ช่วยเหลือได้รวดเร็วและแม่นยำ<br>กรุณากด "ส่งพิกัด" ก่อนโทร</p>
                 <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 25px;">
-                    <button id="modal-send-location-btn" class="btn-action" style="background-color: var(--action-blue); margin-top:0;">ส่งพิกัดก่อนโทร</button>
-                    <button id="modal-call-anyway-btn" class="btn-action" style="background-color: var(--action-gray); margin-top:0;">โทรเลยไม่ส่งพิกัด</button>
+                    <button id="modal-send-location-btn" class="btn-action" style="background-color: var(--action-blue); margin-top:0; color:white;">ส่งพิกัดก่อนโทร</button>
+                    <button id="modal-call-anyway-btn" class="btn-action" style="background-color: var(--action-gray); margin-top:0; color:white;">โทรเลยไม่ส่งพิกัด</button>
                 </div>
             </div>
         </div>
@@ -268,8 +281,8 @@
             <div class="modal-content">
                 <h3 style="text-align:center;">✨ ข้อความส่งต่อแพทย์</h3>
                 <textarea id="aiSummaryText" style="width:100%; height:150px; padding:10px; border-radius:10px; border:1px solid #ccc; font-size:1em;" readonly></textarea>
-                <button class="btn-action" style="background-color:#28a745; margin-top:10px; padding:15px;" onclick="copySummary()">คัดลอกข้อความ</button>
-                <button class="btn-action" style="background-color:#6c757d; margin-top:10px; padding:15px;" onclick="document.getElementById('aiSummaryModal').style.display='none'">ปิด</button>
+                <button class="btn-action" style="background-color:#28a745; margin-top:10px; padding:15px; color:white;" onclick="copySummary()">คัดลอกข้อความ</button>
+                <button class="btn-action" style="background-color:#6c757d; margin-top:10px; padding:15px; color:white;" onclick="document.getElementById('aiSummaryModal').style.display='none'">ปิด</button>
             </div>
         </div>
         <div id="how-to-act-modal" class="modal normal-font-mode"></div>
@@ -295,6 +308,7 @@
     let currentActionElement = null;
     let currentActionKey = '';
     let notificationSent = false;
+    let pendingCallUrl = null; // Store URL for pending call
 
     const symptomImages = {
         'Balance': 'https://img2.pic.in.th/pic/-14a8e9c4fc269d4d8f.md.png',
@@ -340,10 +354,9 @@
         document.getElementById('loading').style.display = 'none'; 
         buildInitialHTML();
         buildAILayers(); 
-        document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>`;
+        document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color); color:white;">รับทราบ</button></div>`;
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:1em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.4em; padding:15px; border-radius: 10px; width:100%; margin-top:15px;">รับทราบ</button></div>`;
         
-        // Bind event listener
         setTimeout(() => {
             const infoBtn = document.getElementById('info-btn');
             if(infoBtn) {
@@ -351,7 +364,7 @@
             }
         }, 500);
         
-        document.getElementById('modal-call-anyway-btn').onclick = () => { document.getElementById('confirmLocationModal').style.display = 'none'; proceedWithSave(); };
+        document.getElementById('modal-call-anyway-btn').onclick = () => { document.getElementById('confirmLocationModal').style.display = 'none'; executePendingCall(); };
         document.getElementById('modal-send-location-btn').onclick = () => { document.getElementById('confirmLocationModal').style.display = 'none'; getLocation(true); };
 
         try {
@@ -366,7 +379,6 @@
     };
 
     function buildInitialHTML() {
-        // Changed Icon to Text Button
         document.getElementById('layer-1').innerHTML = `
             <div class="card-body">
                 <h1 class="section-title">ประเมินอาการสโตรก <div id="info-btn" class="help-btn">อ่านก่อน</div></h1>
@@ -418,8 +430,8 @@
         document.getElementById('layer-2').innerHTML = `<div class="card-body"><h2 id="layer-2-title" class="section-title" style="text-align:center;"></h2><div id="layer-2-new-content"></div><hr id="layer-2-separator" style="margin: 25px 0;"><p id="layer-2-subtitle" class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-3').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเกิดขึ้นอย่างไร?</h2><div class="options-container"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</div></div>`;
         document.getElementById('layer-4').innerHTML = `<div class="card-body"><h2 class="section-title" style="text-align:center;">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div class="options-container time-options" id="time-options-container"></div></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</div></div>`;
-        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p>อาการของท่าน เข้าข่าย</p><p class="large-red-blink">เป็นอาการของสโตรก</p><p class="small-black-blink">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red);" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</div></div>`;
-        document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 5em; margin-bottom: 15px;"></div><h2 id="final-title" class="section-title" style="text-align:center;"></h2><p id="final-text" style="text-align:center; font-size:1.3em;"></p><button class="btn-action" style="background-color: var(--primary-color); padding: 25px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
+        document.getElementById('layer-5').innerHTML = `<div class="card-body"><div class="emergency-text-container"><p>อาการของท่าน เข้าข่าย</p><p class="large-red-blink">เป็นอาการของสโตรก</p><p class="small-black-blink">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="countdown-timer"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="summary-table"></table><div id="contact-buttons" class="contact-buttons"></div><div id="route-button-container"></div><button class="btn-action" style="background-color: var(--dark-red); color: white;" onclick="triggerSave(this, 'บันทึกและปิด', true)">บันทึกข้อมูลและปิดหน้าต่าง</button></div><div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</div></div>`;
+        document.getElementById('layer-6').innerHTML = `<div class="card-body"><div id="final-emoji" style="text-align:center; font-size: 5em; margin-bottom: 15px;"></div><h2 id="final-title" class="section-title" style="text-align:center;"></h2><p id="final-text" style="text-align:center; font-size:1.3em;"></p><button class="btn-action" style="background-color: var(--primary-color); padding: 25px; color: white;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button></div>`;
         setupTimeOptions();
     }
 
@@ -438,7 +450,7 @@
                     </label>
                 </div>
 
-                <button class="btn-action" style="background-color: var(--primary-color);" onclick="startAiTestFlow()">เริ่มการทดสอบ</button>
+                <button class="btn-action" style="background-color: var(--primary-color); color:white;" onclick="startAiTestFlow()">เริ่มการทดสอบ</button>
             </div>
             <div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</div></div>
         `;
@@ -521,7 +533,6 @@
         }
     };
 
-    // Changed: Trigger search on Button Click only
     window.triggerSearch = function() {
         const input = document.getElementById('patient-phone');
         const phone = input.value.replace(/[^0-9]/g, '');
@@ -711,11 +722,17 @@
         }
     }
 
-    function createContactButton(tel, label, key) { return `<a href="tel:${tel}" class="contact-button" onclick="triggerSave(this, '${key}')"><span class="iconify" data-icon="mdi:phone"></span><span class="label">${label}</span></a>`; }
+    function createContactButton(tel, label, key) { 
+        return `<div class="contact-button" onclick="handleCallClick(this, '${key}', '${tel}')">
+                    <span class="iconify" data-icon="mdi:phone"></span><span class="label">${label}</span>
+                </div>`; 
+    }
+    
     function createTableRow(iconName, label, value, isUrgent = false, rowClass = '') {
         const valueClass = isUrgent ? 'value-col value-urgent' : 'value-col';
         return `<tr class="${rowClass}"><td class="icon-col"><span class="iconify" data-icon="${iconName}"></span></td><td class="label-col">${label}</td><td class="${valueClass}">${value || 'N/A'}</td></tr>`;
     }
+    
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         if (!container) return;
@@ -723,8 +740,12 @@
             <div class="action-button-wrapper">
                 <div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="mdi:map-marker"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
             </div>
-            <a href="tel:0894745523" class="action-button-wrapper" onclick="triggerSave(this, 'tel_sawee')"><div class="action-button tel-sawi-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร รพ.สวี</p></a>
-            <a href="tel:1669" class="action-button-wrapper" onclick="triggerSave(this, 'tel_1669')"><div class="action-button tel-1669-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร 1669</p></a>`;
+            <div class="action-button-wrapper" onclick="handleCallClick(this, 'tel_sawee', '0894745523')">
+                <div class="action-button tel-sawi-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร รพ.สวี</p>
+            </div>
+            <div class="action-button-wrapper" onclick="handleCallClick(this, 'tel_1669', '1669')">
+                <div class="action-button tel-1669-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร 1669</p>
+            </div>`;
     }
 
     // --- AI & Global Helper Functions ---
@@ -783,7 +804,6 @@
         // Updated: Check if AT LEAST ONE input exists
         if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { alert("กรุณาใส่อย่างน้อย 1 ข้อมูล"); return; }
         showLayer('layer-ai-processing');
-        // UPDATED: Include userId and name in userData
         const userDataPayload = { 
             risk_group: sessionData.risk_group, 
             score: sessionData.thai_cv_risk_score,
@@ -795,7 +815,6 @@
         .then(res => res.json()).then(data => { 
             if (data.status === 'success') { 
                 currentAnalysisResult = data.data; 
-                // *** IMPORTANT: Save URL from backend to sessionData ***
                 if (data.data.fileUrls) {
                      sessionData.fileUrls = data.data.fileUrls;
                      sessionData.isAiAssessment = true;
@@ -828,7 +847,7 @@
         const container = document.getElementById('ai-result-content');
         let html = '';
         if (!result.isValid) {
-            html += `<h2 style="color:orange;">⚠️ ข้อมูลไม่ชัดเจน</h2><p>${result.refusalReason || "รูปภาพไม่ชัดเจน หรือไม่ใช่รูปคนที่ต้องการ"}</p><button class="btn-action" style="background:#333;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>`;
+            html += `<h2 style="color:orange;">⚠️ ข้อมูลไม่ชัดเจน</h2><p>${result.refusalReason || "รูปภาพไม่ชัดเจน หรือไม่ใช่รูปคนที่ต้องการ"}</p><button class="btn-action" style="background:#333; color:white;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>`;
         } else {
             if (result.isRisk) { html += `<h2 style="color:var(--symptom-red);">🚨 พบความเสี่ยงสูง (${result.riskScore}%)</h2><div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); html += `</ul><p>${result.analysis}</p></div>`; } 
             else { html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2><p>${result.analysis}</p>`; }
@@ -850,16 +869,14 @@
                 </div>`; 
             }
 
-            html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
+            html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px; color:white;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
             
-            // Connect to Manual Flow (Acute check)
             if(result.isRisk) {
-                 html += `<button class="btn-action" style="background-color:var(--symptom-red);" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
+                 html += `<button class="btn-action" style="background-color:var(--symptom-red); color:white;" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
             } else {
-                 html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px;" onclick="saveData('symptomDetail', 'AI: No significant risk found'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
+                 html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px; color:white;" onclick="saveData('symptomDetail', 'AI: No significant risk found'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
             }
         }
-        // Add Back Button to Result Page
         html += `<div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-ai-input')">ย้อนกลับไปแก้ไขข้อมูล</div></div>`;
         container.innerHTML = html;
         showLayer('layer-ai-result');
@@ -875,7 +892,7 @@
         if(button && button.disabled) return;
         if(button) button.disabled = true;
         sessionData.isEmergency = isEmergency;
-        sessionData.isFinalSave = true; // Ensure logic triggers flex
+        sessionData.isFinalSave = true; 
         
         const callbackName = 'saveCallback' + Date.now();
         window[callbackName] = function(response) {
@@ -894,27 +911,66 @@
     
     window.triggerSave = function(element, key, isFinalSave = false) {
         currentActionElement = element; currentActionKey = key; sessionData.isFinalSave = isFinalSave;
-        if (key.startsWith('tel_') && !sessionData.location) { document.getElementById('confirmLocationModal').style.display = 'flex'; } else { proceedWithSave(); }
+        proceedWithSave();
     };
     
     window.proceedWithSave = function() {
         if (currentActionKey.startsWith('tel_')) { sessionData[currentActionKey] = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' }); }
         sessionData.contactedVia = currentActionKey;
-        // Check notification status handled in backend now mostly
         handleFinalSave(currentActionElement, true);
     };
     
-    window.getLocation = function(andThenSave = false) {
-        const locButton = document.getElementById('location-action'); const locText = document.getElementById('location-text');
-        if (!locButton) return;
-        locButton.onclick = null; locText.textContent = 'กำลังค้นหา...';
+    // Updated: Logic for calling (Confirm -> GetLoc -> Save -> Call)
+    window.handleCallClick = function(element, key, tel) {
+        if(confirm("การกดโทรออกจะส่งพิกัดให้ รพ.สวี ยอมรับหรือไม่?")) {
+            currentActionKey = key;
+            currentActionElement = element;
+            pendingCallUrl = `tel:${tel}`;
+            document.getElementById('confirmLocationModal').style.display = 'flex';
+            // Actually try to get location immediately too
+            getLocation(false, true); 
+        }
+    };
+
+    window.executePendingCall = function() {
+        if(pendingCallUrl) {
+            proceedWithSave();
+            window.location.href = pendingCallUrl;
+        }
+    }
+    
+    window.getLocation = function(andThenSave = false, justUpdateData = false) {
+        const locButton = document.getElementById('location-action'); 
+        const locText = document.getElementById('location-text');
+        if (locButton) {
+             locButton.onclick = null; locText.textContent = 'กำลังค้นหา...';
+        }
+        
         navigator.geolocation.getCurrentPosition(position => {
-            locButton.classList.add('success'); locButton.innerHTML = `<span class="iconify" data-icon="mdi:check-circle"></span>`; locText.textContent = 'ส่งพิกัดแล้ว';
+            if(locButton) {
+                locButton.classList.add('success'); locButton.innerHTML = `<span class="iconify" data-icon="mdi:check-circle"></span>`; locText.textContent = 'ส่งพิกัดแล้ว';
+            }
             const { latitude, longitude } = position.coords; saveData('location', `${latitude},${longitude}`);
             const distance = getDistanceFromLatLonInKm(latitude, longitude, hospitalCoords.lat, hospitalCoords.lon);
             updateSummaryAndActions(distance);
-            if (andThenSave) proceedWithSave();
-        }, error => { alert("ไม่สามารถเข้าถึงตำแหน่งได้"); locButton.onclick = () => getLocation(andThenSave); locText.textContent = 'ส่งพิกัดที่อยู่'; updateSummaryAndActions(null); });
+            
+            if (justUpdateData) {
+                 // Do nothing else, just updated sessionData
+                 if(document.getElementById('confirmLocationModal').style.display === 'flex') {
+                     // Auto close modal and execute call if location found quickly
+                     document.getElementById('confirmLocationModal').style.display = 'none';
+                     executePendingCall();
+                 }
+            } else if (andThenSave) {
+                proceedWithSave();
+            }
+        }, error => { 
+            // If failed, allow manual retry
+            if(locButton) {
+                locButton.onclick = () => getLocation(andThenSave); locText.textContent = 'ส่งพิกัดที่อยู่'; updateSummaryAndActions(null); 
+            }
+            // If this was an automated attempt before call, just let user decide via modal buttons
+        });
     };
 
     window.fetchUserData = function(userId) {
