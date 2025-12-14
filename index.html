@@ -299,7 +299,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec"; 
     const LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
-    const HEALTH_INFO_LIFF_ID = "2005789397-RLAGXrBJ"; // Add constants here
+    const HEALTH_INFO_LIFF_ID = "2005789397-RLAGXrBJ"; 
     const DAILY_CHECK_LIFF_ID = "2005789397-WRm1lYd9";
     
     let sessionData = {};
@@ -729,7 +729,7 @@
         if (!container) return;
         container.innerHTML = `
             <div class="action-button-wrapper">
-                <div id="location-action" class="action-button location-button" onclick="getLocation(false, false)"><span class="iconify" data-icon="mdi:map-marker"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
+                <div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="mdi:map-marker"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
             </div>
             <div class="action-button-wrapper" onclick="handleCallClick(this, 'tel_sawee', '0894745523')">
                 <div class="action-button tel-sawi-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร รพ.สวี</p>
@@ -1021,8 +1021,27 @@
         if (!result.isValid) {
             html += `<h2 style="color:orange;">⚠️ ข้อมูลไม่ชัดเจน</h2><p>${result.refusalReason || "รูปภาพไม่ชัดเจน หรือไม่ใช่รูปคนที่ต้องการ"}</p><button class="btn-action" style="background:#333; color:white;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>`;
         } else {
-            if (result.isRisk) { html += `<h2 style="color:var(--symptom-red);">🚨 พบความเสี่ยงสูง (${result.riskScore}%)</h2><div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); html += `</ul><p>${result.analysis}</p></div>`; } 
-            else { html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2><p>${result.analysis}</p>`; }
+            // Updated title with probability
+            let riskTitle = `🚨 พบความเสี่ยงสูง`;
+            if (result.riskScore) riskTitle += ` (${result.riskScore}%)`;
+
+            // Combine AI score with Thai CV Risk Score logic
+            let additionalWarning = "";
+            if (result.riskScore < 50 && sessionData.thai_cv_risk_score && parseInt(sessionData.thai_cv_risk_score) > 20) {
+                 additionalWarning = `<div style="background:#fff3cd; color:#856404; padding:10px; border-radius:5px; margin-top:10px; font-size:0.9em;">⚠️ <strong>ข้อควรระวัง:</strong> แม้ผลวิเคราะห์ภาพ/เสียงจะดูความเสี่ยงต่ำ แต่ประวัติความเสี่ยงสะสมของท่านสูง (${sessionData.thai_cv_risk_score}%) ควรเฝ้าระวังอาการใกล้ชิด</div>`;
+            }
+
+            if (result.isRisk) { 
+                html += `<h2 style="color:var(--symptom-red);">${riskTitle}</h2>
+                         ${additionalWarning}
+                         <div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; 
+                (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); 
+                html += `</ul><p>${result.analysis}</p></div>`; 
+            } else { 
+                html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2>
+                         ${additionalWarning}
+                         <p>${result.analysis}</p>`; 
+            }
             
             html += `<h3>ภาพที่วิเคราะห์</h3>`;
             if (aiInputs.face) { 
@@ -1212,10 +1231,18 @@
             if (phoneInput && phoneInput.value.length === 10) phoneInput.style.borderColor = "#28a745";
             if(sessionData.district && sessionData.village) { fetchVolunteerData(`ต.${sessionData.district} ม.${sessionData.village}`); }
         } else {
-             infoBar.style.display = 'none';
+             // Handle Not Found - Use generic name
+             sessionData.registeredName = `ผู้ป่วยไม่มีประวัติ (ประเมินโดย ${sessionData.userName || 'Guest'})`;
+             sessionData.risk_group = "ไม่ระบุ";
+             
+             infoBar.style.display = 'flex'; // Show bar to confirm interaction
+             uiName.textContent = sessionData.registeredName;
+             uiRisk.textContent = "-";
+             uiDate.textContent = "-";
+
              if (phoneInput && phoneInput.value.length === 10) {
-                 phoneInput.style.borderColor = "#dc3545";
-                 alert("ไม่พบข้อมูลของเบอร์โทรนี้");
+                 phoneInput.style.borderColor = "#f0ad4e"; // Yellow warn color
+                 // Optional: alert("ไม่พบข้อมูล แต่สามารถดำเนินการต่อได้");
             }
         }
     };
