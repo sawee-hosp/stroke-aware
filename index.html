@@ -20,6 +20,8 @@
             --ai-yellow: #FFD700; --ai-text: #000;
         }
 
+        * { box-sizing: border-box; } /* ป้องกัน padding ดัน layout ล้น */
+
         body { 
             font-family: "Noto Sans Thai", sans-serif; 
             background-color: var(--background-color); 
@@ -41,7 +43,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             text-align: center;
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; box-sizing: border-box; font-size: 1.1em; padding: 15px;
+            width: 100%; font-size: 1.1em; padding: 15px;
         }
         button:active, .btn-action:active { transform: scale(0.98); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
@@ -66,9 +68,9 @@
         .spinner { border: 8px solid #333; border-top: 8px solid #ffc107; border-radius: 50%; width: 80px; height: 80px; animation: spin 1s linear infinite; margin-bottom: 30px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .main-container { max-width: 600px; margin: 0 auto; }
-        .card { padding: 25px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 10px; }
-        .card-body { padding-bottom: 10px; }
+        .main-container { max-width: 600px; margin: 0 auto; width: 100%; }
+        .card { padding: 25px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 10px; width: 100%; overflow: hidden; }
+        .card-body { padding-bottom: 10px; width: 100%; }
 
         .section-title { font-size: 1.6em; font-weight: 700; color: var(--text-color); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; text-align: center;}
         .section-subtitle { font-size: 1.1em; color: #555; margin-top: 0px; margin-bottom: 20px; text-align: center; }
@@ -76,38 +78,31 @@
         .assessor-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; flex-wrap: nowrap; }
         .modern-select { 
             flex-grow: 0; width: auto; padding: 10px 15px; font-size: 1em; border-radius: 50px; border: 2px solid #ddd; background-color: #fff; 
-            font-family: "Noto Sans Thai", sans-serif; /* บังคับฟอนต์ */
+            font-family: "Noto Sans Thai", sans-serif;
             color: #333; min-width: 120px; 
         }
         
-        /* Phone Input Style */
-        .phone-input-wrapper { display: none; margin-bottom: 20px; }
+        /* Phone Input Style Refined */
+        .phone-input-wrapper { display: none; margin-bottom: 20px; width: 100%; }
+        .phone-input-container { display: flex; gap: 10px; align-items: center; width: 100%; }
         .phone-input { 
-            width: 100%; padding: 12px 40px 12px 20px; /* เพิ่ม padding ขวาสำหรับ icon */
+            flex: 1; padding: 12px 20px; 
             border-radius: 50px; border: 2px solid #ddd; font-size: 1em; 
-            font-family: "Noto Sans Thai", sans-serif; /* บังคับฟอนต์ */
-            text-align: center; margin-bottom: 10px; 
-            transition: border-color 0.3s;
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 24px;
-        }
-        .phone-input::placeholder {
             font-family: "Noto Sans Thai", sans-serif;
-            color: #aaa;
+            text-align: center; outline: none; width: 100%;
         }
-        /* สถานะเจอข้อมูล (ติ๊กถูกเขียว) */
-        .phone-input.valid { 
-            border-color: #28a745; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2328a745'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E"); 
-        }
-        /* สถานะไม่เจอข้อมูล (กากบาทเทา) */
-        .phone-input.invalid { 
-            border-color: #6c757d; 
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236c757d'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E"); 
+        .phone-input:focus { border-color: var(--primary-color); }
+        .search-btn {
+            width: auto !important; padding: 0 25px !important; margin: 0 !important;
+            background-color: var(--primary-color); color: white;
+            border-radius: 50px;
         }
         
-        .user-info-compact { font-size: 0.9em; background: #f8f9fa; padding: 10px 15px; border-radius: 15px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #eee; }
+        .user-info-compact { 
+            font-size: 0.9em; background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; 
+            display: flex; flex-wrap: wrap; /* แก้ปัญหาล้นจอ */
+            align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #eee; 
+        }
         .user-info-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
         .info-label { color: #666; font-size: 0.85em; }
         .info-val { font-weight: bold; color: #333; }
@@ -161,9 +156,29 @@
         .contact-buttons { margin-top: 25px; }
         .contact-button { border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; }
         
-        .global-footer-hint { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.9); color: white; text-align: center; padding: 10px; font-size: 1em; z-index: 3500; font-weight: bold; }
+        .global-footer-hint { 
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: rgba(0,0,0,0.9); color: white; text-align: center; 
+            padding: 10px; font-size: 0.9em; z-index: 3500; font-weight: bold; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Force single line */
+            height: 40px; line-height: 20px;
+        }
         .modal { position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; text-align: left; max-height: 80vh; overflow-y: auto; }
+        
+        /* New Help Button Style */
+        .help-btn {
+            font-size: 0.8em; 
+            background-color: var(--primary-color); 
+            color: white; 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            margin-left: 10px; 
+            cursor: pointer; 
+            display: inline-block; 
+            vertical-align: middle;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
     </style>
 </head>
 <body>
@@ -237,6 +252,7 @@
         <div id="image-viewer-modal" class="modal" style="background-color: rgba(0,0,0,0.95); flex-direction: column;" onclick="document.getElementById('image-viewer-modal').style.display='none'">
             <img id="full-image" style="max-width: 90%; max-height: 80vh; object-fit: contain; border-radius: 10px;">
             <div style="color: #ccc; margin-top: 10px; font-size: 18px;">แตะที่ว่างเพื่อปิด</div>
+            <div class="btn-back" style="color: white; border-color: white; width: auto; padding: 10px 30px; margin-top: 20px;" onclick="document.getElementById('image-viewer-modal').style.display='none'">ปิด</div>
         </div>
     </div>
 
@@ -302,7 +318,14 @@
         buildAILayers(); 
         document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none'; if(liff.isInClient()){liff.closeWindow();}" class="btn-action" style="background-color:var(--primary-color);">รับทราบ</button></div>`;
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:1em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.4em; padding:15px; border-radius: 10px; width:100%; margin-top:15px;">รับทราบ</button></div>`;
-        document.getElementById('info-icon').onclick = () => { document.querySelector('#disclaimerModal').style.display = 'flex'; };
+        
+        // Bind event listener
+        setTimeout(() => {
+            const infoBtn = document.getElementById('info-btn');
+            if(infoBtn) {
+                infoBtn.onclick = () => { document.querySelector('#disclaimerModal').style.display = 'flex'; };
+            }
+        }, 500);
         
         document.getElementById('modal-call-anyway-btn').onclick = () => { document.getElementById('confirmLocationModal').style.display = 'none'; proceedWithSave(); };
         document.getElementById('modal-send-location-btn').onclick = () => { document.getElementById('confirmLocationModal').style.display = 'none'; getLocation(true); };
@@ -319,9 +342,10 @@
     };
 
     function buildInitialHTML() {
+        // Changed Icon to Text Button
         document.getElementById('layer-1').innerHTML = `
             <div class="card-body">
-                <h1 class="section-title" style="font-size: 1.4em;">ประเมินอาการสโตรก <span id="info-icon" class="iconify" data-icon="mdi:help-circle-outline" style="cursor:pointer; color:var(--primary-color);"></span></h1>
+                <h1 class="section-title" style="font-size: 1.4em;">ประเมินอาการสโตรก <div id="info-btn" class="help-btn">อ่านก่อน</div></h1>
                 
                 <div class="assessor-row">
                     <p style="margin:0; font-size:1em; white-space: nowrap;">ท่านประเมินอาการให้ใคร</p>
@@ -332,12 +356,17 @@
                 </div>
                 <!-- Phone Input for Others -->
                 <div id="patient-phone-wrapper" class="phone-input-wrapper">
-                    <input type="tel" id="patient-phone" class="phone-input" placeholder="กรอกเบอร์โทรผู้ป่วย (10 หลัก)" onkeyup="checkPhoneAndFetch(this)">
+                    <div class="phone-input-container">
+                        <input type="tel" id="patient-phone" class="phone-input" placeholder="เบอร์โทรศัพท์" maxlength="10" inputmode="numeric">
+                        <button class="search-btn" onclick="triggerSearch()">
+                            <span class="iconify" data-icon="mdi:magnify" style="font-size:1.5em;"></span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Compact User Info Bar -->
                 <div id="user-info-bar" class="user-info-compact" style="display:none;">
-                    <div class="user-info-item"><span class="info-label">ชื่อ:</span> <span class="info-val" id="ui-name">-</span></div>
+                    <div class="user-info-item" style="flex-basis: 100%;"><span class="info-label">ชื่อ:</span> <span class="info-val" id="ui-name">-</span></div>
                     <div class="user-info-item"><span class="info-label">ความเสี่ยง:</span> <span class="info-val" id="ui-risk">-</span></div>
                     <div class="user-info-item"><span class="info-label">วันที่:</span> <span class="info-val" id="ui-date">-</span></div>
                 </div>
@@ -461,20 +490,23 @@
         if (select.value === 'others') {
             phoneWrapper.style.display = 'block';
             phoneInput.value = ''; 
-            phoneInput.classList.remove('valid', 'invalid'); // Reset state
+            phoneInput.classList.remove('valid', 'invalid'); 
         } else {
             phoneWrapper.style.display = 'none';
-            fetchUserData(sessionData.userID); // Revert
+            fetchUserData(sessionData.userID); 
         }
     };
 
-    window.checkPhoneAndFetch = function(input) {
+    // Changed: Trigger search on Button Click only
+    window.triggerSearch = function() {
+        const input = document.getElementById('patient-phone');
         const phone = input.value.replace(/[^0-9]/g, '');
-        // Reset classes if length changes
-        input.classList.remove('valid', 'invalid');
         
         if (phone.length === 10) {
             fetchUserDataByPhone(phone);
+        } else {
+            alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+            input.focus();
         }
     };
 
@@ -724,9 +756,18 @@
         } else { if (mediaRecorder && mediaRecorder.state === "recording") { mediaRecorder.stop(); } else { btn.innerHTML = '<span class="iconify" data-icon="mdi:microphone"></span> กดเพื่ออัดเสียง'; btn.style.backgroundColor = "#d9534f"; } }
     };
     window.analyzeWithGemini = function() {
+        // Updated: Check if AT LEAST ONE input exists
         if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { alert("กรุณาใส่อย่างน้อย 1 ข้อมูล"); return; }
         showLayer('layer-ai-processing');
-        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'analyzeStroke', faceImage: aiInputs.face, armImage: aiInputs.arm, speechAudio: aiInputs.audio, userData: { risk_group: sessionData.risk_group, score: sessionData.thai_cv_risk_score } }) })
+        // UPDATED: Include userId and name in userData
+        const userDataPayload = { 
+            risk_group: sessionData.risk_group, 
+            score: sessionData.thai_cv_risk_score,
+            userId: sessionData.userID || 'guest',
+            name: sessionData.registeredName || sessionData.userName || 'Guest'
+        };
+        
+        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'analyzeStroke', faceImage: aiInputs.face, armImage: aiInputs.arm, speechAudio: aiInputs.audio, userData: userDataPayload }) })
         .then(res => res.json()).then(data => { 
             if (data.status === 'success') { 
                 currentAnalysisResult = data.data; 
@@ -776,10 +817,11 @@
             if(result.isRisk) {
                  html += `<button class="btn-action" style="background-color:var(--symptom-red);" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
             } else {
-                 // **New: End process here for No Risk**
                  html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px;" onclick="saveData('symptomDetail', 'AI: No significant risk found'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
             }
         }
+        // Add Back Button to Result Page
+        html += `<div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-ai-input')">ย้อนกลับไปแก้ไขข้อมูล</div></div>`;
         container.innerHTML = html;
         showLayer('layer-ai-result');
     }
@@ -854,14 +896,14 @@
             sessionData.thai_cv_risk_score = data.thai_cv_risk_score;
             
             uiName.textContent = data.name || '-';
-            uiRisk.textContent = data.risk_group || '-';
+            // UPDATED: Risk Format
+            uiRisk.textContent = (data.risk_group || '-') + (data.thai_cv_risk_score ? ` (${data.thai_cv_risk_score}%)` : '');
             uiDate.textContent = data.timestamp || '-';
             infoBar.style.display = 'flex';
             
-            // Add valid visual if this came from phone search
             if (phoneInput && phoneInput.value.length === 10) {
-                 phoneInput.classList.add('valid');
-                 phoneInput.classList.remove('invalid');
+                 phoneInput.style.borderColor = "#28a745";
+                 // Remove background image logic to keep it simple with new style
             }
             
             if(sessionData.district && sessionData.village) { fetchVolunteerData(`ต.${sessionData.district} ม.${sessionData.village}`); }
@@ -869,8 +911,8 @@
              // Hide or reset if not found
              infoBar.style.display = 'none';
              if (phoneInput && phoneInput.value.length === 10) {
-                 phoneInput.classList.add('invalid');
-                 phoneInput.classList.remove('valid');
+                 phoneInput.style.borderColor = "#dc3545";
+                 alert("ไม่พบข้อมูลของเบอร์โทรนี้");
             }
         }
     };
