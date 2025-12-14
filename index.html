@@ -20,7 +20,7 @@
             --ai-yellow: #FFD700; --ai-text: #000;
         }
 
-        * { box-sizing: border-box; } /* ป้องกัน padding ดัน layout ล้น */
+        * { box-sizing: border-box; } 
 
         body { 
             font-family: "Noto Sans Thai", sans-serif; 
@@ -72,7 +72,7 @@
         .card { padding: 25px; background-color: var(--card-bg-color); border-radius: var(--border-radius); box-shadow: var(--shadow); margin-top: 10px; width: 100%; overflow: hidden; }
         .card-body { padding-bottom: 10px; width: 100%; }
 
-        .section-title { font-size: 1.6em; font-weight: 700; color: var(--text-color); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; text-align: center;}
+        .section-title { font-size: 1.3em; font-weight: 700; color: var(--text-color); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; text-align: center;}
         .section-subtitle { font-size: 1.1em; color: #555; margin-top: 0px; margin-bottom: 20px; text-align: center; }
 
         .assessor-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; flex-wrap: nowrap; }
@@ -168,16 +168,40 @@
         
         /* New Help Button Style */
         .help-btn {
-            font-size: 0.8em; 
+            font-size: 0.7em; 
             background-color: var(--primary-color); 
             color: white; 
-            padding: 5px 12px; 
+            padding: 4px 10px; 
             border-radius: 20px; 
             margin-left: 10px; 
             cursor: pointer; 
             display: inline-block; 
             vertical-align: middle;
             border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* AI Result Styles */
+        .result-image-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .result-image-container img { width: 100%; display: block; }
+        .grid-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(144, 238, 144, 0.3) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(144, 238, 144, 0.3) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        .result-label {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: rgba(0,0,0,0.6); color: white; padding: 8px;
+            text-align: center; font-size: 0.9em; font-weight: bold;
         }
     </style>
 </head>
@@ -345,7 +369,7 @@
         // Changed Icon to Text Button
         document.getElementById('layer-1').innerHTML = `
             <div class="card-body">
-                <h1 class="section-title" style="font-size: 1.4em;">ประเมินอาการสโตรก <div id="info-btn" class="help-btn">อ่านก่อน</div></h1>
+                <h1 class="section-title">ประเมินอาการสโตรก <div id="info-btn" class="help-btn">อ่านก่อน</div></h1>
                 
                 <div class="assessor-row">
                     <p style="margin:0; font-size:1em; white-space: nowrap;">ท่านประเมินอาการให้ใคร</p>
@@ -808,9 +832,24 @@
         } else {
             if (result.isRisk) { html += `<h2 style="color:var(--symptom-red);">🚨 พบความเสี่ยงสูง (${result.riskScore}%)</h2><div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); html += `</ul><p>${result.analysis}</p></div>`; } 
             else { html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2><p>${result.analysis}</p>`; }
+            
+            // New Image Preview with Grid
             html += `<h3>ภาพที่วิเคราะห์</h3>`;
-            if (aiInputs.face) { html += `<div class="result-image-wrapper"><img src="data:image/jpeg;base64,${aiInputs.face}"><div class="grid-overlay"></div><p style="font-size:0.8em; color:#fff; background:rgba(0,0,0,0.5); position:absolute; bottom:0; width:100%;">Face Analysis</p></div>`; }
-            if (aiInputs.arm) { html += `<div class="result-image-wrapper"><img src="data:image/jpeg;base64,${aiInputs.arm}"><div class="grid-overlay"></div><p style="font-size:0.8em; color:#fff; background:rgba(0,0,0,0.5); position:absolute; bottom:0; width:100%;">Arm Analysis</p></div>`; }
+            if (aiInputs.face) { 
+                html += `<div class="result-image-container">
+                    <img src="data:image/jpeg;base64,${aiInputs.face}">
+                    <div class="grid-overlay"></div>
+                    <div class="result-label">Face Analysis</div>
+                </div>`; 
+            }
+            if (aiInputs.arm) { 
+                html += `<div class="result-image-container">
+                    <img src="data:image/jpeg;base64,${aiInputs.arm}">
+                    <div class="grid-overlay"></div>
+                    <div class="result-label">Arm Analysis</div>
+                </div>`; 
+            }
+
             html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
             
             // Connect to Manual Flow (Acute check)
