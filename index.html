@@ -82,6 +82,7 @@
             color: #333; min-width: 120px; 
         }
         
+        /* Phone Input Style Refined */
         .phone-input-wrapper { display: none; margin-bottom: 20px; width: 100%; }
         .phone-input-container { display: flex; gap: 10px; align-items: center; width: 100%; }
         .phone-input { 
@@ -99,7 +100,7 @@
         
         .user-info-compact { 
             font-size: 0.9em; background: #f8f9fa; padding: 15px; border-radius: 15px; margin-bottom: 20px; 
-            display: flex; flex-wrap: wrap; 
+            display: flex; flex-wrap: wrap; /* แก้ปัญหาล้นจอ */
             align-items: center; justify-content: space-between; gap: 10px; border: 1px solid #eee; 
         }
         .user-info-item { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
@@ -146,9 +147,10 @@
         .summary-table .icon-col { width: 50px; text-align: center; font-size: 1.5em; }
         
         .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; place-items: center; margin-top: 25px; }
+        /* UPDATED: Improved Action Button Style */
         .action-button { 
             display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; 
-            border-radius: 20px; font-size: 2.2em; color: white; 
+            border-radius: 20px; font-size: 2.2em; color: white; /* Force White Icon */
             box-shadow: 0 5px 15px rgba(0,0,0,0.2); border: 2px solid white;
         }
         .location-button { background-color: var(--action-blue); }
@@ -158,9 +160,10 @@
         .action-button-text { font-size: 0.9em; font-weight: bold; color: #555; margin-top: 8px; }
         
         .contact-buttons { margin-top: 25px; }
+        /* UPDATED: Contact Buttons to be White Text on Color */
         .contact-button { 
             border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; 
-            background-color: var(--primary-color); color: white !important; 
+            background-color: var(--primary-color); color: white !important; /* Force White Text */
             box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; text-decoration: none;
         }
         .contact-button .iconify { font-size: 1.4em; margin-right: 10px; }
@@ -170,12 +173,13 @@
             position: fixed; bottom: 0; left: 0; width: 100%; 
             background: rgba(0,0,0,0.9); color: white; text-align: center; 
             padding: 10px; font-size: 0.9em; z-index: 3500; font-weight: bold; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Force single line */
             height: 40px; line-height: 20px;
         }
         .modal { position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; text-align: left; max-height: 80vh; overflow-y: auto; }
         
+        /* New Help Button Style */
         .help-btn {
             font-size: 0.7em; 
             background-color: var(--primary-color); 
@@ -189,6 +193,7 @@
             border: 1px solid rgba(255,255,255,0.3);
         }
 
+        /* AI Result Styles */
         .result-image-container {
             position: relative;
             width: 100%;
@@ -323,6 +328,11 @@
         'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก'], unlikely: ['พูดติดขัดเพราะเหนื่อย', 'เสียงแหบ/เป็นหวัด'], desc: 'ทดสอบพูดคำยากเช่น ยายกินลำไยน้ำลายยายไหลย้อย พูดแล้วติดขัดลิ้นพันกัน', hasAi: true }
     };
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
+
+    window.handleEmergencyCall = function(tel, label) {
+        // Updated flow to match main buttons
+        handleCallClick(null, 'floating_call', tel); 
+    };
 
     window.onload = async () => {
         document.getElementById('loading').style.display = 'none'; 
@@ -888,70 +898,155 @@
     
     // --- NEW: Client-side Flex Message Creation ---
     function createFlexMessage(data) {
-        let headerColor = "#28A745"; 
-        let title = "ผลการประเมินปกติ";
+        const altText = "ผลประเมินสวีรู้ทันสโตรก";
+        
+        let headerColor = "#28A745"; // Green by default (Normal)
+        let title = "ผลการประเมิน: ปกติ";
+        let subTitle = "ไม่พบความเสี่ยงชัดเจน";
+        
         if (data.isEmergency) {
-            headerColor = "#D32F2F";
+            headerColor = "#D32F2F"; // Red
             title = "‼️ แจ้งเหตุฉุกเฉิน ‼️";
+            subTitle = "พบความเสี่ยงสูง/อาการชัดเจน";
+        } else if (data.isAiAssessment && data.riskScore && data.riskScore > 50) {
+            headerColor = "#F57C00"; // Orange
+            title = "⚠️ มีความเสี่ยงปานกลาง";
+            subTitle = `AI Score: ${data.riskScore}%`;
         }
 
-        let bodyText = data.symptomDetail || 'ไม่มีอาการผิดปกติ';
-        if (data.isAiAssessment) bodyText = "AI: " + (data.analysis || 'ผลการวิเคราะห์ปกติ');
+        // --- HERO IMAGE (AI ONLY) ---
+        let heroImage = null;
+        if (data.isAiAssessment && data.fileUrls) {
+            // Prefer Face URL, then Arm URL
+            let imgUrl = data.fileUrls.face || data.fileUrls.arm;
+            if (imgUrl) {
+                // Ensure URL is valid string
+                heroImage = {
+                    type: "image",
+                    url: imgUrl,
+                    size: "full",
+                    aspectRatio: "20:13",
+                    aspectMode: "cover",
+                    action: { type: "uri", uri: imgUrl }
+                };
+            }
+        }
+
+        // --- BODY ---
+        let bodyContents = [];
         
-        let contents = {
+        // 1. Patient Info Section
+        bodyContents.push({
+            type: "box", layout: "vertical", margin: "md",
+            contents: [
+                { type: "text", text: "👤 ข้อมูลผู้ป่วย", weight: "bold", size: "sm", color: "#888888" },
+                { type: "text", text: data.registeredName || data.userName || "ไม่ระบุชื่อ", weight: "bold", size: "lg", wrap: true },
+                { type: "text", text: `พื้นที่: ต.${data.district || '-'} ม.${data.village || '-'}`, size: "sm", color: "#666666" }
+            ]
+        });
+
+        // 2. Symptom Section
+        let symptomText = data.symptomDetail || "ไม่มีอาการผิดปกติ";
+        if (data.isAiAssessment) symptomText = `AI: ${data.analysis || 'วิเคราะห์เรียบร้อย'}`;
+        
+        bodyContents.push({ type: "separator", margin: "md" });
+        bodyContents.push({
+            type: "box", layout: "vertical", margin: "md",
+            contents: [
+                { type: "text", text: "📝 อาการ", weight: "bold", size: "sm", color: "#888888" },
+                { type: "text", text: symptomText, wrap: true, size: "sm", color: "#333333" },
+                { type: "text", text: `เริ่มเป็นเมื่อ: ${data.onsetTime || '-'}`, size: "xs", color: "#aaaaaa", margin: "xs" }
+            ]
+        });
+
+        // 3. Location & Emergency Section (If Emergency)
+        if (data.isEmergency) {
+            bodyContents.push({ type: "separator", margin: "md" });
+            bodyContents.push({
+                type: "box", layout: "vertical", margin: "md",
+                contents: [
+                    { type: "text", text: "📍 พิกัด & ติดต่อ", weight: "bold", size: "sm", color: "#888888" },
+                    { type: "text", text: data.location || "ไม่ได้ระบุพิกัด", size: "xs", color: "#333333", wrap: true, margin: "xs" }
+                ]
+            });
+        }
+
+        // --- FOOTER BUTTONS ---
+        let footerContents = [];
+        
+        // 1. Map Button (If location exists)
+        if (data.location) {
+            const loc = data.location.split(',');
+            if (loc.length === 2) {
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${loc[0]},${loc[1]}`;
+                footerContents.push({
+                    type: "button", style: "secondary", height: "sm", margin: "sm",
+                    action: { type: "uri", label: "📍 แผนที่ผู้ป่วย", uri: mapUrl }
+                });
+            }
+        }
+
+        // 2. Call Buttons (Grid Layout)
+        if (data.isEmergency) {
+            let callButtons = [];
+            // Emergency 1669
+            callButtons.push({
+                type: "button", style: "primary", color: "#D32F2F", height: "sm", margin: "sm",
+                action: { type: "uri", label: "📞 1669", uri: "tel:1669" }
+            });
+            // Hospital
+            callButtons.push({
+                type: "button", style: "primary", color: "#F57C00", height: "sm", margin: "sm",
+                action: { type: "uri", label: "📞 รพ.สวี", uri: "tel:0894745523" }
+            });
+            
+            // Volunteers (if available)
+            if (data.volunteerContacts) {
+                const c = data.volunteerContacts;
+                if (c.pcu_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 รพ.สต.", uri: `tel:${c.pcu_tel}` } });
+                if (c.headman_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 ผู้นำฯ", uri: `tel:${c.headman_tel}` } });
+                if (c.volunteer1_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 อสม.1", uri: `tel:${c.volunteer1_tel}` } });
+            }
+
+            // Add buttons to footer in chunks if too many, but vertical stack is safer for mobile
+            callButtons.forEach(btn => footerContents.push(btn));
+        }
+
+        // 3. Link Buttons (Standard)
+        footerContents.push({ type: "separator", margin: "md" });
+        footerContents.push({
+            type: "box", layout: "horizontal", margin: "md", spacing: "sm",
+            contents: [
+                { type: "button", style: "link", height: "sm", action: { type: "uri", label: "ข้อมูลสุขภาพ", uri: `https://liff.line.me/${HEALTH_INFO_LIFF_ID}` } },
+                { type: "button", style: "link", height: "sm", action: { type: "uri", label: "ประเมินซ้ำ", uri: `https://liff.line.me/${DAILY_CHECK_LIFF_ID}` } }
+            ]
+        });
+
+        // Assemble Final JSON
+        let flexContainer = {
             type: "bubble",
             header: {
                 type: "box", layout: "vertical", backgroundColor: headerColor,
                 contents: [
-                    { type: "text", text: title, color: "#ffffff", weight: "bold", size: "lg" },
-                    { type: "text", text: `ของคุณ ${data.registeredName || data.userName || 'ผู้ใช้งาน'}`, color: "#ffffffcc", size: "sm" }
+                    { type: "text", text: title, color: "#ffffff", weight: "bold", size: "xl", wrap: true },
+                    { type: "text", text: subTitle, color: "#ffffffcc", size: "sm" }
                 ]
             },
             body: {
-                type: "box", layout: "vertical", spacing: "md",
-                contents: [
-                    { type: "text", text: "รายละเอียด:", weight: "bold", color: "#555555" },
-                    { type: "text", text: bodyText, wrap: true, size: "md", color: "#666666" },
-                    { type: "text", text: `เวลา: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })}`, size: "xs", color: "#aaaaaa", margin: "lg" }
-                ]
+                type: "box", layout: "vertical",
+                contents: bodyContents
+            },
+            footer: {
+                type: "box", layout: "vertical",
+                contents: footerContents
             }
         };
 
-        if (data.isEmergency) {
-            const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
-            const gmapsUrl = `https://www.google.com/maps/search/?api=1&query=${hospitalCoords.lat},${hospitalCoords.lon}`;
-            
-            // Add specific Emergency info
-            contents.body.contents.splice(2, 0, 
-                { type: "separator", margin: "md" },
-                { type: "box", layout: "vertical", margin: "md", contents: [
-                    { type: "text", text: `ความเสี่ยง: ${data.risk_group || 'N/A'}`, size: "sm" },
-                    { type: "text", text: `พิกัด: ${data.location || 'N/A'}`, size: "sm" },
-                    { type: "text", text: `ติดต่อ: ${data.contactedVia || '-'}`, size: "sm" }
-                ]}
-            );
-
-            // Emergency Footer
-            contents.footer = {
-                type: "box", layout: "vertical", spacing: "sm",
-                contents: [
-                    { type: "button", style: "primary", color: "#D32F2F", action: { type: "uri", label: "📞โทร 1669", uri: "tel:1669" } },
-                    { type: "button", style: "secondary", action: { type: "uri", label: "เส้นทาง รพ.", uri: gmapsUrl } },
-                    { type: "button", style: "link", height: "sm", action: { type: "uri", label: "ข้อมูลสุขภาพ", uri: `https://liff.line.me/${HEALTH_INFO_LIFF_ID}` } }
-                ]
-            };
-        } else {
-            // Normal Footer
-            contents.footer = {
-                type: "box", layout: "vertical", spacing: "sm",
-                contents: [
-                    { type: "button", style: "primary", color: headerColor, action: { type: "uri", label: "ประเมินซ้ำ", uri: `https://liff.line.me/${DAILY_CHECK_LIFF_ID}` } },
-                    { type: "button", style: "link", height: "sm", action: { type: "uri", label: "ข้อมูลสุขภาพ", uri: `https://liff.line.me/${HEALTH_INFO_LIFF_ID}` } }
-                ]
-            };
+        if (heroImage) {
+            flexContainer.hero = heroImage;
         }
-        
-        return { type: "flex", altText: title, contents: contents };
+
+        return { type: "flex", altText: altText, contents: flexContainer };
     }
 
     // Database & Final Save Logic
