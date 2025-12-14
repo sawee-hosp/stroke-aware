@@ -1258,7 +1258,7 @@
             sessionData.thai_cv_risk_score = data.thai_cv_risk_score;
             uiName.textContent = data.name || '-';
             uiRisk.textContent = (data.risk_group || '-') + (data.thai_cv_risk_score ? ` (${data.thai_cv_risk_score}%)` : '');
-            uiDate.textContent = data.timestamp || '-';
+            uiDate.textContent = formatFullDateTime(data.timestamp);
             infoBar.style.display = 'flex';
             
             if (phoneInput && phoneInput.value.length === 10) phoneInput.style.borderColor = "#28a745";
