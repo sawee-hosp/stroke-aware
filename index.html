@@ -351,7 +351,16 @@
         
         document.getElementById('modal-send-location-btn').onclick = () => { 
             document.getElementById('confirmLocationModal').style.display = 'none'; 
-            getLocation(false, true); // Get location -> Then call
+            getLocation(false, true, () => {
+                // After location is obtained (and saved via sessionData update), if this was triggered by "Save & Close", we proceed.
+                // But wait, the button calls getLocation(false, true). The 'true' is 'callAfter'.
+                // If we are reusing this modal for Final Save, we need to handle that.
+                if (currentActionKey === 'บันทึกและปิด') {
+                    handleFinalSave(currentActionElement, true);
+                } else {
+                    executePendingCall();
+                }
+            }); 
         };
 
         try {
@@ -834,11 +843,14 @@
 
                 displayAiResult(data.data); 
             } else { 
-                alert("Error: " + data.message); 
+                alert("การวิเคราะห์ขัดข้อง โปรดลองใหม่อีกครั้ง (" + data.message + ")");
                 showLayer('layer-ai-input'); 
             } 
         })
-        .catch(err => { alert("Connection Error"); showLayer('layer-ai-input'); });
+        .catch(err => { 
+            alert("การเชื่อมต่อขัดข้อง โปรดตรวจสอบอินเทอร์เน็ต (" + err.message + ")"); 
+            showLayer('layer-ai-input'); 
+        });
     };
     window.requestSummary = function() {
         if (!currentAnalysisResult) return;
@@ -852,49 +864,6 @@
         }).catch(err => { btn.innerText = originalText; btn.disabled = false; alert("Connection Error"); });
     };
     window.copySummary = function() { const copyText = document.getElementById("aiSummaryText"); copyText.select(); copyText.setSelectionRange(0, 99999); document.execCommand("copy"); alert("คัดลอกข้อความแล้ว"); };
-    
-    function displayAiResult(result) {
-        const container = document.getElementById('ai-result-content');
-        let html = '';
-        if (!result.isValid) {
-            html += `<h2 style="color:orange;">⚠️ ข้อมูลไม่ชัดเจน</h2><p>${result.refusalReason || "รูปภาพไม่ชัดเจน หรือไม่ใช่รูปคนที่ต้องการ"}</p><button class="btn-action" style="background:#333; color:white;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>`;
-        } else {
-            if (result.isRisk) { html += `<h2 style="color:var(--symptom-red);">🚨 พบความเสี่ยงสูง (${result.riskScore}%)</h2><div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); html += `</ul><p>${result.analysis}</p></div>`; } 
-            else { html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2><p>${result.analysis}</p>`; }
-            
-            html += `<h3>ภาพที่วิเคราะห์</h3>`;
-            if (aiInputs.face) { 
-                html += `<div class="result-image-container">
-                    <img src="data:image/jpeg;base64,${aiInputs.face}">
-                    <div class="grid-overlay"></div>
-                    <div class="result-label">Face Analysis</div>
-                </div>`; 
-            }
-            if (aiInputs.arm) { 
-                html += `<div class="result-image-container">
-                    <img src="data:image/jpeg;base64,${aiInputs.arm}">
-                    <div class="grid-overlay"></div>
-                    <div class="result-label">Arm Analysis</div>
-                </div>`; 
-            }
-
-            html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px; color:white;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
-            
-            if(result.isRisk) {
-                 html += `<button class="btn-action" style="background-color:var(--symptom-red); color:white;" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
-            } else {
-                 html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px; color:white;" onclick="saveData('symptomDetail', 'AI: No significant risk found'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
-            }
-        }
-        html += `<div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-ai-input')">ย้อนกลับไปแก้ไขข้อมูล</div></div>`;
-        container.innerHTML = html;
-        showLayer('layer-ai-result');
-    }
-
-    // --- Core Navigation & Utilities ---
-    window.showLayer = function(id) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); };
-    window.saveData = function(key, value) { sessionData[key] = value; };
-    window.viewImage = function(src) { const modal = document.getElementById('image-viewer-modal'); document.getElementById('full-image').src = src; modal.style.display = "flex"; };
     
     // --- NEW: Client-side Flex Message Creation ---
     function createFlexMessage(data) {
@@ -1022,6 +991,16 @@
             ]
         });
 
+        // 4. Branding Footer
+        footerContents.push({ 
+            type: "text", 
+            text: "จัดทำโดย สวีรู้ทันสโตรก", 
+            size: "xxs", 
+            color: "#aaaaaa", 
+            align: "center", 
+            margin: "sm" 
+        });
+
         // Assemble Final JSON
         let flexContainer = {
             type: "bubble",
@@ -1049,9 +1028,64 @@
         return { type: "flex", altText: altText, contents: flexContainer };
     }
 
+    function displayAiResult(result) {
+        const container = document.getElementById('ai-result-content');
+        let html = '';
+        if (!result.isValid) {
+            html += `<h2 style="color:orange;">⚠️ ข้อมูลไม่ชัดเจน</h2><p>${result.refusalReason || "รูปภาพไม่ชัดเจน หรือไม่ใช่รูปคนที่ต้องการ"}</p><button class="btn-action" style="background:#333; color:white;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>`;
+        } else {
+            if (result.isRisk) { html += `<h2 style="color:var(--symptom-red);">🚨 พบความเสี่ยงสูง (${result.riskScore}%)</h2><div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); html += `</ul><p>${result.analysis}</p></div>`; } 
+            else { html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2><p>${result.analysis}</p>`; }
+            
+            html += `<h3>ภาพที่วิเคราะห์</h3>`;
+            if (aiInputs.face) { 
+                html += `<div class="result-image-container">
+                    <img src="data:image/jpeg;base64,${aiInputs.face}">
+                    <div class="grid-overlay"></div>
+                    <div class="result-label">Face Analysis</div>
+                </div>`; 
+            }
+            if (aiInputs.arm) { 
+                html += `<div class="result-image-container">
+                    <img src="data:image/jpeg;base64,${aiInputs.arm}">
+                    <div class="grid-overlay"></div>
+                    <div class="result-label">Arm Analysis</div>
+                </div>`; 
+            }
+
+            html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px; color:white;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
+            
+            if(result.isRisk) {
+                 html += `<button class="btn-action" style="background-color:var(--symptom-red); color:white;" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
+            } else {
+                 html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px; color:white;" onclick="saveData('symptomDetail', 'AI: No significant risk found'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
+            }
+        }
+        html += `<div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-ai-input')">ย้อนกลับไปแก้ไขข้อมูล</div></div>`;
+        container.innerHTML = html;
+        showLayer('layer-ai-result');
+    }
+
+    // --- Core Navigation & Utilities ---
+    window.showLayer = function(id) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); };
+    window.saveData = function(key, value) { sessionData[key] = value; };
+    window.viewImage = function(src) { const modal = document.getElementById('image-viewer-modal'); document.getElementById('full-image').src = src; modal.style.display = "flex"; };
+    
     // Database & Final Save Logic
     window.handleFinalSave = function(button, isEmergency) {
         if(button && button.disabled) return;
+        
+        // --- FORCE LOCATION FOR EMERGENCY CASES ---
+        if (isEmergency && !sessionData.location) {
+            if(confirm("สำหรับเคสฉุกเฉิน จำเป็นต้องระบุพิกัดเพื่อความช่วยเหลือที่แม่นยำ\nกด 'ตกลง' เพื่อส่งพิกัด")) {
+                 // Reuse existing location logic but callback to save again
+                 getLocation(false, true, () => {
+                     handleFinalSave(button, isEmergency);
+                 });
+            }
+            return;
+        }
+
         if(button) button.disabled = true;
         sessionData.isEmergency = isEmergency;
         sessionData.isFinalSave = true; 
@@ -1074,7 +1108,6 @@
                             if (currentActionKey === 'บันทึกและปิด' || !isEmergency) {
                                 liff.closeWindow();
                             } else {
-                                // If emergency call was made, maybe keep open or show "Sent" state
                                 alert("ส่งข้อมูลเรียบร้อย");
                                 if(document.getElementById('how-to-act-modal').style.display !== 'flex') {
                                      liff.closeWindow();
@@ -1084,11 +1117,9 @@
                         .catch((err) => {
                             console.error('LIFF Send Error', err);
                             alert("บันทึกแล้ว (ส่งข้อความไม่สำเร็จ: " + err.code + ")");
-                            // Still close if user wants to leave
                             if (currentActionKey === 'บันทึกและปิด') liff.closeWindow();
                         });
                 } else {
-                    // Web browser fallback
                     if (isEmergency) {
                         document.getElementById('how-to-act-modal').style.display = 'flex';
                     } else {
@@ -1111,31 +1142,26 @@
         currentActionElement = element;
         pendingCallUrl = `tel:${tel}`;
         
-        // Show confirm modal first
         document.getElementById('confirmLocationModal').style.display = 'flex';
     };
 
     window.executePendingCall = function() {
         if(pendingCallUrl) {
-            // Save contact log first via simple get (fire and forget)
             sessionData.contactedVia = currentActionKey;
             if(currentActionKey.startsWith('tel_')) sessionData[currentActionKey] = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' });
             
-            // We do a quick save call, but don't block the UI too long
-            const payload = { ...sessionData, isEmergency: true }; // Saving 'call' implies emergency interest
+            const payload = { ...sessionData, isEmergency: true }; 
             const dataStr = encodeURIComponent(JSON.stringify(payload));
-            const url = `${GAS_URL}?action=saveData&data=${dataStr}`; // Fire and forget save
-            const img = new Image(); img.src = url; // Simple beacon-like request
+            const url = `${GAS_URL}?action=saveData&data=${dataStr}`; 
+            const img = new Image(); img.src = url; 
             
-            // Show instructions modal for when they return
             document.getElementById('how-to-act-modal').style.display = 'flex';
             
-            // Execute call
             window.location.href = pendingCallUrl;
         }
     }
     
-    window.getLocation = function(andThenSave = false, callAfter = false) {
+    window.getLocation = function(andThenSave = false, callAfter = false, callback = null) {
         const locButton = document.getElementById('location-action'); 
         const locText = document.getElementById('location-text');
         if (locButton) {
@@ -1149,20 +1175,20 @@
             const { latitude, longitude } = position.coords; 
             saveData('location', `${latitude},${longitude}`);
             
-            // Calculate distance immediately
             const distance = getDistanceFromLatLonInKm(latitude, longitude, hospitalCoords.lat, hospitalCoords.lon);
             updateSummaryAndActions(distance);
             
-            if (callAfter) {
-                 // Close modal and call
+            if (callback) {
+                callback();
+            } else if (callAfter) {
                  document.getElementById('confirmLocationModal').style.display = 'none';
                  executePendingCall();
             } else if (andThenSave) {
-                // proceedWithSave(); // Legacy flow
+                // Legacy support
             }
         }, error => { 
             if(locButton) {
-                locButton.onclick = () => getLocation(andThenSave, callAfter); locText.textContent = 'ส่งพิกัดที่อยู่'; updateSummaryAndActions(null); 
+                locButton.onclick = () => getLocation(andThenSave, callAfter, callback); locText.textContent = 'ส่งพิกัดที่อยู่'; updateSummaryAndActions(null); 
             }
             alert("ไม่สามารถรับพิกัดได้ กรุณาลองใหม่อีกครั้ง หรือกดโทรเลย");
         });
@@ -1228,3 +1254,4 @@
 </script>
 </body>
 </html>
+</script>
