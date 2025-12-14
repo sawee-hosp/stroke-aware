@@ -165,6 +165,7 @@
             border-radius: 50px; padding: 15px; margin-bottom: 15px; font-size: 1.2em; 
             background-color: var(--primary-color); color: white !important; /* Force White Text */
             box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; text-decoration: none;
+            cursor: pointer;
         }
         .contact-button .iconify { font-size: 1.4em; margin-right: 10px; }
         .route-button { background-color: #17a2b8; }
@@ -331,7 +332,6 @@
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
 
     window.handleEmergencyCall = function(tel, label) {
-        // Updated flow to match main buttons
         handleCallClick(null, 'floating_call', tel); 
     };
 
@@ -343,7 +343,14 @@
         // Prepare "How to act" modal content
         document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none';" class="btn-action" style="background-color:var(--primary-color); color:white;">รับทราบ</button></div>`;
         
-        document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()"><h2 style="text-align:center;">ข้อจำกัดความรับผิดชอบ</h2><p>• แอปพลิเคชันนี้ใช้เพื่อ <strong>ประเมินอาการเบื้องต้น</strong> เท่านั้น ไม่ใช่การวินิจฉัยทางการแพทย์</p><p>• การตัดสินใจรักษาต้องพิจารณาจากปัจจัยจริงโดยบุคลากรทางการแพทย์</p><p>• แอปพลิเคชันนี้ <strong>ไม่ได้โทรออกฉุกเฉินให้ท่าน</strong> หากมีเหตุจำเป็น ท่านต้องเป็นผู้กดโทรออกด้วยตนเอง</p><p style="font-size:1em; color:#555;">การประเมินนี้เป็นการคัดกรองตามอาการ ไม่ได้รวมปัจจัยเสี่ยงส่วนบุคคล</p><button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.4em; padding:15px; border-radius: 10px; width:100%; margin-top:15px;">รับทราบ</button></div>`;
+        // Updated Disclaimer Text
+        document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()">
+            <h2 style="text-align:center;">จัดทำโดย รพ.สวี จ.ชุมพร</h2>
+            <p>ระบบนี้จัดทำโดย <strong>โรงพยาบาลสวี จังหวัดชุมพร</strong> เพื่ออำนวยความสะดวกในการคัดกรองและประสานงานผู้ป่วยโรคหลอดเลือดสมองในเขตพื้นที่ อ.สวี เท่านั้น</p>
+            <hr style="margin:15px 0;">
+            <p style="font-size:0.9em; color:#555;">สำหรับผู้ใช้งานนอกเขตพื้นที่ ท่านสามารถใช้งานเพื่อศึกษาความรู้และประเมินอาการเบื้องต้นได้ แต่ระบบการประสานงานรถพยาบาลอาจไม่ครอบคลุมถึงพื้นที่ของท่าน</p>
+            <button onclick="document.querySelector('#disclaimerModal').style.display='none'" style="background-color:var(--primary-color); color:white; font-size:1.4em; padding:15px; border-radius: 10px; width:100%; margin-top:15px;">รับทราบ</button>
+        </div>`;
         
         setTimeout(() => {
             const infoBtn = document.getElementById('info-btn');
@@ -353,7 +360,6 @@
         document.getElementById('modal-send-location-btn').onclick = () => { 
             document.getElementById('confirmLocationModal').style.display = 'none'; 
             getLocation(false, true, () => {
-                // If we are reusing this modal for Final Save, we need to handle that.
                 if (currentActionKey === 'บันทึกและปิด') {
                     handleFinalSave(currentActionElement, true);
                 } else {
@@ -646,6 +652,8 @@
         sessionData.arrivalDeadline = formatTime(arrivalDeadline);
         sessionData.rtpaDeadline = formatTime(rtpaDeadline);
         startCountdown(rtpaDeadline.getTime());
+        
+        // Update Table
         let tableHtml = '<tbody>';
         tableHtml += createTableRow('mdi:account-circle', 'ผู้ป่วย', sessionData.registeredName || sessionData.userName);
         tableHtml += createTableRow('mdi:account-heart-outline', 'อาการ', sessionData.symptomDetail);
@@ -654,8 +662,28 @@
         tableHtml += createTableRow('mdi:timer-sand', 'ต้องได้รับยาภายใน (4.5ชม.)', sessionData.rtpaDeadline + ' น.');
         tableHtml += '</tbody>';
         document.getElementById('summary-table').innerHTML = tableHtml;
+        
         buildActionContainer();
-        updateSummaryAndActions(null);
+        
+        // Auto check location button state if location already exists
+        if(sessionData.location) {
+             const locButton = document.getElementById('location-action'); 
+             const locText = document.getElementById('location-text');
+             if (locButton) {
+                 locButton.classList.add('success'); 
+                 locButton.innerHTML = `<span class="iconify" data-icon="mdi:check-circle"></span>`; 
+                 locText.textContent = 'ส่งพิกัดแล้ว';
+                 
+                 // If loc exists, calc distance immediately
+                 const coords = sessionData.location.split(',');
+                 if(coords.length === 2) {
+                     const distance = getDistanceFromLatLonInKm(parseFloat(coords[0]), parseFloat(coords[1]), hospitalCoords.lat, hospitalCoords.lon);
+                     updateSummaryAndActions(distance);
+                 }
+             }
+        } else {
+            updateSummaryAndActions(null);
+        }
     }
 
     function startCountdown(deadlineMillis) {
@@ -729,7 +757,7 @@
         if (!container) return;
         container.innerHTML = `
             <div class="action-button-wrapper">
-                <div id="location-action" class="action-button location-button" onclick="getLocation()"><span class="iconify" data-icon="mdi:map-marker"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
+                <div id="location-action" class="action-button location-button" onclick="getLocation(false, false)"><span class="iconify" data-icon="mdi:map-marker"></span></div><p id="location-text" class="action-button-text">ส่งพิกัดที่อยู่</p>
             </div>
             <div class="action-button-wrapper" onclick="handleCallClick(this, 'tel_sawee', '0894745523')">
                 <div class="action-button tel-sawi-button"><span class="iconify" data-icon="mdi:phone"></span></div><p class="action-button-text">โทร รพ.สวี</p>
@@ -880,8 +908,10 @@
         // --- HERO IMAGE (AI ONLY) ---
         let heroImage = null;
         if (data.isAiAssessment && data.fileUrls) {
+            // Prefer Face URL, then Arm URL
             let imgUrl = data.fileUrls.face || data.fileUrls.arm;
             if (imgUrl) {
+                // Ensure URL is valid string
                 heroImage = {
                     type: "image",
                     url: imgUrl,
@@ -950,15 +980,18 @@
         // 2. Call Buttons (Grid Layout)
         if (data.isEmergency) {
             let callButtons = [];
+            // Emergency 1669
             callButtons.push({
                 type: "button", style: "primary", color: "#D32F2F", height: "sm", margin: "sm",
                 action: { type: "uri", label: "📞 1669", uri: "tel:1669" }
             });
+            // Hospital
             callButtons.push({
                 type: "button", style: "primary", color: "#F57C00", height: "sm", margin: "sm",
                 action: { type: "uri", label: "📞 รพ.สวี", uri: "tel:0894745523" }
             });
             
+            // Volunteers (if available)
             if (data.volunteerContacts) {
                 const c = data.volunteerContacts;
                 if (c.pcu_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 รพ.สต.", uri: `tel:${c.pcu_tel}` } });
@@ -966,6 +999,7 @@
                 if (c.volunteer1_tel) callButtons.push({ type: "button", style: "secondary", height: "sm", margin: "sm", action: { type: "uri", label: "📞 อสม.1", uri: `tel:${c.volunteer1_tel}` } });
             }
 
+            // Add buttons to footer in chunks if too many, but vertical stack is safer for mobile
             callButtons.forEach(btn => footerContents.push(btn));
         }
 
@@ -989,6 +1023,7 @@
             margin: "sm" 
         });
 
+        // Assemble Final JSON
         let flexContainer = {
             type: "bubble",
             header: {
