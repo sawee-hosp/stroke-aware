@@ -300,7 +300,7 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyptTEQF-bSEVcghqYZlQdPdP9WWbxn7JDzbidpI-m6wCe23ASFET9GF6M2l5RHBaz4/exec"; 
     const LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTRATION_LIFF_URL = "https://liff.line.me/2005789397-nebQ8oJy";
-    const HEALTH_INFO_LIFF_ID = "2005789397-RLAGXrBJ"; // Add constants here
+    const HEALTH_INFO_LIFF_ID = "2005789397-RLAGXrBJ"; 
     const DAILY_CHECK_LIFF_ID = "2005789397-WRm1lYd9";
     
     let sessionData = {};
@@ -332,7 +332,6 @@
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
 
     window.handleEmergencyCall = function(tel, label) {
-        // Updated flow to match main buttons
         handleCallClick(null, 'floating_call', tel); 
     };
 
@@ -341,10 +340,8 @@
         buildInitialHTML();
         buildAILayers(); 
         
-        // Prepare "How to act" modal content
         document.getElementById('how-to-act-modal').innerHTML = `<div class="modal-content"><h2 style="text-align:center;">ข้อควรปฏิบัติขณะเดินทาง</h2><div style="text-align:left;"><strong>1. ทันทีที่สงสัยว่ามีอาการสโตรก</strong><ul><li>โทรแจ้งเหตุฉุกเฉินทันที แจ้งว่า “สงสัยสโตรก”</li><li>แจ้งชื่อผู้ป่วย, เวลาเริ่มมีอาการครั้งแรก, และที่อยู่ปัจจุบัน</li><li>หากส่งข้อมูลผ่านแอปแล้วให้แจ้งว่า <strong style="color: var(--symptom-red);">"ส่งข้อมูลทาง Line สวีรู้ทันสโตรกแล้ว"</strong></li></ul><strong>2. ขณะรอรถพยาบาล</strong><ul><li>ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย (15-30°)</li><li>คลายเสื้อผ้าให้หายใจสะดวก, **ห้ามกินยาหรือดื่มน้ำเด็ดขาด**</li><li>เฝ้าสังเกตอาการและการหายใจ</li></ul><strong>3. ระหว่างเดินทางและเมื่อถึงโรงพยาบาล</strong><ul><li>ไม่ควรขับรถเอง ให้รอรถพยาบาล</li><li>เตรียมข้อมูลสำคัญ: ชื่อ, ประวัติโรคประจำตัว, ยาที่ใช้</li><li>เตรียมบัตรประชาชน</li></ul><strong>4. เมื่อถึงโรงพยาบาล</strong><ul><li>รีบแจ้งแพทย์/พยาบาลว่า "สงสัยสโตรก" และบอกเวลาที่เริ่มมีอาการ</li></ul></div><button onclick="document.querySelector('#how-to-act-modal').style.display='none';" class="btn-action" style="background-color:var(--primary-color); color:white;">รับทราบ</button></div>`;
         
-        // Updated Disclaimer Text
         document.getElementById('disclaimerModal').innerHTML = `<div class="modal-content" onclick="event.stopPropagation()">
             <h2 style="text-align:center;">จัดทำโดย รพ.สวี จ.ชุมพร</h2>
             <p>ระบบนี้จัดทำโดย <strong>โรงพยาบาลสวี จังหวัดชุมพร</strong> เพื่ออำนวยความสะดวกในการคัดกรองและประสานงานผู้ป่วยโรคหลอดเลือดสมองในเขตพื้นที่ อ.สวี เท่านั้น</p>
@@ -361,7 +358,6 @@
         document.getElementById('modal-send-location-btn').onclick = () => { 
             document.getElementById('confirmLocationModal').style.display = 'none'; 
             getLocation(false, true, () => {
-                // If we are reusing this modal for Final Save, we need to handle that.
                 if (currentActionKey === 'บันทึกและปิด') {
                     handleFinalSave(currentActionElement, true);
                 } else {
@@ -422,11 +418,11 @@
                 </div>
 
                 <div class="symptom-grid">
-                    <div class="symptom-card" onclick="showLayer2('Balance')"><img src="${symptomImages['Balance']}"><p>เซ/มึนหัว</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Eye')"><img src="${symptomImages['Eye']}"><p>ตามัวมาก</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Face')"><img src="${symptomImages['Face']}"><p>มุมปากตก</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Arm')"><img src="${symptomImages['Arm']}"><p>ยกแขนยาก</p></div>
-                    <div class="symptom-card" onclick="showLayer2('Speech')"><img src="${symptomImages['Speech']}"><p>ลำบากพูด</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Balance')"><img src="https://img2.pic.in.th/pic/-14a8e9c4fc269d4d8f.md.png"><p>เซ/มึนหัว</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Eye')"><img src="https://img2.pic.in.th/pic/-16881cec753a949477.md.png"><p>ตามัวมาก</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Face')"><img src="https://img5.pic.in.th/file/secure-sv1/-1846055524307466a7.md.png"><p>มุมปากตก</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Arm')"><img src="https://img2.pic.in.th/pic/-15dbb33e12115949f4.md.png"><p>ยกแขนยาก</p></div>
+                    <div class="symptom-card" onclick="showLayer2('Speech')"><img src="https://img5.pic.in.th/file/secure-sv1/-179b7758ead26c6d76.md.png"><p>ลำบากพูด</p></div>
                     <div style="min-height: 160px;"></div>
                 </div>
             </div>`;
@@ -749,17 +745,11 @@
         }
     }
 
-    function createContactButton(tel, label, key) { 
-        return `<div class="contact-button" onclick="handleCallClick(this, '${key}', '${tel}')">
-                    <span class="iconify" data-icon="mdi:phone"></span><span class="label">${label}</span>
-                </div>`; 
-    }
-    
+    function createContactButton(tel, label, key) { return `<div class="contact-button" onclick="handleCallClick(this, '${key}', '${tel}')"><span class="iconify" data-icon="mdi:phone"></span><span class="label">${label}</span></div>`; }
     function createTableRow(iconName, label, value, isUrgent = false, rowClass = '') {
         const valueClass = isUrgent ? 'value-col value-urgent' : 'value-col';
         return `<tr class="${rowClass}"><td class="icon-col"><span class="iconify" data-icon="${iconName}"></span></td><td class="label-col">${label}</td><td class="${valueClass}">${value || 'N/A'}</td></tr>`;
     }
-    
     function buildActionContainer() {
         const container = document.getElementById('action-grid-container');
         if (!container) return;
@@ -1058,6 +1048,68 @@
         return { type: "flex", altText: altText, contents: flexContainer };
     }
 
+    function displayAiResult(result) {
+        const container = document.getElementById('ai-result-content');
+        let html = '';
+        if (!result.isValid) {
+            html += `<h2 style="color:orange;">⚠️ ข้อมูลไม่ชัดเจน</h2><p>${result.refusalReason || "รูปภาพไม่ชัดเจน หรือไม่ใช่รูปคนที่ต้องการ"}</p><button class="btn-action" style="background:#333; color:white;" onclick="showLayer('layer-ai-input')">ลองถ่ายใหม่</button>`;
+        } else {
+            // Updated title with probability
+            let riskTitle = `🚨 พบความเสี่ยงสูง`;
+            if (result.riskScore) riskTitle += ` (${result.riskScore}%)`;
+
+            // Combine AI score with Thai CV Risk Score logic
+            let additionalWarning = "";
+            if (result.riskScore < 50 && sessionData.thai_cv_risk_score && parseInt(sessionData.thai_cv_risk_score) > 20) {
+                 additionalWarning = `<div style="background:#fff3cd; color:#856404; padding:10px; border-radius:5px; margin-top:10px; font-size:0.9em;">⚠️ <strong>ข้อควรระวัง:</strong> แม้ผลวิเคราะห์ภาพ/เสียงจะดูความเสี่ยงต่ำ แต่ประวัติความเสี่ยงสะสมของท่านสูง (${sessionData.thai_cv_risk_score}%) ควรเฝ้าระวังอาการใกล้ชิด</div>`;
+            }
+
+            if (result.isRisk) { 
+                html += `<h2 style="color:var(--symptom-red);">${riskTitle}</h2>
+                         ${additionalWarning}
+                         <div style="background:#fee; padding:15px; border-radius:10px; text-align:left; margin-bottom:15px;"><strong>อาการที่พบ:</strong><ul>`; 
+                (result.detectedSymptoms || []).forEach(s => html += `<li>${s}</li>`); 
+                html += `</ul><p>${result.analysis}</p></div>`; 
+            } else { 
+                html += `<h2 style="color:var(--symptom-green);">✅ ไม่พบความเสี่ยงชัดเจน</h2>
+                         ${additionalWarning}
+                         <p>${result.analysis}</p>`; 
+            }
+            
+            html += `<h3>ภาพที่วิเคราะห์</h3>`;
+            if (aiInputs.face) { 
+                html += `<div class="result-image-container">
+                    <img src="data:image/jpeg;base64,${aiInputs.face}">
+                    <div class="grid-overlay"></div>
+                    <div class="result-label">Face Analysis</div>
+                </div>`; 
+            }
+            if (aiInputs.arm) { 
+                html += `<div class="result-image-container">
+                    <img src="data:image/jpeg;base64,${aiInputs.arm}">
+                    <div class="grid-overlay"></div>
+                    <div class="result-label">Arm Analysis</div>
+                </div>`; 
+            }
+
+            html += `<button id="btn-gen-summary" class="btn-action" style="background-color:#17a2b8; margin-bottom:10px; color:white;" onclick="requestSummary()">✨ สร้างสรุปอาการส่งต่อแพทย์</button>`;
+            
+            if(result.isRisk) {
+                 html += `<button class="btn-action" style="background-color:var(--symptom-red); color:white;" onclick="saveData('symptomDetail', 'AI Analysis Result: ' + '${result.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลันต่อ</button>`;
+            } else {
+                 html += `<button class="btn-action" style="background-color:var(--primary-color); margin-top:10px; color:white;" onclick="saveData('symptomDetail', 'AI: No significant risk found'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
+            }
+        }
+        html += `<div class="btn-back-container"><div class="btn-back" onclick="showLayer('layer-ai-input')">ย้อนกลับไปแก้ไขข้อมูล</div></div>`;
+        container.innerHTML = html;
+        showLayer('layer-ai-result');
+    }
+
+    // --- Core Navigation & Utilities ---
+    window.showLayer = function(id) { document.querySelectorAll('[data-layer]').forEach(el => el.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); };
+    window.saveData = function(key, value) { sessionData[key] = value; };
+    window.viewImage = function(src) { const modal = document.getElementById('image-viewer-modal'); document.getElementById('full-image').src = src; modal.style.display = "flex"; };
+    
     // Database & Final Save Logic
     window.handleFinalSave = function(button, isEmergency) {
         if(button && button.disabled) return;
@@ -1260,7 +1312,16 @@
 
     // Utils
     function formatTime(date) { return date.toTimeString().slice(0, 5); }
-    function formatFullDateTime(date) { if (!date || isNaN(new Date(date).getTime())) return 'N/A'; const d = new Date(date); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth()+1).padStart(2, '0')}/${d.getFullYear()+543} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} น.`; }
+    function formatFullDateTime(date) { 
+        if (!date || isNaN(new Date(date).getTime())) return 'N/A'; 
+        const d = new Date(date); 
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear() + 543;
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        return `${day}/${month}/${year} ${hours}:${minutes}`; 
+    }
     function formatDuration(minutes) { if (isNaN(minutes) || minutes < 0) return 'N/A'; const h = Math.floor(minutes / 60); const m = Math.round(minutes % 60); return h > 0 ? `${h} ชม. ${m} นาที` : `${m} นาที`; }
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) { const R = 6371; const dLat = (lat2-lat1) * Math.PI/180; const dLon = (lon2-lon1) * Math.PI/180; const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2); return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
 </script>
