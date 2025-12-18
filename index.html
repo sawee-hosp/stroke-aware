@@ -728,12 +728,13 @@
             if (aiInputs.face) html += `<div class="result-image-container"><img src="data:image/jpeg;base64,${aiInputs.face}"><div class="grid-overlay"></div><div class="detection-label">Face detection</div></div>`;
             if (aiInputs.arm) html += `<div class="result-image-container"><img src="data:image/jpeg;base64,${aiInputs.arm}"><div class="grid-overlay"></div><div class="detection-label">Arm detection</div></div>`;
             html += `<button class="btn-action btn-info text-white mt-4" onclick="requestSummary()">✨ สรุปส่งแพทย์</button>`;
+            html += `<button class="btn-action btn-share mt-3" onclick="handleShare()">แชร์ผลการประเมินให้คนอื่น</button>`;
             if(res.isRisk) {
                  html += `<button class="btn-action btn-danger mt-3" onclick="handleProceedToAcute()">ประเมินความเฉียบพลันต่อ</button>`;
             } else {
                  html += `<button class="btn-action btn-primary-custom mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
             }
-            html += `<button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>`;
+            html += `<button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button>`;
             html += `<div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-ai-input')">กลับไปแก้ไข</button></div>`;
             c.innerHTML = html;
         }
