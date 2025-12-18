@@ -129,7 +129,7 @@
         .btn-likely { background-color: #D32F2F; color: white; border: 3px solid #B71C1C; }
         .btn-unlikely { background-color: #388E3C; color: white; border: 3px solid #2E7D32; }
         
-        /* Back Button Style (แก้ไขตามขอ) */
+        /* Back Button Style */
         .btn-back { 
             background: transparent; 
             color: #007BFF; 
@@ -143,7 +143,7 @@
         }
         .btn-back-container { padding: 20px 0; border-top: 2px solid #eee; margin-top: 25px; text-align: center; }
 
-        /* AI Button Specific (ปรับให้พอดีบรรทัดเดียว + Icon Wink) */
+        /* AI Button Specific (ปรับให้ข้อความกลาง + Icon Wink) */
         .btn-ai { 
             background-color: var(--ai-yellow); 
             color: black; 
@@ -152,8 +152,8 @@
             position: relative; 
             overflow: visible; 
             margin-top: 10px;
-            justify-content: space-between; /* จัดซ้ายขวา */
-            padding-left: 25px;
+            justify-content: center; /* ข้อความอยู่ตรงกลาง */
+            padding-left: 20px;
             padding-right: 20px;
         }
         .wink-icon-right {
@@ -161,23 +161,25 @@
             color: #fff;
             text-shadow: 0 0 5px #F1C40F;
             animation: wink-slow 1.5s infinite ease-in-out;
+            position: absolute; /* ลอยอิสระ */
+            right: 20px;
         }
         @keyframes wink-slow { 
             0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } 
             50% { opacity: 0.6; transform: scale(1.1) rotate(10deg); } 
         }
 
-        /* Symptom Grid (Maximized Images) */
+        /* Symptom Grid */
         .symptom-grid { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
-            gap: 10px; /* Space น้อยสุดๆ */
+            gap: 10px; 
         }
         .symptom-card { 
             border-radius: 20px; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
             text-align: center; 
-            padding: 5px; /* Padding น้อยเน้นรูป */
+            padding: 5px; 
             cursor: pointer; 
             background: #fff; 
             border: 2px solid #eee; 
@@ -199,7 +201,7 @@
         .symptom-card p { 
             margin: 0; 
             font-weight: 800; 
-            font-size: 32px; /* ขยายใหญ่สุดๆ */
+            font-size: 32px; 
             color: #2c3e50; 
             line-height: 1.1;
             white-space: nowrap; 
@@ -208,7 +210,7 @@
             width: 100%;
         }
 
-        /* Action Grid (Telephone Page - 3 Buttons inline) */
+        /* Action Grid */
         .action-buttons-grid { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
@@ -250,7 +252,7 @@
             line-height: 1.1; 
         }
 
-        /* Floating Buttons (Very Big) */
+        /* Floating Buttons */
         .floating-actions { position: fixed; bottom: 70px; right: 15px; display: flex; flex-direction: column; gap: 15px; z-index: 4000; }
         .float-btn { 
             width: 100px; height: 100px; border-radius: 50%; color: white; 
@@ -272,12 +274,13 @@
             position: fixed; bottom: 0; left: 0; width: 100%;
             background-color: #000; color: #fff;
             text-align: center; padding: 10px 5px;
-            font-size: 20px; font-weight: bold;
+            font-size: 18px; /* ลดขนาดตามขอ */
+            font-weight: bold;
             z-index: 5000; line-height: 1.2;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
         }
 
-        /* Alert Box Layer 5 (Red blinking) */
+        /* Alert Box Layer 5 */
         .alert-stroke-detected {
             background-color: #D32F2F !important; 
             color: white !important;
@@ -304,9 +307,9 @@
             to { background-color: #B71C1C; transform: scale(1.02); } 
         }
 
-        /* Time Buttons (Reduced Padding) */
+        /* Time Buttons */
         .time-btn { 
-            padding: 10px 5px !important; /* ลด Space ภายใน */
+            padding: 10px 5px !important; 
             font-size: 22px !important; 
             min-height: 60px;
         }
@@ -346,6 +349,9 @@
             padding: 5px 15px; border-radius: 15px; font-size: 18px; font-weight: bold;
         }
         .result-label { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.7); color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
+        
+        /* Test Button Style */
+        .btn-test-close { background-color: #7f8c8d; color: white; border: 3px solid #666; font-size: 20px; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -356,7 +362,7 @@
         <div id="loading-subtext" style="font-size: 24px; color: #666; margin-top: 10px;">กรุณารอสักครู่</div>
     </div>
 
-    <!-- Floating Buttons (Extra Large) -->
+    <!-- Floating Buttons -->
     <div class="floating-actions">
         <div class="float-btn float-sawi" onclick="handleCallClick(this, 'tel_sawee', '0894745523')">
             <span class="iconify" data-icon="mdi:hospital-box"></span>
@@ -615,6 +621,7 @@
             <div id="route-button-container" class="mt-4"></div>
             
             <button class="btn-action" style="background-color: #C0392B; color: white; margin-top:30px; font-size:30px;" onclick="handleFinalSave(this, true)">บันทึกข้อมูลและปิดหน้าต่าง</button>
+            <button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>
             <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</button></div>
         `;
 
@@ -624,7 +631,7 @@
             <p id="final-text" class="text-center" style="font-size:28px;"></p>
             <div class="d-flex flex-column gap-3 mt-4">
                 <button class="btn-action btn-primary-custom" style="padding: 25px; font-size:30px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button>
-                <button class="btn-action" style="background-color: #666; color: white; padding: 20px; font-size:24px;" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>
+                <button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>
             </div>
         `;
         
@@ -638,7 +645,7 @@
             <h2 class="section-title"><span class="iconify" data-icon="mdi:brain"></span> ทดสอบด้วย AI</h2>
             <p class="text-muted fs-4 mb-4 text-start">ระบบ AI เป็นส่วนหนึ่งของการศึกษา ผลลัพธ์อาจมีความคลาดเคลื่อน <strong>หากมีอาการผิดปกติ ควรรีบพบแพทย์</strong></p>
             <div class="pdpa-box">
-                <div class="form-check">
+                <div class="form-check d-flex align-items-center">
                     <input class="form-check-input" type="checkbox" id="pdpa-consent" style="transform: scale(2); margin-right: 20px;">
                     <label class="form-check-label fs-4" for="pdpa-consent">ข้าพเจ้ายินยอมให้นำรูปภาพและเสียงไปประมวลผลด้วย AI เพื่อประเมินความเสี่ยงเบื้องต้นเท่านั้น</label>
                 </div>
@@ -691,7 +698,7 @@
             </div>
 
             <p class="text-center text-danger fw-bold mt-3 fs-4">* ต้องส่งรูปหรือเสียงอย่างน้อย 1 อย่าง *</p>
-            <button class="btn-action btn-ai" style="font-size:30px;" onclick="analyzeWithGemini()">
+            <button class="btn-action btn-ai" style="font-size:30px; justify-content:center;" onclick="analyzeWithGemini()">
                 <span>ส่งวิเคราะห์</span>
                 <span class="iconify wink-icon-right" data-icon="mdi:sparkles"></span>
             </button>
@@ -891,6 +898,7 @@
             html += `<button class="btn-action btn-info text-white mt-4" onclick="requestSummary()">✨ สรุปส่งแพทย์</button>`;
             if(res.isRisk) html += `<button class="btn-action btn-danger mt-3" onclick="saveData('symptomDetail', 'AI: '+ '${res.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลัน</button>`;
             else html += `<button class="btn-action btn-primary-custom mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบ</button>`;
+            html += `<button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>`;
             html += `<div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-ai-input')">กลับไปแก้ไข</button></div>`;
             c.innerHTML = html;
         }
@@ -922,13 +930,17 @@
             if (images.length > 0) {
                 let imageBox = { type: "box", layout: "horizontal", contents: [] };
                 images.forEach(url => {
-                    imageBox.contents.push({ 
-                        type: "image", url: url, size: "full", aspectRatio: "1:1", aspectMode: "cover", flex: 1, margin: "sm",
-                        action: { type: "uri", uri: url }
-                    });
+                    if (url && typeof url === 'string') {
+                        imageBox.contents.push({ 
+                            type: "image", url: url, size: "full", aspectRatio: "1:1", aspectMode: "cover", flex: 1, margin: "sm",
+                            action: { type: "uri", uri: url }
+                        });
+                    }
                 });
-                bodyContents.push(imageBox);
-                bodyContents.push({ type: "separator", margin: "md" });
+                if (imageBox.contents.length > 0) {
+                    bodyContents.push(imageBox);
+                    bodyContents.push({ type: "separator", margin: "md" });
+                }
             }
         }
 
@@ -970,7 +982,9 @@
         if (isAbnormal) {
             if (data.location) {
                 const loc = data.location.split(',');
-                footerContents.push({ type: "button", style: "secondary", action: { type: "uri", label: "📍 แผนที่ผู้ป่วย", uri: `https://www.google.com/maps/search/?api=1&query=${loc[0]},${loc[1]}` } });
+                if (loc.length >= 2) {
+                    footerContents.push({ type: "button", style: "secondary", action: { type: "uri", label: "📍 แผนที่ผู้ป่วย", uri: `https://www.google.com/maps/search/?api=1&query=${loc[0]},${loc[1]}` } });
+                }
             }
             footerContents.push({ type: "button", style: "primary", color: "#D32F2F", action: { type: "uri", label: "📞 1669", uri: "tel:1669" } });
             footerContents.push({ type: "button", style: "primary", color: "#F57C00", margin: "sm", action: { type: "uri", label: "📞 รพ.สวี", uri: "tel:0894745523" } });
@@ -991,7 +1005,7 @@
             altText: "ผลประเมินสวีรู้ทันสโตรก", 
             contents: { 
                 type: "bubble", 
-                size: "giga", // Max size
+                size: "giga", 
                 header: { type: "box", layout: "vertical", backgroundColor: headerColor, contents: [{ type: "text", text: title, color: "#ffffff", weight: "bold", size: "xxl", align: "center" }] }, 
                 body: { type: "box", layout: "vertical", contents: bodyContents }, 
                 footer: { type: "box", layout: "vertical", contents: footerContents } 
@@ -1009,17 +1023,38 @@
         window[cb] = function(res) {
             if(res && res.status==='success') {
                 if(liff.isInClient()) {
-                    const flexMsg = createFlexMessage(sessionData);
-                    // Attempt sending via client-side first
-                    liff.sendMessages([flexMsg]).then(() => {
-                        if (currentActionKey === 'บันทึกและปิด' || !isUrg) liff.closeWindow();
-                        else if (document.getElementById('how-to-act-modal').style.display !== 'block') liff.closeWindow();
-                    }).catch(e => {
-                        alert("บันทึกแล้ว (ไม่สามารถส่ง Flex ได้)");
+                    try {
+                        const flexMsg = createFlexMessage(sessionData);
+                        let messagesToSend = [flexMsg];
+                        
+                        if (isUrg) {
+                            const instructionText = "คำแนะนำเบื้องต้น:\n1. โทร 1669 ทันที\n2. ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย\n3. ห้ามกินยาหรือดื่มน้ำ\n4. เตรียมบัตรประชาชนและข้อมูลยา";
+                            messagesToSend.push({ type: 'text', text: instructionText });
+                        }
+
+                        liff.sendMessages(messagesToSend)
+                            .then(() => {
+                                if (currentActionKey === 'บันทึกและปิด' || !isUrg) {
+                                    liff.closeWindow();
+                                } else {
+                                    alert("ส่งข้อมูลเรียบร้อย");
+                                    if(document.getElementById('how-to-act-modal').style.display !== 'block') {
+                                         liff.closeWindow();
+                                    }
+                                }
+                            })
+                            .catch((err) => {
+                                console.error('LIFF Send Error', err);
+                                alert("บันทึกแล้ว (ส่งข้อความไม่สำเร็จ: " + err.code + ")");
+                                if (currentActionKey === 'บันทึกและปิด') liff.closeWindow();
+                            });
+                    } catch (flexError) {
+                        console.error("Flex Gen Error:", flexError);
+                        alert("บันทึกแล้ว (สร้างการ์ดสรุปไม่สำเร็จ)");
                         liff.closeWindow();
-                    });
+                    }
                 } else {
-                    if(isUrg) document.getElementById('how-to-act-modal').style.display='block'; else alert("บันทึกแล้ว");
+                    if (isUrg) document.getElementById('how-to-act-modal').style.display='block'; else alert("บันทึกแล้ว");
                 }
             } else alert("บันทึกไม่สำเร็จ");
             if(btn) btn.disabled = false;
