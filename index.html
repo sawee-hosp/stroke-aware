@@ -143,7 +143,7 @@
         }
         .btn-back-container { padding: 20px 0; border-top: 2px solid #eee; margin-top: 25px; text-align: center; }
 
-        /* AI Button Specific (ปรับให้ข้อความกลาง + Icon Wink) */
+        /* AI Button Specific */
         .btn-ai { 
             background-color: var(--ai-yellow); 
             color: black; 
@@ -152,7 +152,7 @@
             position: relative; 
             overflow: visible; 
             margin-top: 10px;
-            justify-content: center; /* ข้อความอยู่ตรงกลาง */
+            justify-content: center; 
             padding-left: 20px;
             padding-right: 20px;
         }
@@ -161,7 +161,7 @@
             color: #fff;
             text-shadow: 0 0 5px #F1C40F;
             animation: wink-slow 1.5s infinite ease-in-out;
-            position: absolute; /* ลอยอิสระ */
+            position: absolute; 
             right: 20px;
         }
         @keyframes wink-slow { 
@@ -250,6 +250,21 @@
             margin-top: 5px; 
             color: #444; 
             line-height: 1.1; 
+        }
+
+        /* Contact Row Style */
+        .contact-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #fff; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #eee;
+        }
+        .contact-name { font-weight: bold; font-size: 24px; color: #333; }
+        .call-btn-small {
+            background-color: var(--primary-red); color: white;
+            border-radius: 50%; width: 50px; height: 50px;
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         /* Floating Buttons */
@@ -621,7 +636,7 @@
             <div id="route-button-container" class="mt-4"></div>
             
             <button class="btn-action" style="background-color: #C0392B; color: white; margin-top:30px; font-size:30px;" onclick="handleFinalSave(this, true)">บันทึกข้อมูลและปิดหน้าต่าง</button>
-            <button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>
+            <button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button>
             <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</button></div>
         `;
 
@@ -631,7 +646,7 @@
             <p id="final-text" class="text-center" style="font-size:28px;"></p>
             <div class="d-flex flex-column gap-3 mt-4">
                 <button class="btn-action btn-primary-custom" style="padding: 25px; font-size:30px;" onclick="handleFinalSave(this, false)">บันทึกและปิด</button>
-                <button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>
+                <button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button>
             </div>
         `;
         
@@ -838,11 +853,19 @@
         if (sessionData.volunteerContacts) {
             const c = sessionData.volunteerContacts;
             contacts.innerHTML = `<h5 style="text-align:center; margin-top:30px; font-weight:bold; font-size:28px;">เบอร์โทรผู้ช่วยเหลือในพื้นที่</h5>`;
-            if (c.volunteer1_tel) contacts.innerHTML += createContactButton(c.volunteer1_tel, "โทรหา อสม. 1", "tel_asm1");
-            if (c.volunteer2_tel) contacts.innerHTML += createContactButton(c.volunteer2_tel, "โทรหา อสม. 2", "tel_asm2");
-            if (c.headman_tel) contacts.innerHTML += createContactButton(c.headman_tel, `โทรหา ผู้นำชุมชน`, "tel_header");
-            if (c.pcu_tel) contacts.innerHTML += createContactButton(c.pcu_tel, `โทรหา ${c.pcu_name || 'รพ.สต.'}`, "tel_pcu");
+            if (c.volunteer1_tel) contacts.innerHTML += createContactRow("อสม. 1", c.volunteer1_tel);
+            if (c.volunteer2_tel) contacts.innerHTML += createContactRow("อสม. 2", c.volunteer2_tel);
+            if (c.headman_tel) contacts.innerHTML += createContactRow("ผู้นำชุมชน", c.headman_tel);
+            if (c.pcu_tel) contacts.innerHTML += createContactRow(c.pcu_name || 'รพ.สต.', c.pcu_tel);
         }
+    }
+
+    // New Row Style Contact
+    function createContactRow(name, tel) {
+        return `<div class="contact-row">
+            <span class="contact-name">${name}</span>
+            <a href="tel:${tel}" class="call-btn-small" onclick="handleCallClick(this, 'tel_community', '${tel}')"><span class="iconify" data-icon="mdi:phone"></span></a>
+        </div>`;
     }
 
     function createContactButton(tel, label, key) { return `<div class="contact-button btn-primary-custom" onclick="handleCallClick(this, '${key}', '${tel}')"><span class="iconify" data-icon="mdi:phone"></span><span>${label}</span></div>`; }
@@ -884,6 +907,17 @@
             else showAiError(data.message); 
         }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
     };
+    
+    // Updated: Remove inline onclick injection to prevent quotes breaking HTML
+    window.handleProceedToAcute = function() {
+        if (currentAnalysisResult && currentAnalysisResult.analysis) {
+            saveData('symptomDetail', 'AI: ' + currentAnalysisResult.analysis);
+            showLayer('layer-3');
+        } else {
+            showLayer('layer-3');
+        }
+    };
+
     function displayAiResult(res) {
         const c = document.getElementById('ai-result-content');
         if (!res.isValid) c.innerHTML = `<div class="text-center"><h3 class="text-warning fw-bold fs-2">⚠️ ข้อมูลไม่ชัดเจน</h3><p>${res.refusalReason}</p><button class="btn-action btn-secondary" onclick="showLayer('layer-ai-input')">ลองใหม่</button></div>`;
@@ -896,9 +930,14 @@
             if (aiInputs.arm) html += `<div class="result-image-container"><img src="data:image/jpeg;base64,${aiInputs.arm}"><div class="grid-overlay"></div><div class="detection-label">Arm detection</div></div>`;
             
             html += `<button class="btn-action btn-info text-white mt-4" onclick="requestSummary()">✨ สรุปส่งแพทย์</button>`;
-            if(res.isRisk) html += `<button class="btn-action btn-danger mt-3" onclick="saveData('symptomDetail', 'AI: '+ '${res.analysis}'); showLayer('layer-3');">ประเมินความเฉียบพลัน</button>`;
-            else html += `<button class="btn-action btn-primary-custom mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบ</button>`;
-            html += `<button class="btn-action btn-test-close" onclick="handleTestClose()">ปิดหน้าต่าง (ทดสอบระบบ)</button>`;
+            
+            if(res.isRisk) {
+                 // FIXED: Use function call instead of inline string injection
+                 html += `<button class="btn-action btn-danger mt-3" onclick="handleProceedToAcute()">ประเมินความเฉียบพลันต่อ</button>`;
+            } else {
+                 html += `<button class="btn-action btn-primary-custom mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
+            }
+            html += `<button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button>`;
             html += `<div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-ai-input')">กลับไปแก้ไข</button></div>`;
             c.innerHTML = html;
         }
@@ -907,7 +946,7 @@
     window.requestSummary = function() { if(!currentAnalysisResult)return; fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'generateSummary', data: currentAnalysisResult }) }).then(r=>r.json()).then(d=>{ if(d.status==='success'){ document.getElementById('aiSummaryText').value = d.summary; document.getElementById('aiSummaryModal').style.display='block'; } else alert("Error"); }); };
     window.copySummary = function() { document.getElementById("aiSummaryText").select(); document.execCommand("copy"); alert("คัดลอกแล้ว"); };
 
-    // --- SAVE & FLEX ---
+    // --- SAVE & FLEX (Strict Fix) ---
     function createFlexMessage(data) {
         // --- 1. Determine State ---
         const isAbnormal = data.isEmergency || (data.isAiAssessment && data.riskScore && parseInt(data.riskScore) > 50);
@@ -921,27 +960,22 @@
         // --- 2. Build Body ---
         let bodyContents = [];
         
-        // Image Section (AI Only) - Show 1 or 2 images
+        // Image Section (AI Only) - Validate URLs carefully
         if (isAI && data.fileUrls) {
             let images = [];
-            if (data.fileUrls.face) images.push(data.fileUrls.face);
-            if (data.fileUrls.arm) images.push(data.fileUrls.arm);
+            if (data.fileUrls.face && String(data.fileUrls.face).startsWith('http')) images.push(data.fileUrls.face);
+            if (data.fileUrls.arm && String(data.fileUrls.arm).startsWith('http')) images.push(data.fileUrls.arm);
             
             if (images.length > 0) {
                 let imageBox = { type: "box", layout: "horizontal", contents: [] };
                 images.forEach(url => {
-                    // Check URL validity to prevent Flex crash
-                    if (url && typeof url === 'string' && url.startsWith('http')) {
-                        imageBox.contents.push({ 
-                            type: "image", url: url, size: "full", aspectRatio: "1:1", aspectMode: "cover", flex: 1, margin: "sm",
-                            action: { type: "uri", uri: url }
-                        });
-                    }
+                    imageBox.contents.push({ 
+                        type: "image", url: url, size: "full", aspectRatio: "1:1", aspectMode: "cover", flex: 1, margin: "sm",
+                        action: { type: "uri", uri: url }
+                    });
                 });
-                if (imageBox.contents.length > 0) {
-                    bodyContents.push(imageBox);
-                    bodyContents.push({ type: "separator", margin: "md" });
-                }
+                bodyContents.push(imageBox);
+                bodyContents.push({ type: "separator", margin: "md" });
             }
         }
 
@@ -954,9 +988,10 @@
             ]
         });
 
-        // Analysis / Symptom Text
+        // Analysis / Symptom Text (Truncate to avoid payload error)
         let symptomText = isAI ? `AI: ${String(data.analysis || '-')}` : String(data.symptomDetail || "ปกติ");
         if (!isAbnormal) symptomText = "ไม่พบความเสี่ยงชัดเจน";
+        if (symptomText.length > 100) symptomText = symptomText.substring(0, 97) + "...";
         
         bodyContents.push({
             type: "box", layout: "vertical", margin: "md", backgroundColor: isAbnormal ? "#FFEBEE" : "#E8F5E9", cornerRadius: "md", paddingAll: "md",
@@ -982,7 +1017,7 @@
         // Emergency Buttons
         if (isAbnormal) {
             if (data.location) {
-                const loc = data.location.split(',');
+                const loc = String(data.location).split(',');
                 if (loc.length >= 2) {
                     footerContents.push({ type: "button", style: "secondary", action: { type: "uri", label: "📍 แผนที่ผู้ป่วย", uri: `https://www.google.com/maps/search/?api=1&query=${loc[0]},${loc[1]}` } });
                 }
@@ -1046,7 +1081,7 @@
                             })
                             .catch((err) => {
                                 console.error('LIFF Send Error', err);
-                                alert("บันทึกแล้ว (ส่งข้อความไม่สำเร็จ: " + err.code + ")");
+                                alert("บันทึกแล้ว (ส่งข้อความไม่สำเร็จ)");
                                 if (currentActionKey === 'บันทึกและปิด') liff.closeWindow();
                             });
                     } catch (flexError) {
@@ -1064,7 +1099,7 @@
     };
 
     window.handleTestClose = function() {
-        if(confirm("ยืนยันการปิดหน้าต่าง?\n(ข้อมูลจะไม่ถูกบันทึก และไม่แจ้งเตือน รพ.)")) {
+        if(confirm("ยืนยันการปิดหน้าต่าง?\n(ระบบจะสิ้นสุดการทำงานทันที โดยไม่แจ้งเตือนไปที่ รพ.)")) {
             if(liff.isInClient()) liff.closeWindow();
             else window.close();
         }
