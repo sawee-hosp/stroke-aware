@@ -409,19 +409,32 @@
     window.closeCustomModal = function(id) {
         document.getElementById(id).style.display = 'none';
     };
-    window.showCustomConfirm = function(msg, title, callback) {
+    
+    // ปรับปรุง showCustomConfirm ให้รองรับ callback กรณีผู้ใช้กด "ยกเลิก"
+    window.showCustomConfirm = function(msg, title, onConfirm, onCancel) {
         document.getElementById('custom-confirm-title').textContent = title || "ยืนยัน";
         document.getElementById('custom-confirm-body').innerHTML = msg;
+        
         const btnYes = document.getElementById('btn-confirm-yes');
+        const btnNo = document.querySelector('#custom-confirm-modal .btn-modal-secondary');
         
         // Remove old listeners to prevent stacking
-        const newBtn = btnYes.cloneNode(true);
-        btnYes.parentNode.replaceChild(newBtn, btnYes);
+        const newBtnYes = btnYes.cloneNode(true);
+        btnYes.parentNode.replaceChild(newBtnYes, btnYes);
         
-        newBtn.onclick = function() {
+        const newBtnNo = btnNo.cloneNode(true);
+        btnNo.parentNode.replaceChild(newBtnNo, btnNo);
+        
+        newBtnYes.onclick = function() {
             closeCustomModal('custom-confirm-modal');
-            if (callback) callback();
+            if (onConfirm) onConfirm();
         };
+        
+        newBtnNo.onclick = function() {
+            closeCustomModal('custom-confirm-modal');
+            if (onCancel) onCancel();
+        };
+        
         document.getElementById('custom-confirm-modal').style.display = 'flex';
     };
 
@@ -732,7 +745,7 @@
             if(res.isRisk) {
                  html += `<button class="btn-action btn-danger mt-3" onclick="handleProceedToAcute()">ประเมินความเฉียบพลันต่อ</button>`;
             } else {
-                 html += `<button class="btn-action btn-primary-custom mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); saveData('isFinalSave', true); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
+                 html += `<button class="btn-action btn-primary-custom mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); handleFinalSave(this, false);">บันทึกและจบการประเมิน</button>`;
             }
             html += `<button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button>`;
             html += `<div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-ai-input')">กลับไปแก้ไข</button></div>`;
@@ -818,19 +831,40 @@
         return { type: "flex", altText: "ผลประเมินสวีรู้ทันสโตรก", contents: { type: "bubble", size: "giga", header: { type: "box", layout: "vertical", background: { type: "linearGradient", angle: "90deg", startColor: headerStartColor, endColor: headerEndColor }, contents: [{ type: "text", text: titleText, color: "#ffffff", weight: "bold", size: "xl", align: "center" }, { type: "text", text: subTitleText, color: "#ffffffcc", size: "md", align: "center" }] }, body: { type: "box", layout: "vertical", contents: bodyContents }, footer: { type: "box", layout: "vertical", contents: footerContents } } };
     }
 
- window.handleFinalSave = function(btn, isUrg) {
+    // --- แก้ไข: ฟังชันบันทึกข้อมูลแบบปรับปรุงใหม่ ให้ทำต่อได้แม้กดยกเลิก ---
+    window.handleFinalSave = function(btn, isUrg, skipLocationCheck = false) {
         if(btn && btn.disabled) return;
-        
-        // แก้ไข: บังคับขอพิกัด "เฉพาะกรณีฉุกเฉิน (isUrg = true)" เท่านั้น
-        if (isUrg && !sessionData.location) {
-             showCustomConfirm("ท่านยังไม่ได้ระบุพิกัด \nต้องการส่งพิกัดเพื่อให้รถพยาบาลมารับถูกจุดหรือไม่?", "แจ้งเตือนพิกัด", () => {
-                 getLocation(false, true, () => handleFinalSave(btn, isUrg));
+
+        // 1. ตรวจสอบพิกัดถ้าฉุกเฉิน และยังไม่เคยกดข้าม
+        if (isUrg && !sessionData.location && !skipLocationCheck) {
+             showCustomConfirm("ท่านยังไม่ได้ระบุพิกัด \nต้องการส่งพิกัดเพื่อให้รถพยาบาลมารับถูกจุดหรือไม่?", "แจ้งเตือนพิกัด", 
+             () => { // กดยืนยัน (หาพิกัด)
+                 document.getElementById('loading-text').textContent = 'กำลังหาพิกัด...';
+                 document.getElementById('loading').style.display = 'flex';
+                 getLocation(false, true, () => {
+                     document.getElementById('loading').style.display = 'none';
+                     handleFinalSave(btn, isUrg, true);
+                 });
+             }, 
+             () => { // กดยกเลิก (ข้ามพิกัดไปเลย)
+                 handleFinalSave(btn, isUrg, true);
              });
              return;
         }
 
+        // ป้องกันการกดย้ำ
         if(btn) btn.disabled = true;
-        sessionData.isEmergency = isUrg; sessionData.isFinalSave = true;
+
+        // เปิดหน้า Loading แสดงให้ผู้ใช้รู้ว่าระบบกำลังทำงาน
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) {
+            document.getElementById('loading-text').textContent = 'กำลังบันทึกและส่งข้อมูล...';
+            document.getElementById('loading-subtext').textContent = 'กรุณารอสักครู่';
+            loadingEl.style.display = 'flex';
+        }
+
+        sessionData.isEmergency = isUrg; 
+        sessionData.isFinalSave = true;
         
         const cb = 'cb'+Date.now();
         window[cb] = function(res) {
@@ -838,21 +872,32 @@
                 if(liff.isInClient()) {
                     const flexMsg = createFlexMessage(sessionData);
                     liff.sendMessages([flexMsg]).then(() => {
-                        if (currentActionKey === 'บันทึกและปิด' || !isUrg) liff.closeWindow();
-                        else if (document.getElementById('how-to-act-modal') && document.getElementById('how-to-act-modal').style.display !== 'block') liff.closeWindow();
+                        // ปิดหน้าจอทิ้งทันทีหลังส่งผ่าน LINE สำเร็จ
+                        liff.closeWindow();
                     }).catch(e => {
                         console.error(e);
-                        showCustomAlert("บันทึกแล้ว (แต่ส่ง Flex ไม่ได้เนื่องจากติดสิทธิ์ LINE)");
-                        liff.closeWindow();
+                        if (loadingEl) loadingEl.style.display = 'none';
+                        showCustomAlert("บันทึกแล้ว แต่ระบบไม่อนุญาตให้ส่งข้อความเข้าแชท (อาจติดสิทธิ์ LINE)");
+                        setTimeout(() => liff.closeWindow(), 3000);
                     });
                 } else {
-                    if(isUrg && document.getElementById('how-to-act-modal')) document.getElementById('how-to-act-modal').style.display='block'; 
-                    else showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                    if (loadingEl) loadingEl.style.display = 'none';
+                    showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว (ทดสอบบนเบราว์เซอร์)");
                 }
-            } else showCustomAlert("บันทึกไม่สำเร็จ");
-            if(btn) btn.disabled = false;
+            } else {
+                if (loadingEl) loadingEl.style.display = 'none';
+                showCustomAlert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+                if(btn) btn.disabled = false;
+            }
         };
+        
+        // เผื่ออินเตอร์เน็ตหลุดตอนสร้าง script
         const s = document.createElement('script'); 
+        s.onerror = function() {
+             if (loadingEl) loadingEl.style.display = 'none';
+             showCustomAlert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง");
+             if(btn) btn.disabled = false;
+        };
         s.src = `${GAS_URL}?action=saveData&callback=${cb}&data=${encodeURIComponent(JSON.stringify(sessionData))}`; 
         document.body.appendChild(s);
     };
@@ -876,20 +921,27 @@
         });
     };
 
+    // ปรับปรุงการกดโทร ให้รองรับพฤติกรรมยกเลิก
     window.handleCallClick = function(el, key, tel, name) { 
         currentActionKey = key; currentActionElement = el; pendingCallUrl = `tel:${tel}`; currentTel = tel;
-        showCustomConfirm(`ต้องการส่งพิกัดและบันทึกชื่อก่อนโทรหา <b>${name}</b> หรือไม่?`, "ยืนยันการโทร", () => {
-             // Confirm -> Get Loc -> Save Log -> Call
+        showCustomConfirm(`ต้องการส่งพิกัดและบันทึกชื่อก่อนโทรหา <b>${name}</b> หรือไม่?`, "ยืนยันการโทร", 
+        () => { 
+             document.getElementById('loading-text').textContent = 'กำลังหาพิกัด...';
+             document.getElementById('loading').style.display = 'flex';
              getLocation(false, false, () => {
+                 document.getElementById('loading').style.display = 'none';
                  executePendingCall();
              });
+        },
+        () => {
+             // ถ้ายกเลิก ก็คือไม่เอาพิกัด ให้โทรออกทันที
+             executePendingCall();
         });
     };
 
     window.executePendingCall = function() {
         if(pendingCallUrl) {
             sessionData.contactedVia = currentActionKey;
-            // Add UI log fields
             const payload = { 
                 ...sessionData, 
                 isEmergency: true,
@@ -898,10 +950,10 @@
             };
             
             const img = new Image(); img.src = `${GAS_URL}?action=saveData&data=${encodeURIComponent(JSON.stringify(payload))}`;
-            document.getElementById('how-to-act-modal').style.display = 'block';
             window.location.href = pendingCallUrl;
         }
     };
+
     window.getLocation = function(save, call, cb) {
         const btn = document.getElementById('location-action'); if(btn) document.getElementById('location-text').textContent = 'กำลังค้นหา...';
         navigator.geolocation.getCurrentPosition(p => {
@@ -910,8 +962,12 @@
             const dist = getDistanceFromLatLonInKm(p.coords.latitude, p.coords.longitude, hospitalCoords.lat, hospitalCoords.lon);
             updateSummaryAndActions(dist);
             if(cb) cb(); else if(call) executePendingCall();
-        }, e => showCustomAlert("รับพิกัดไม่ได้"));
+        }, e => {
+            showCustomAlert("รับพิกัดไม่ได้ หรือผู้ใช้ไม่อนุญาต");
+            if(cb) cb(); // ดำเนินการต่อแม้รับพิกัดไม่ได้
+        });
     };
+    
     window.triggerSave = function(el, key) { currentActionKey = key; handleFinalSave(el, true); };
     window.fetchUserData = function(uid) { const s = document.createElement('script'); s.src = `${GAS_URL}?action=getUserData&userId=${uid}&callback=processUserData`; document.head.appendChild(s); };
     window.processUserData = function(res) {
@@ -941,8 +997,19 @@
     window.fetchVolunteerData = function(area) { const s = document.createElement('script'); s.src = `${GAS_URL}?action=getVolunteerData&areaKey=${encodeURIComponent(area)}&callback=processVolunteerData`; document.head.appendChild(s); };
     window.processVolunteerData = function(res) { if(res.status==='found') sessionData.volunteerContacts = res.data; };
     window.handleNoSymptom = function() { document.getElementById('no-symptom-content').innerHTML = Object.keys(symptomImages).map(k=>`<div class="symptom-card" style="margin-bottom:20px; flex-direction:row; padding:20px;" onclick="showLayer2('${k}')"><img src="${symptomImages[k]}" style="width:100px;"><div style="flex-grow:1; text-align:left; padding-left:20px;"><h6 class="fw-bold" style="font-size:28px;">${symptomTranslations[k]}</h6></div></div>`).join('') + `<button class="btn-unlikely mt-3" style="font-size:28px;" onclick="handleFinalNoSymptom()">ยืนยันไม่มีอาการ</button>`; showLayer('layer-no-symptom-review'); };
-    window.handleFinalNoSymptom = function() { saveData('symptomCategory', 'ไม่มีอาการ'); showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย"); };
-    window.showFinalMessage = function(t, txt) { saveData('symptomDetail', txt); document.getElementById('final-title').textContent = t; document.getElementById('final-text').textContent = txt; document.getElementById('final-emoji').textContent = '👍'; showLayer('layer-6'); };
+    
+    window.handleFinalNoSymptom = function() { 
+        saveData('symptomCategory', 'ไม่มีอาการ'); 
+        showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย"); 
+    };
+    
+    window.showFinalMessage = function(t, txt) { 
+        saveData('symptomDetail', txt); 
+        document.getElementById('final-title').textContent = t; 
+        document.getElementById('final-text').textContent = txt; 
+        document.getElementById('final-emoji').textContent = '👍'; 
+        showLayer('layer-6'); 
+    };
 
     // Utils
     function formatTime(d) { return d.toTimeString().slice(0,5); }
