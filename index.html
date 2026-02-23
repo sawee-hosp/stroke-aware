@@ -818,9 +818,11 @@
         return { type: "flex", altText: "ผลประเมินสวีรู้ทันสโตรก", contents: { type: "bubble", size: "giga", header: { type: "box", layout: "vertical", background: { type: "linearGradient", angle: "90deg", startColor: headerStartColor, endColor: headerEndColor }, contents: [{ type: "text", text: titleText, color: "#ffffff", weight: "bold", size: "xl", align: "center" }, { type: "text", text: subTitleText, color: "#ffffffcc", size: "md", align: "center" }] }, body: { type: "box", layout: "vertical", contents: bodyContents }, footer: { type: "box", layout: "vertical", contents: footerContents } } };
     }
 
-    window.handleFinalSave = function(btn, isUrg) {
+ window.handleFinalSave = function(btn, isUrg) {
         if(btn && btn.disabled) return;
-        if (!sessionData.location) {
+        
+        // แก้ไข: บังคับขอพิกัด "เฉพาะกรณีฉุกเฉิน (isUrg = true)" เท่านั้น
+        if (isUrg && !sessionData.location) {
              showCustomConfirm("ท่านยังไม่ได้ระบุพิกัด \nต้องการส่งพิกัดเพื่อให้รถพยาบาลมารับถูกจุดหรือไม่?", "แจ้งเตือนพิกัด", () => {
                  getLocation(false, true, () => handleFinalSave(btn, isUrg));
              });
@@ -837,19 +839,22 @@
                     const flexMsg = createFlexMessage(sessionData);
                     liff.sendMessages([flexMsg]).then(() => {
                         if (currentActionKey === 'บันทึกและปิด' || !isUrg) liff.closeWindow();
-                        else if (document.getElementById('how-to-act-modal').style.display !== 'block') liff.closeWindow();
+                        else if (document.getElementById('how-to-act-modal') && document.getElementById('how-to-act-modal').style.display !== 'block') liff.closeWindow();
                     }).catch(e => {
                         console.error(e);
-                        showCustomAlert("บันทึกแล้ว (ส่ง Flex ไม่ได้)");
+                        showCustomAlert("บันทึกแล้ว (แต่ส่ง Flex ไม่ได้เนื่องจากติดสิทธิ์ LINE)");
                         liff.closeWindow();
                     });
                 } else {
-                    if(isUrg) document.getElementById('how-to-act-modal').style.display='block'; else showCustomAlert("บันทึกแล้ว");
+                    if(isUrg && document.getElementById('how-to-act-modal')) document.getElementById('how-to-act-modal').style.display='block'; 
+                    else showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว");
                 }
             } else showCustomAlert("บันทึกไม่สำเร็จ");
             if(btn) btn.disabled = false;
         };
-        const s = document.createElement('script'); s.src = `${GAS_URL}?action=saveData&callback=${cb}&data=${encodeURIComponent(JSON.stringify(sessionData))}`; document.body.appendChild(s);
+        const s = document.createElement('script'); 
+        s.src = `${GAS_URL}?action=saveData&callback=${cb}&data=${encodeURIComponent(JSON.stringify(sessionData))}`; 
+        document.body.appendChild(s);
     };
 
     window.handleShare = function() {
