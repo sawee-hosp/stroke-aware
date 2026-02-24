@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Safety Helper</title>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    
+    <style>
+        /* UI เดิมทุกประการ (Green Theme) */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Tahoma', sans-serif;
+            margin: 0; 
+            padding: 20px;
+            background-color: #ccdvc1; 
+            background: linear-gradient(180deg, #dcebe0 0%, #eff5ef 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container { max-width: 450px; margin: 0 auto; }
+
+        .search-card {
+            background: #ffffff;
+            border-radius: 20px; 
+            padding: 25px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            min-height: 80vh; /* เพิ่มความสูงขั้นต่ำให้สวยงาม */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header Styles --- */
+        h3 {
+            margin: 0 0 5px 0; 
+            color: #2F3E33; 
+            font-size: 20px; 
+            font-weight: bold;
+            display: flex; align-items: center; gap: 10px;
+        }
+        h3::before {
+            content: ''; display: block; width: 10px; height: 10px;
+            background-color: #8EB996; 
+            border-radius: 50%;
+        }
+        h3 span { font-weight: normal; font-size: 16px; color: #666; }
+
+        .subtitle { 
+            font-size: 14px; color: #888; 
+            margin-bottom: 20px; line-height: 1.4; 
+            margin-left: 20px; 
+        }
+
+        /* --- Input Styles (Search) --- */
+        .input-wrapper { position: relative; margin-bottom: 5px; }
+        input {
+            width: 100%; 
+            padding: 16px 20px;
+            border-radius: 15px; 
+            border: none; 
+            background-color: #f1f3f5; 
+            font-size: 16px;
+            font-family: 'Tahoma', sans-serif; 
+            outline: none; 
+            color: #333;
+        }
+        input:focus { background-color: #e9ecef; }
+        input::placeholder { color: #adb5bd; }
+
+        .status-area {
+            min-height: 30px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            margin-left: 5px;
+        }
+        .status-text { font-size: 14px; color: #adb5bd; }
+        .status-highlight { color: #666; }
+        .status-sub { display: block; font-size: 12px; color: #999; margin-top: 4px; }
+
+        /* --- List Item Styles (Common) --- */
+        .result-item, .history-item {
+            background: white; 
+            border-radius: 16px; 
+            padding: 15px 20px;
+            margin-bottom: 12px; 
+            border: 1px solid #f0f0f0; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); 
+            cursor: pointer;
+            position: relative;
+        }
+        .result-item:active, .history-item:active { background-color: #f8f9fa; }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .drug-name { font-size: 18px; font-weight: bold; color: #333; }
+        
+        .id-badge { 
+            background-color: #f1f3f5; 
+            color: #888; 
+            font-size: 12px; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-weight: bold;
+        }
+        .card-detail { font-size: 14px; color: #666; }
+
+        /* --- History Specific Styles --- */
+        .profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+        .profile-img-lg {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            object-fit: cover;
+            margin-bottom: 10px;
+            background-color: #eee;
+        }
+        .profile-name { font-size: 18px; font-weight: bold; color: #2F3E33; }
+        .page-title-badge {
+            display: inline-block; background-color: #8eb08a; color: white;
+            font-size: 12px; padding: 4px 12px; border-radius: 20px; margin-top: 5px;
+        }
+        .timestamp { font-size: 11px; color: #bbb; }
+        .click-hint { font-size: 12px; color: #999; margin-top: 5px; }
+        /* Fallback img */
+        .img-error {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ccc"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+            background-size: 50%; background-position: center; background-repeat: no-repeat;
+        }
+
+        /* --- Footer Contact --- */
+        .contact-section { margin-top: auto; padding-top: 20px; border-top: 1px solid transparent; }
+        .contact-label { font-size: 14px; color: #888; margin-bottom: 15px; text-align: center; }
+        
+        .btn-group { display: flex; gap: 12px; }
+        
+        .btn {
+            flex: 1; height: 50px; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: normal; cursor: pointer;
+            text-decoration: none; border: none;
+            background-color: #f1f3f5; color: #495057; 
+            transition: background-color 0.2s;
+        }
+        .btn:active { background-color: #e2e6ea; transform: scale(0.98); }
+        .icon-svg { width: 20px; height: 20px; margin-right: 10px; fill: #495057; }
+
+        /* --- Utilities --- */
+        #loading { text-align: center; color: #888; margin-top: 20px; font-size: 13px; }
+        .hidden { display: none !important; }
+
+        .overlay-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.7); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .spinner {
+            width: 30px; height: 30px; border: 3px solid #ccc;
+            border-top: 3px solid #8EB996; border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="sendingOverlay" class="overlay-loading hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="search-card">
+            
+            <!-- ====== SEARCH VIEW (DEFAULT) ====== -->
+            <div id="searchView">
+                <h3>ค้นหายา <span>(Safety Data)</span></h3>
+                <div class="subtitle">
+                    พิมพ์อย่างน้อย 2 ตัวอักษร เพื่อค้นหา แล้วแตะรายการที่ต้องการ ระบบจะส่งข้อมูลยากลับไปในแชทอัตโนมัติ
+                </div>
+                
+                <div class="input-wrapper">
+                    <input type="text" id="searchInput" placeholder="พิมพ์ชื่อยา (Eng)" oninput="handleInput()">
+                </div>
+                
+                <div id="statusArea" class="status-area">
+                    <div id="statusMain" class="status-text">เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)</div>
+                </div>
+                
+                <div id="results"></div>
+            </div>
+
+            <!-- ====== HISTORY VIEW (HIDDEN INITIALLY) ====== -->
+            <div id="historyView" class="hidden">
+                <!-- ส่วนแสดงโปรไฟล์ -->
+                <div class="profile-card">
+                    <img id="userImg" class="profile-img-lg img-error" src="">
+                    <div id="userName" class="profile-name">-</div>
+                    <div class="page-title-badge">ประวัติการค้นหาของคุณ</div>
+                </div>
+
+                <h3>รายการที่เคยค้นหา</h3>
+                <div class="subtitle" style="margin-left:0; text-align: center;">แตะที่ชื่อยาเพื่อส่งผลลัพธ์เข้าแชท</div>
+                
+                <div id="historyList"></div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden">🔄 กำลังโหลดข้อมูล...</div>
+
+            <!-- Contact Section (Common for both views) -->
+            <div class="contact-section">
+                <div class="contact-label">หากไม่พบยาที่ต้องการ กรุณาติดต่อได้ที่</div>
+                <div class="btn-group">
+                    <a href="tel:0958694454" class="btn">
+                        <svg class="icon-svg" viewBox="0 0 512 512">
+                            <path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/>
+                        </svg>
+                        โทร
+                    </a>
+                    <a href="https://lin.ee/YzfEQX5" target="_blank" class="btn">
+                        <svg class="icon-svg" viewBox="0 0 512 512">
+                            <path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32z"/>
+                        </svg>
+                        แอดไลน์
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw_Mhs0VlmlWT58FF-L51f4bqxM2CBT6QvS2D3tG1o40wUaEdCvGnNeE1skCoxGYJ7o/exec"; 
+        const MY_LIFF_ID = "2008913086-PnCUTvt2";
+
+        let allDrugs = [];
+        let isDataLoaded = false;
+
+        async function main() {
+            await liff.init({ liffId: MY_LIFF_ID });
+            
+            // เช็ค URL Parameter ว่าเป็นโหมด History หรือไม่
+            // ตัวอย่าง URL: https://liff.line.me/ID?action=getHistory
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+
+            if (action === 'getHistory') {
+                // === MODE: HISTORY ===
+                switchToHistoryMode();
+            } else {
+                // === MODE: SEARCH (DEFAULT) ===
+                fetchDrugData();
+            }
+        }
+
+        // --- SEARCH LOGIC ---
+        async function fetchDrugData() {
+            const loading = document.getElementById('loading');
+            const searchView = document.getElementById('searchView');
+            
+            // ใช้ Cache ถ้ามี
+            const cachedData = localStorage.getItem('drugData_v1');
+            if (cachedData) {
+                try { allDrugs = JSON.parse(cachedData); isDataLoaded = true; } catch(e){}
+            }
+
+            if (!isDataLoaded) loading.classList.remove('hidden');
+
+            try {
+                const response = await fetch(GAS_API_URL); // เรียก Default doGet (ดึงยา)
+                const newData = await response.json();
+                allDrugs = newData;
+                isDataLoaded = true;
+                localStorage.setItem('drugData_v1', JSON.stringify(newData));
+                
+                loading.classList.add('hidden');
+                
+                // เช็ค input ค้าง
+                const input = document.getElementById('searchInput');
+                if(input.value.length > 0) handleInput();
+            } catch (error) {
+                console.error("Error", error);
+                loading.innerText = "โหลดข้อมูลยาไม่สำเร็จ";
+            }
+        }
+
+        function handleInput() {
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            const statusMain = document.getElementById('statusMain');
+            const loading = document.getElementById('loading');
+            
+            resultsDiv.innerHTML = '';
+
+            if (query.length < 2) {
+                statusMain.innerHTML = "เริ่มพิมพ์เพื่อค้นหา (อย่างน้อย 2 ตัวอักษร)";
+                statusMain.className = "status-text"; 
+                return;
+            }
+
+            if (!isDataLoaded || allDrugs.length === 0) {
+                statusMain.innerHTML = "กำลังค้นหา...";
+                statusMain.className = "status-highlight";
+                loading.classList.remove('hidden'); 
+                return; 
+            } else {
+                loading.classList.add('hidden');
+            }
+
+            const filtered = allDrugs.filter(item => 
+                item.drug.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length > 0) {
+                statusMain.className = "status-highlight";
+                statusMain.innerHTML = `พบ ${filtered.length} รายการ <span class="status-sub">คลิกที่รายชื่อยาเพื่อส่งผลเข้าแชท</span>`;
+            } else {
+                statusMain.className = "status-text";
+                statusMain.innerHTML = "ไม่พบผลลัพธ์";
+                return;
+            }
+
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <div class="card-top">
+                        <div class="drug-name">${item.drug}</div>
+                        <div class="id-badge">${item.fda ? 'FDA: ' + item.fda : '-'}</div>
+                    </div>
+                    <div class="card-detail">${item.category || 'General'}</div>
+                `;
+                div.onmousedown = function(e) { e.preventDefault(); };
+                div.onclick = function() { sendToLine(item.drug); };
+                resultsDiv.appendChild(div);
+            });
+        }
+
+        // --- HISTORY LOGIC ---
+        async function switchToHistoryMode() {
+            // ซ่อน Search, แสดง History
+            document.getElementById('searchView').classList.add('hidden');
+            document.getElementById('historyView').classList.remove('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+            
+            try {
+                const profile = await liff.getProfile();
+                // เรียก API ดึง History (?action=getHistory)
+                const response = await fetch(`${GAS_API_URL}?action=getHistory`);
+                const allHistory = await response.json();
+                
+                // กรองเฉพาะ User นี้
+                const myHistory = allHistory.filter(item => item.userId === profile.userId);
+                renderHistoryPage(myHistory, profile);
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading').innerText = "ไม่สามารถโหลดประวัติได้";
+            }
+        }
+
+        function renderHistoryPage(historyData, profile) {
+            document.getElementById('loading').classList.add('hidden');
+            
+            // Set Profile
+            const userImg = document.getElementById('userImg');
+            const userName = document.getElementById('userName');
+            
+            // ใช้รูปจาก LIFF Profile เป็นหลัก
+            userImg.src = profile.pictureUrl || '';
+            userName.innerText = profile.displayName || 'Unknown';
+
+            const listDiv = document.getElementById('historyList');
+            listDiv.innerHTML = '';
+
+            if (historyData.length === 0) {
+                listDiv.innerHTML = '<div style="text-align:center; color:#999; margin-top:20px;">คุณยังไม่เคยค้นหายา</div>';
+                return;
+            }
+
+            historyData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="card-top">
+                        <div class="drug-name">${item.drug}</div>
+                        <div class="timestamp">${item.displayTime}</div>
+                    </div>
+                    <div class="click-hint">แตะเพื่อดูข้อมูล</div>
+                `;
+                div.onclick = function() { sendToLine(item.drug); };
+                listDiv.appendChild(div);
+            });
+        }
+
+        // --- SHARED FUNCTION ---
+        function sendToLine(name) {
+            document.getElementById('sendingOverlay').classList.remove('hidden');
+
+            if (!liff.isInClient()) {
+                setTimeout(() => {
+                    alert("ส่งค่า: " + name);
+                    document.getElementById('sendingOverlay').classList.add('hidden');
+                }, 300);
+                return;
+            }
+
+            liff.sendMessages([{ type: 'text', text: name }])
+                .then(() => {
+                    liff.closeWindow();
+                })
+                .catch((err) => {
+                    console.error('Error:', err);
+                    document.getElementById('sendingOverlay').classList.add('hidden');
+                    alert("เกิดข้อผิดพลาดในการส่งข้อความ");
+                });
+        }
+
+        main();
+    </script>
+</body>
+</html>
