@@ -97,6 +97,15 @@
             justify-content: center; 
             gap: 10px; 
             cursor: pointer;
+            flex-direction: column; /* ให้ข้อความขึ้นบรรทัดใหม่ได้ */
+        }
+        
+        /* เพิ่มสไตล์สำหรับข้อความรองในปุ่ม */
+        .btn-sub-text {
+            font-size: 18px;
+            font-weight: normal;
+            opacity: 0.9;
+            margin-top: -5px;
         }
 
         .btn-action:active { 
@@ -106,6 +115,7 @@
         .btn-primary-custom { 
             background-color: #007BFF; 
             color: white; 
+            flex-direction: row; /* กลับไปเป็น row สำหรับปุ่มทั่วไป */
         }
 
         .btn-likely { 
@@ -120,6 +130,7 @@
             color: white; 
             border: 3px solid #2E7D32; 
             margin-bottom: 10px;
+            flex-direction: row; /* ปุ่มไม่เข้าข่ายไม่ต้องขึ้นบรรทัดใหม่ */
         }
 
         .btn-no-symptom { 
@@ -127,6 +138,7 @@
             color: white; 
             border: 4px solid #0097a7; 
             margin-top: 25px; 
+            flex-direction: row;
         }
 
         .btn-back { 
@@ -138,6 +150,7 @@
             margin: 0 auto; 
             font-size: 24px; 
             padding: 10px 30px; 
+            flex-direction: row;
         }
 
         .btn-back-container { 
@@ -152,6 +165,7 @@
             border: 4px solid #F1C40F; 
             margin-top: 10px; 
             position: relative; 
+            flex-direction: row;
         }
 
         .wink-icon-right { 
@@ -173,6 +187,7 @@
             color: white !important; 
             font-size: 30px !important; 
             margin-top: 30px; 
+            flex-direction: row;
         }
 
         @keyframes jerky-pulse { 
@@ -189,6 +204,7 @@
             padding: 20px !important; 
             border: 4px solid #cc0000 !important; 
             animation: pulse-danger-btn 1.5s infinite; 
+            flex-direction: row;
         }
 
         @keyframes pulse-danger-btn { 
@@ -277,6 +293,7 @@
             padding: 10px 5px !important; 
             font-size: 22px !important; 
             min-height: 60px; 
+            flex-direction: row;
         }
 
         .time-btn.highlight { 
@@ -292,7 +309,7 @@
             to { transform: scale(1.05); } 
         }
 
-        /* --- Toggle & Watermark --- */
+        /* --- Toggle 3D & Watermark --- */
         .toggle-wrapper { 
             display: flex; 
             align-items: center; 
@@ -301,6 +318,15 @@
             padding: 15px; 
             border-radius: 20px; 
             margin-bottom: 20px; 
+            border: 2px solid #d9e2ec; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); 
+        }
+
+        .toggle-label-text { 
+            font-size: 22px; 
+            font-weight: bold; 
+            color: #555; 
+            margin-left: 15px; 
         }
 
         .switch { 
@@ -308,6 +334,7 @@
             display: inline-block; 
             width: 70px; 
             height: 38px; 
+            flex-shrink: 0; 
         }
 
         .switch input { 
@@ -323,6 +350,7 @@
             background-color: #ccc; 
             transition: .4s; 
             border-radius: 38px; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); 
         }
 
         .slider:before { 
@@ -335,6 +363,7 @@
             background-color: white; 
             transition: .4s; 
             border-radius: 50%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
         }
 
         input:checked + .slider { 
@@ -391,11 +420,6 @@
             width: 100px; height: 100px; 
             animation: spin 1s linear infinite; 
             margin-bottom: 20px;
-        }
-
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
         }
         
         .hidden { display: none !important; }
@@ -494,13 +518,22 @@
             background-color: var(--primary-red); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 28px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); flex-shrink: 0; border: 3px solid white; cursor: pointer; 
         }
 
+        /* --- Floating Buttons --- */
         .floating-actions { position: fixed; bottom: 70px; right: 15px; display: flex; flex-direction: column; gap: 15px; z-index: 4000; }
-        .float-btn { width: 100px; height: 100px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 6px 20px rgba(0,0,0,0.5); border: 5px solid white; cursor: pointer; text-decoration: none; }
-        .float-1669 { background-color: #D32F2F; animation: pulse 2s infinite; }
-        .float-sawi { background-color: #f39c12; }
+        .float-btn { width: 100px; height: 100px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 6px 20px rgba(0,0,0,0.5); border: 5px solid white; cursor: pointer; text-decoration: none; animation: float-pulse 3s infinite ease-in-out; }
+        .float-1669 { background-color: #D32F2F; animation-delay: 0.5s; }
+        .float-sawi { background-color: #f39c12; animation-delay: 1.5s; }
         .float-label { font-size: 16px; margin-top: -2px; display: block; font-weight: 800; }
+        @keyframes float-pulse { 
+            0%, 100% { transform: scale(1); } 
+            10% { transform: scale(1.1) rotate(5deg); } 
+            20% { transform: scale(1.1) rotate(-5deg); }
+            30% { transform: scale(1); }
+        }
 
         .footer-credit { text-align: center; color: #666; font-size: 16px; margin-top: 10px; margin-bottom: 0; padding-bottom: 0; }
+        
+        /* --- Fixed Footer Alert --- */
         .fixed-footer-alert { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #000; color: #fff; text-align: center; padding: 8px 5px; font-size: 16px; font-weight: bold; z-index: 5000; line-height: 1.2; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); }
         
         .alert-stroke-detected { background-color: #D32F2F !important; color: white !important; border: 4px solid #B71C1C; padding: 25px; border-radius: 25px; text-align: center; animation: pulse-bg 1s infinite alternate; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
@@ -510,7 +543,7 @@
         .input-group .btn { padding: 0 30px; }
         .result-image-container { position: relative; width: 100%; max-width: 400px; margin: 20px auto; border-radius: 25px; overflow: hidden; box-shadow: 0 8px 15px rgba(0,0,0,0.15); border: 3px solid #eee; }
         .result-image-container img { width: 100%; display: block; }
-        .btn-test-close { background-color: #7f8c8d; color: white; border: 3px solid #666; font-size: 20px; margin-top: 15px; }
+        .btn-test-close { background-color: #7f8c8d; color: white; border: 3px solid #666; font-size: 20px; margin-top: 15px; flex-direction: row; }
     </style>
 </head>
 <body>
@@ -518,9 +551,22 @@
         <div class="watermark-text">โหมดทดสอบ<br>สามารถทดลองใช้งานได้ตามต้องการ<br>โดยไม่ได้ส่งข้อมูลเรียกรถโรงพยาบาล</div>
     </div>
 
-    <div id="loading">
+    <!-- โหลดข้อมูลเนียนๆ โดยไม่บังหน้าเว็บ -->
+    <div id="loading" style="display: none;">
         <div class="spinner"></div>
         <div id="loading-text" style="color: #ff3654; font-weight: bold; font-size: 30px;">กำลังโหลด...</div>
+    </div>
+
+    <!-- Floating Buttons (โทรด่วนกระตุกๆ) -->
+    <div class="floating-actions">
+        <div class="float-btn float-sawi" onclick="handleCallClick(this, 'tel_sawee', '0894745523', 'รพ.สวี')">
+            <span class="iconify" data-icon="mdi:hospital-box"></span>
+            <span class="float-label">รพ.สวี</span>
+        </div>
+        <div class="float-btn float-1669" onclick="handleCallClick(this, 'tel_1669', '1669', '1669')">
+            <span class="iconify" data-icon="mdi:phone-alert"></span>
+            <span class="float-label" style="font-size: 20px;">1669</span>
+        </div>
     </div>
 
     <div class="container">
@@ -545,6 +591,9 @@
         </div>
     </div>
 
+    <!-- แถบดำล่างสุด (แจ้งเตือนโทรออกเลย) -->
+    <div class="fixed-footer-alert">หากฉุกเฉินเร่งด่วนโปรดกดโทรทันที ไม่ต้องรอประเมิน</div>
+
     <!-- Modals -->
     <div id="custom-alert-modal" class="custom-modal">
         <div class="custom-modal-content">
@@ -565,26 +614,6 @@
         </div>
     </div>
 
-    <div id="disclaimerModal" class="custom-modal" style="display:none;">
-        <div class="custom-modal-content">
-            <div class="custom-modal-title">จัดทำโดย รพ.สวี จ.ชุมพร</div>
-            <div class="custom-modal-body" style="font-size: 20px;">
-                ระบบนี้จัดทำโดย <strong>โรงพยาบาลสวี</strong> เพื่ออำนวยความสะดวกในการคัดกรองและประสานงานผู้ป่วยโรคหลอดเลือดสมองในเขตพื้นที่ อ.สวี เท่านั้น
-                <hr>
-                <span style="font-size: 18px; color: #666;">สำหรับผู้ใช้งานนอกเขตพื้นที่ ท่านสามารถใช้งานเพื่อศึกษาความรู้และประเมินอาการเบื้องต้นได้</span>
-            </div>
-            <div class="custom-modal-actions">
-                <button class="btn-modal btn-modal-primary" onclick="closeCustomModal('disclaimerModal')">รับทราบ</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="image-viewer-modal" class="custom-modal" style="background-color: rgba(0,0,0,0.95);" onclick="this.style.display='none'">
-        <img id="full-image" style="max-width: 95%; max-height: 80vh; object-fit: contain; border-radius: 20px;">
-        <div style="color: #ccc; margin-top: 20px; font-size: 28px; font-weight:bold;">แตะที่ว่างเพื่อปิด</div>
-        <div class="btn-back" style="color: white; border-color: white; width: auto; padding: 15px 50px; margin-top: 30px; cursor:pointer;" onclick="this.style.display='none'">ปิด</div>
-    </div>
-    
     <!-- Cropper Modal -->
     <div id="crop-modal">
         <div class="crop-text-guide">จัดใบหน้าให้อยู่ในกรอบสีเขียว</div>
@@ -711,26 +740,27 @@
         buildInitialHTML();
         buildAILayers(); 
         
+        // ไม่ต้องแสดงหน้า Loading ตอนเริ่ม รอให้ LIFF ตรวจสอบเสร็จเลยเพื่อความลื่นไหล
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 sessionData.userID = profile.userId;
                 sessionData.userName = profile.displayName;
+                // แสดงสถานะกำลังค้นหาที่ช่องชื่อ
+                document.getElementById('ui-name').innerHTML = '<span class="text-muted fs-5">กำลังค้นหาข้อมูล...</span>';
+                document.getElementById('user-info-bar').style.display = 'flex';
                 fetchUserDataPOST(profile.userId, 'userId');
             } else { 
                 liff.login(); 
             }
         } catch (e) { 
-            document.getElementById('loading').style.display = 'none'; 
+            console.log("LIFF Init Error");
         }
     };
 
     // --- Database Fetching (POST Method Fix) ---
     window.fetchUserDataPOST = function(id, actionType) {
-        document.getElementById('loading-text').textContent = "กำลังค้นหาข้อมูล...";
-        document.getElementById('loading').style.display = 'flex';
-        
         let action = actionType === 'userId' ? 'getUserData' : 'getUserDataByPhone';
         let payload = { action: action };
         
@@ -746,11 +776,9 @@
         })
         .then(r => r.json())
         .then(res => {
-            document.getElementById('loading').style.display = 'none';
             processUserData(res);
         }).catch(err => {
-            document.getElementById('loading').style.display = 'none';
-            showCustomAlert("ไม่สามารถเชื่อมต่อฐานข้อมูลได้");
+            document.getElementById('ui-name').innerHTML = '<span class="text-danger fs-5">เชื่อมต่อฐานข้อมูลล้มเหลว</span>';
         });
     }
 
@@ -759,6 +787,8 @@
         const phone = input.value.replace(/[^0-9]/g, '');
         if (phone.length === 10) {
             sessionData.targetUserId = phone; 
+            document.getElementById('ui-name').innerHTML = '<span class="text-muted fs-5">กำลังค้นหาข้อมูล...</span>';
+            document.getElementById('user-info-bar').style.display = 'flex';
             fetchUserDataPOST(phone, 'phone');
         } else { 
             showCustomAlert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก"); 
@@ -804,6 +834,8 @@
         } else { 
             document.getElementById('patient-phone-wrapper').style.display = 'none'; 
             sessionData.targetUserId = sessionData.userID;
+            document.getElementById('ui-name').innerHTML = '<span class="text-muted fs-5">กำลังค้นหาข้อมูล...</span>';
+            document.getElementById('user-info-bar').style.display = 'flex';
             fetchUserDataPOST(sessionData.userID, 'userId'); 
         }
     };
@@ -843,6 +875,7 @@
                 </div>
             </div>
             
+            <!-- ปุ่ม AI เปิดให้กดได้แล้ว โดยเรียกโชว์ Layer AI Intro -->
             <button class="btn-action btn-ai mb-4" onclick="handleAiTest()">
                 <span>ทดสอบอาการด้วย AI</span>
                 <span class="iconify wink-icon-right" data-icon="mdi:sparkles"></span>
@@ -873,7 +906,7 @@
             <h2 class="section-title">อาการเกิดขึ้นอย่างไร?</h2>
             <div class="d-flex flex-column gap-3">
                 <button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button>
-                <button class="btn-action" style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button>
+                <button class="btn-action" style="background-color: #E67E22; color: white; flex-direction:row;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button>
             </div>
             <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</button></div>
         `;
@@ -1008,8 +1041,13 @@
         
         cardHtml += `
                 <div class="d-flex flex-column gap-3">
-                    <button class="btn-likely" style="font-size:28px;" onclick="handleSymptomResult(true, '${detail.likely[0]}')">อาการเข้าข่าย (เป็น)</button>
-                    <button class="btn-unlikely" style="font-size:28px;" onclick="handleSymptomResult(false, 'อาการไม่เข้าข่าย')">อาการไม่เข้าข่าย (ไม่เป็น)</button>
+                    <button class="btn-likely" style="font-size:28px;" onclick="handleSymptomResult(true, '${detail.likely[0]}')">
+                        อาการเข้าข่าย (เป็น)
+                        <span class="btn-sub-text">(${detail.likely[0]})</span>
+                    </button>
+                    <button class="btn-unlikely" style="font-size:28px;" onclick="handleSymptomResult(false, 'อาการไม่เข้าข่าย')">
+                        อาการไม่เข้าข่าย (ไม่เป็น)
+                    </button>
                 </div>
             </div>
         `;
@@ -1466,6 +1504,12 @@
     
     window.saveData = function(k, v) { 
         sessionData[k] = v; 
+    };
+    
+    // กำหนดฟังก์ชัน handleAiTest อย่างชัดเจน
+    window.handleAiTest = function() { 
+        showLayer('layer-ai-intro'); 
+        updateBaselineFaceUI(); 
     };
 </script>
 </body>
