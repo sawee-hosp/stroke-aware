@@ -753,12 +753,13 @@
         else {
             let html = `<h3 class="text-center fw-bold fs-2 ${res.isRisk?'text-danger':'text-success'}">${res.isRisk ? `🚨 เสี่ยงสูง (${res.riskScore}%)` : '✅ ไม่พบความเสี่ยงชัดเจน'}</h3><div class="bg-light p-3 rounded mb-3 text-start border fs-5"><strong>ผล:</strong><p>${res.analysis}</p></div>`;
             
-            // เพิ่มคำเตือน/Disclaimer สีแดง
-            html += `<p class="text-danger mt-3 mb-4" style="font-size: 20px; font-weight: bold; text-align: center; border: 2px dashed #ff3654; padding: 10px; border-radius: 15px; background-color: #ffe6e6;">* คำเตือน: ระบบ AI ประเมินผลเบื้องต้นจากข้อมูลที่ได้รับเท่านั้น หากท่านรู้สึกผิดปกติหรือไม่แน่ใจ โปรดปรึกษาแพทย์หรือโทร 1669 ทันที</p>`;
-
             html += `<h5 class="mt-4 fw-bold text-center fs-4">ภาพที่วิเคราะห์</h5>`;
             if (aiInputs.face) html += `<div class="result-image-container"><img src="data:image/jpeg;base64,${aiInputs.face}"><div class="grid-overlay"></div><div class="detection-label">Face detection</div></div>`;
             if (aiInputs.arm) html += `<div class="result-image-container"><img src="data:image/jpeg;base64,${aiInputs.arm}"><div class="grid-overlay"></div><div class="detection-label">Arm detection</div></div>`;
+
+            // เลื่อน Disclaimer มาวางไว้ด้านล่างของรูปภาพการวิเคราะห์
+            html += `<p class="text-danger mt-4 mb-4" style="font-size: 20px; font-weight: bold; text-align: left; border: 2px dashed #ff3654; padding: 15px; border-radius: 15px; background-color: #ffe6e6;">🚨 คำเตือน: ผลลัพธ์จาก AI เป็นเพียงการประเมินเบื้องต้นจากรูปภาพและเสียงที่ส่งมาเท่านั้น ไม่สามารถใช้แทนการวินิจฉัยของแพทย์ได้ หากท่านมีอาการผิดปกติที่น่าสงสัย หรือรู้สึกไม่แน่ใจ โปรดรีบไปพบแพทย์หรือโทร 1669 ทันที</p>`;
+
             html += `<button class="btn-action btn-info text-white mt-4" onclick="requestSummary()">✨ สรุปส่งแพทย์</button>`;
             html += `<button class="btn-action btn-share mt-3" onclick="handleShare()">แชร์ผลการประเมินให้คนอื่น</button>`;
             if(res.isRisk) {
