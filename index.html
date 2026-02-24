@@ -47,6 +47,8 @@
             max-width: 800px;
             padding: 15px;
             margin: 0 auto;
+            position: relative;
+            z-index: 10;
         }
 
         /* --- Header --- */
@@ -135,6 +137,9 @@
         .btn-unlikely { background-color: #388E3C; color: white; border: 3px solid #2E7D32; }
         .btn-share { background-color: #17a2b8; color: white; border: 3px solid #138496; }
         
+        /* New: Button for "No Symptoms" */
+        .btn-no-symptom { background-color: #00bcd4; color: white; border: 4px solid #0097a7; font-size: 26px; margin-top: 25px; }
+
         /* Back Button Style */
         .btn-back { 
             background: transparent; 
@@ -283,9 +288,30 @@
         .detection-label { position: absolute; top: 10px; left: 10px; background: rgba(40, 167, 69, 0.8); color: white; padding: 5px 15px; border-radius: 15px; font-size: 18px; font-weight: bold; }
         .result-label { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.7); color: white; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; }
         .btn-test-close { background-color: #7f8c8d; color: white; border: 3px solid #666; font-size: 20px; margin-top: 15px; }
+
+        /* New: 3D Toggle Switch */
+        .toggle-wrapper { display: flex; align-items: center; justify-content: center; background: #f0f4f8; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #d9e2ec; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .toggle-label-text { font-size: 22px; font-weight: bold; color: #555; margin-left: 15px; }
+        .switch { position: relative; display: inline-block; width: 70px; height: 38px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 38px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .slider:before { position: absolute; content: ""; height: 30px; width: 30px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        input:checked + .slider { background-color: #ff3654; }
+        input:checked + .slider:before { transform: translateX(32px); }
+
+        /* New: Test Mode Watermark */
+        .watermark { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .watermark.active { opacity: 0.15; }
+        .watermark-text { font-size: 50px; font-weight: 900; color: red; transform: rotate(-45deg); white-space: nowrap; text-align: center; line-height: 1.2; text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white; }
+
     </style>
 </head>
 <body>
+
+    <!-- Watermark โหมดทดสอบ -->
+    <div id="test-watermark" class="watermark">
+        <div class="watermark-text">โหมดทดสอบ<br>ไม่ได้ส่งข้อมูลเรียกรถ รพ.</div>
+    </div>
 
     <div id="loading">
         <div class="spinner"></div>
@@ -461,6 +487,17 @@
 
     window.handleEmergencyCall = function(tel, label) { handleCallClick(null, 'floating_call', tel, label); };
 
+    // ควบคุมสวิตช์โหมดทดสอบ
+    window.toggleTestMode = function(checkbox) {
+        sessionData.isTestMode = checkbox.checked;
+        const watermark = document.getElementById('test-watermark');
+        if (checkbox.checked) {
+            watermark.classList.add('active');
+        } else {
+            watermark.classList.remove('active');
+        }
+    };
+
     window.onload = async () => {
         document.getElementById('loading').style.display = 'none'; 
         buildInitialHTML();
@@ -486,6 +523,7 @@
     };
 
     function checkReferrerDisplay() {
+        // Changed newSearchParams to new URLSearchParams
         const urlParams = new URLSearchParams(window.location.search);
         const refId = urlParams.get('ref');
         if (refId) {
@@ -507,7 +545,15 @@
     // --- MAIN HTML BUILDERS ---
     function buildInitialHTML() {
         document.getElementById('layer-1').innerHTML = `
-            <div class="assessor-row d-flex align-items-center justify-content-between mb-4">
+            <div class="toggle-wrapper">
+                <label class="switch">
+                    <input type="checkbox" id="test-mode-toggle" onchange="toggleTestMode(this)">
+                    <span class="slider"></span>
+                </label>
+                <div class="toggle-label-text">ฉันสบายดี ต้องการทดสอบระบบเท่านั้น</div>
+            </div>
+
+            <div class="assessor-row d-flex align-items-center justify-content-between mb-4 mt-2">
                 <p class="m-0 fw-bold" style="font-size:26px;">ท่านประเมินอาการให้ใคร</p>
                 <select id="assessor-select" class="form-select w-auto rounded-pill fw-bold" onchange="handleAssessorChange(this)">
                     <option value="myself">ตัวฉันเอง</option>
@@ -524,6 +570,10 @@
                 <div class="w-100 mb-2"><strong>ชื่อ:</strong> <span id="ui-name" class="text-primary">-</span></div>
                 <div><strong>เสี่ยง:</strong> <span id="ui-risk">-</span></div>
                 <div><strong>วันที่:</strong> <span id="ui-date">-</span></div>
+                
+                <div id="ui-register-btn" class="w-100 mt-3" style="display:none;">
+                    <a href="https://liff.line.me/2005789397-nebQ8oJy" class="btn-action btn-primary-custom py-2" style="font-size: 22px;">ประเมินปัจจัยเสี่ยงสโตรก (ลงทะเบียน)</a>
+                </div>
             </div>
             <button class="btn-action btn-ai mb-4" onclick="handleAiTest()">
                 <span>ทดสอบอาการด้วย AI</span>
@@ -535,7 +585,12 @@
                 <div class="symptom-card" onclick="showLayer2('Face')"><img src="${symptomImages.Face}"><p>มุมปากตก</p></div>
                 <div class="symptom-card" onclick="showLayer2('Arm')"><img src="${symptomImages.Arm}"><p>ยกแขนยาก</p></div>
                 <div class="symptom-card" onclick="showLayer2('Speech')"><img src="${symptomImages.Speech}"><p>ลำบากพูด</p></div>
-            </div>`;
+            </div>
+            
+            <button class="btn-action btn-no-symptom" onclick="handleFinalNoSymptom()">
+                <span class="iconify" data-icon="mdi:emoticon-happy-outline"></span> ฉันไม่มีอาการอะไรเลย
+            </button>
+            `;
         document.getElementById('layer-2').innerHTML = `<h2 id="layer-2-title" class="section-title"></h2><div id="layer-2-new-content"></div><hr class="my-4"><p class="section-subtitle">หรือเลือกอาการที่ใกล้เคียงที่สุด</p><div id="layer-2-buttons" class="d-flex flex-wrap gap-3 justify-content-center"></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</button></div>`;
         document.getElementById('layer-3').innerHTML = `<h2 class="section-title">อาการเกิดขึ้นอย่างไร?</h2><div class="d-flex flex-column gap-3"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button class="btn-action" style="background-color: #E67E22; color: white;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</button></div>`;
         document.getElementById('layer-4').innerHTML = `<h2 class="section-title">อาการเริ่มเป็นเมื่อไหร่?</h2><p class="section-subtitle">โปรดประมาณการเวลาให้ใกล้เคียงที่สุด</p><div id="time-options-container" class="d-flex flex-wrap gap-3 justify-content-center"></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</button></div>`;
@@ -737,7 +792,22 @@
     window.analyzeWithGemini = function() {
         if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { showCustomAlert("ใส่ข้อมูลอย่างน้อย 1 อย่าง"); return; }
         showLayer('layer-ai-processing');
-        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'analyzeStroke', faceImage: aiInputs.face, armImage: aiInputs.arm, speechAudio: aiInputs.audio, userData: { risk_group: sessionData.risk_group, score: sessionData.thai_cv_risk_score, userId: sessionData.userID, name: sessionData.registeredName } }) })
+        fetch(GAS_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ 
+                action: 'analyzeStroke', 
+                faceImage: aiInputs.face, 
+                armImage: aiInputs.arm, 
+                speechAudio: aiInputs.audio, 
+                userData: { 
+                    risk_group: sessionData.risk_group, 
+                    score: sessionData.thai_cv_risk_score, 
+                    userId: sessionData.userID, 
+                    name: sessionData.registeredName 
+                },
+                isTestMode: sessionData.isTestMode || false // ส่งสถานะ Test Mode ไปหลังบ้าน
+            }) 
+        })
         .then(res => res.json()).then(data => { 
             if (data.status === 'success') { currentAnalysisResult = data.data; if (data.data.fileUrls) { sessionData.fileUrls = data.data.fileUrls; sessionData.isAiAssessment = true; } sessionData.riskScore = data.data.riskScore; sessionData.analysis = data.data.analysis; displayAiResult(data.data); } 
             else showAiError(data.message); 
@@ -789,7 +859,8 @@
         const isAbnormal = data.isEmergency || (data.isAiAssessment && data.riskScore && parseInt(data.riskScore) > 50);
         const headerStartColor = isAbnormal ? "#D32F2F" : "#2E7D32";
         const headerEndColor = isAbnormal ? "#B71C1C" : "#1B5E20";
-        const titleText = "ประเมินอาการสัญญาณสโตรก";
+        // เปลี่ยน Title ถือว่าเป็น Test Mode
+        const titleText = data.isTestMode ? "[ทดสอบระบบ] ประเมินอาการ" : "ประเมินอาการสัญญาณสโตรก";
         const subTitleText = isAbnormal ? "ผลการประเมิน: มีความเสี่ยง" : "ผลการประเมิน: ปกติ";
         
         let bodyContents = [];
@@ -1001,7 +1072,10 @@
     window.triggerSave = function(el, key) { currentActionKey = key; handleFinalSave(el, true); };
     window.fetchUserData = function(uid) { const s = document.createElement('script'); s.src = `${GAS_URL}?action=getUserData&userId=${uid}&callback=processUserData`; document.head.appendChild(s); };
     window.processUserData = function(res) {
-        const bar = document.getElementById('user-info-bar'); const phone = document.getElementById('patient-phone');
+        const bar = document.getElementById('user-info-bar'); 
+        const phone = document.getElementById('patient-phone');
+        const regBtn = document.getElementById('ui-register-btn'); // ปุ่มประเมินปัจจัยเสี่ยง
+
         if(res.status==='found' && res.data) {
             sessionData = { ...sessionData, registeredName: res.data.name, district: res.data.district, village: res.data.village, risk_group: res.data.risk_group, thai_cv_risk_score: res.data.thai_cv_risk_score };
             document.getElementById('ui-name').textContent = res.data.name || '-';
@@ -1015,19 +1089,29 @@
             document.getElementById('ui-date').textContent = dateShow;
 
             bar.style.display = 'flex';
+            if (regBtn) regBtn.style.display = 'none'; // ซ่อนปุ่มถ้าพบประวัติ
             if (phone && phone.value.length === 10) phone.style.borderColor = "#28a745";
             if(res.data.district) fetchVolunteerData(`ต.${res.data.district} ม.${res.data.village}`);
         } else {
             sessionData.registeredName = `ผู้ป่วยไม่มีประวัติ (ประเมินโดย ${sessionData.userName || 'Guest'})`;
             sessionData.risk_group = "ไม่ระบุ";
-            bar.style.display = 'flex'; document.getElementById('ui-name').textContent = "ไม่พบประวัติ"; document.getElementById('ui-risk').textContent = "-"; document.getElementById('ui-date').textContent = "-";
+            bar.style.display = 'flex'; 
+            document.getElementById('ui-name').textContent = "ไม่พบประวัติ"; 
+            document.getElementById('ui-risk').textContent = "-"; 
+            document.getElementById('ui-date').textContent = "-";
+            if (regBtn) regBtn.style.display = 'block'; // แสดงปุ่มถ้าไม่พบประวัติ
             if (phone && phone.value.length === 10) phone.style.borderColor = "#f0ad4e";
         }
     };
     window.fetchVolunteerData = function(area) { const s = document.createElement('script'); s.src = `${GAS_URL}?action=getVolunteerData&areaKey=${encodeURIComponent(area)}&callback=processVolunteerData`; document.head.appendChild(s); };
     window.processVolunteerData = function(res) { if(res.status==='found') sessionData.volunteerContacts = res.data; };
-    window.handleNoSymptom = function() { document.getElementById('no-symptom-content').innerHTML = Object.keys(symptomImages).map(k=>`<div class="symptom-card" style="margin-bottom:20px; flex-direction:row; padding:20px;" onclick="showLayer2('${k}')"><img src="${symptomImages[k]}" style="width:100px;"><div style="flex-grow:1; text-align:left; padding-left:20px;"><h6 class="fw-bold" style="font-size:28px;">${symptomTranslations[k]}</h6></div></div>`).join('') + `<button class="btn-unlikely mt-3" style="font-size:28px;" onclick="handleFinalNoSymptom()">ยืนยันไม่มีอาการ</button>`; showLayer('layer-no-symptom-review'); };
     
+    window.handleNoSymptom = function() { 
+        document.getElementById('no-symptom-content').innerHTML = Object.keys(symptomImages).map(k=>`<div class="symptom-card" style="margin-bottom:20px; flex-direction:row; padding:20px;" onclick="showLayer2('${k}')"><img src="${symptomImages[k]}" style="width:100px;"><div style="flex-grow:1; text-align:left; padding-left:20px;"><h6 class="fw-bold" style="font-size:28px;">${symptomTranslations[k]}</h6></div></div>`).join('') + `<button class="btn-unlikely mt-3" style="font-size:28px;" onclick="handleFinalNoSymptom()">ยืนยันไม่มีอาการ</button>`; 
+        showLayer('layer-no-symptom-review'); 
+    };
+    
+    // เมื่อกดปุ่ม "ฉันไม่มีอาการอะไรเลย" จะเข้าสู่ฟังก์ชันนี้โดยตรง สิ้นสุดและส่ง Flex
     window.handleFinalNoSymptom = function() { 
         saveData('symptomCategory', 'ไม่มีอาการ'); 
         showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย"); 
