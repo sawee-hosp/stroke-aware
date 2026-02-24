@@ -211,8 +211,9 @@
     <div class="container">
         <div class="app-header">
             <h1 class="main-title">ประเมินอาการสโตรก</h1>
+            <div id="info-btn" class="help-btn">อ่านก่อน</div>
         </div>
-        
+
         <div class="main-card">
             <div id="referrer-display"></div>
             <input type="hidden" id="referrerId">
@@ -237,16 +238,16 @@
     <!-- Modals -->
     <div id="custom-alert-modal" class="custom-modal">
         <div class="custom-modal-content">
-            <div id="custom-alert-title" class="fw-bold fs-2 mb-3">แจ้งเตือน</div>
-            <div id="custom-alert-body" class="fs-4 mb-4"></div>
-            <button class="btn-action btn-primary-custom" onclick="closeCustomModal('custom-alert-modal')">รับทราบ</button>
+            <div id="custom-alert-title" class="custom-modal-title">แจ้งเตือน</div>
+            <div id="custom-alert-body" class="custom-modal-body"></div>
+            <div class="custom-modal-actions"><button class="btn-action btn-primary-custom" onclick="closeCustomModal('custom-alert-modal')">รับทราบ</button></div>
         </div>
     </div>
-    
+
     <div id="custom-confirm-modal" class="custom-modal">
         <div class="custom-modal-content">
-            <div id="custom-confirm-title" class="fw-bold fs-2 mb-3">ยืนยัน</div>
-            <div id="custom-confirm-body" class="fs-4 mb-4"></div>
+            <div id="custom-confirm-title" class="custom-modal-title">ยืนยัน</div>
+            <div id="custom-confirm-body" class="custom-modal-body"></div>
             <div class="custom-modal-actions">
                 <button id="btn-confirm-yes" class="btn-action btn-primary-custom">ยืนยัน</button>
                 <button class="btn-action btn-modal-secondary" onclick="closeCustomModal('custom-confirm-modal')">ยกเลิก</button>
@@ -271,12 +272,11 @@
         <div class="btn-back" style="color: white; border-color: white; width: auto; padding: 15px 50px; margin-top: 30px; cursor:pointer;" onclick="this.style.display='none'">ปิด</div>
     </div>
 
-    <!-- Cropper Modal -->
+    <!-- Cropper Modal: ซ่อนไว้ตั้งแต่ต้นผ่าน style -->
     <div id="crop-modal" style="display: none;">
         <div class="crop-text-guide">เลื่อนและขยายรูปให้พอดีกรอบเขียว</div>
         <div class="crop-container">
             <img id="crop-image" style="max-width: 100%; display: block;">
-            <div class="crop-overlay-guide"></div>
         </div>
         <div class="crop-actions">
             <button class="btn-action" style="background:#555; color:white; flex-direction:row;" onclick="cancelCrop()">ยกเลิก</button>
@@ -304,6 +304,7 @@
     let cropper;
     let activeAiModule = 'all'; 
 
+    const symptomTranslations = { 'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด' };
     const symptomImages = {
         'Balance': 'https://img2.pic.in.th/pic/-14a8e9c4fc269d4d8f.md.png',
         'Eye': 'https://img2.pic.in.th/pic/-16881cec753a949477.md.png',
@@ -311,7 +312,6 @@
         'Arm': 'https://img2.pic.in.th/pic/-15dbb33e12115949f4.md.png',
         'Speech': 'https://img5.pic.in.th/file/secure-sv1/-179b7758ead26c6d76.md.png'
     };
-    const symptomTranslations = { 'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด' };
     const symptomDetails = {
         'Balance': { likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้'], unlikely: ['เวียนหัวตอนเปลี่ยนท่า', 'น้ำในหูไม่เท่ากัน'], desc: 'ยืนตัวตรงแขนแนบลำตัว 10 วินาที ไม่ได้ มีเซล้ม' },
         'Eye': { likely: ['ตามัวหรือมองไม่เห็น', 'เห็นภาพซ้อน', 'เสียการมองเห็นครึ่งซีก'], unlikely: ['ปัญหาสายตาเดิม', 'ตาแห้ง/ระคายเคือง'], desc: 'เอามือปิดตาทีละข้างแล้วมอง เห็นไม่ชัด' },
@@ -320,6 +320,10 @@
         'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก'], unlikely: ['พูดติดขัดเพราะเหนื่อย', 'เสียงแหบ/เป็นหวัด'], desc: 'ทดสอบพูดคำยากเช่น ยายกินลำไยน้ำลายยายไหลย้อย พูดแล้วติดขัดลิ้นพันกัน', hasAi: true }
     };
     const hospitalCoords = { lat: 10.229937, lon: 99.109073 };
+
+    window.showAiError = function(msg) {
+        document.getElementById('layer-ai-processing').innerHTML = `<div class="text-center py-5"><span class="iconify" data-icon="mdi:robot-confused" style="font-size: 100px; color: #999;"></span><h3 class="mt-4 text-danger" style="font-size:32px;">AI วิเคราะห์ไม่สำเร็จ</h3><p class="text-muted fs-3">${msg}</p><div class="d-flex flex-column gap-3 mt-4"><button class="btn-action btn-secondary" onclick="showLayer('layer-ai-input'); document.getElementById('layer-ai-processing').innerHTML = '<div class=\\'text-center py-5\\'><div class=\\'spinner mx-auto mb-4\\'></div><h2 style=\\'font-size:32px;\\'>กำลังวิเคราะห์...</h2><p class=\\'text-muted fs-3\\'>AI กำลังตรวจสอบข้อมูลที่ส่งมา</p></div>';">กลับไปแก้ไขข้อมูล</button></div></div>`;
+    };
 
     window.showCustomAlert = function(msg, title="แจ้งเตือน") {
         document.getElementById('custom-alert-title').textContent = title;
@@ -574,6 +578,7 @@
                                 <div class="file-upload-btn btn-primary-custom" style="flex-direction:row;">
                                     <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูปปัจจุบัน
                                 </div>
+                                <!-- ไม่บังคับกล้อง อนุญาตให้เปิดแกลเลอรี่ได้ -->
                                 <input type="file" accept="image/*" onchange="openCropModal(this, 'current')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
                             </div>
                         </div>
@@ -631,6 +636,8 @@
                 </div>
             </div>
             
+            <p class="text-center text-primary fw-bold mt-2 mb-3 fs-4">* เลือกประเมิน ใบหน้า การยกแขน หรือการพูด อย่างน้อย 1 อย่างแล้วกดส่ง *</p>
+
             <button class="btn-action btn-ai" style="font-size:30px; flex-direction:row;" onclick="analyzeWithGemini()">
                 <span>ส่งวิเคราะห์</span>
                 <span class="iconify wink-icon-right" data-icon="mdi:sparkles"></span>
@@ -751,7 +758,6 @@
         buildSummaryPage();
     };
 
-    // --- CANVAS IMAGE PROCESSING (Stamping Badge & Grid) ---
     function applyGridAndBadge(base64Str, label, callback) {
         let img = new Image();
         img.onload = function() {
@@ -760,22 +766,20 @@
             canvas.height = img.height;
             let ctx = canvas.getContext('2d');
             
-            // วาดรูปต้นฉบับ
             ctx.drawImage(img, 0, 0);
 
-            // ตีเส้น Grid สีเขียวสด 4x6 (เส้นหนา)
+            // ตีเส้น Grid สีเขียวสด 4x6 (เส้นหนาขึ้น)
             ctx.strokeStyle = "rgba(0, 255, 0, 0.8)";
             ctx.lineWidth = 4;
             
-            // 3 vertical lines (4 columns)
+            // 3 vertical lines
             for(let i=1; i<=3; i++) {
                 ctx.beginPath();
                 ctx.moveTo((canvas.width/4)*i, 0);
                 ctx.lineTo((canvas.width/4)*i, canvas.height);
                 ctx.stroke();
             }
-            
-            // 5 horizontal lines (6 rows)
+            // 5 horizontal lines
             for(let j=1; j<=5; j++) {
                 ctx.beginPath();
                 ctx.moveTo(0, (canvas.height/6)*j);
@@ -797,14 +801,14 @@
             ctx.shadowColor = "black";
             ctx.shadowBlur = 4;
             ctx.fillText(timeStr, 15, canvas.height - 15);
-            ctx.shadowBlur = 0; // reset
+            ctx.shadowBlur = 0; 
             
             callback(canvas.toDataURL("image/jpeg", 0.8).split(',')[1]);
         };
         img.src = "data:image/jpeg;base64," + base64Str;
     }
 
-    // --- CROPPER LOGIC (รูปไข่ ลากย่อขยายได้) ---
+    // --- CROPPER LOGIC ---
     let currentCropType = ''; 
     window.openCropModal = function(input, type) {
         if (!input.files || !input.files[0]) return;
@@ -877,7 +881,7 @@
         }
     };
 
-    // --- ARM VIDEO (10s Prep + 10s Rec with Canvas Stamp) ---
+    // --- ARM VIDEO ---
     window.startArmVideo = function() {
         const video = document.getElementById('arm-video-preview');
         const overlay = document.getElementById('video-overlay-prep');
@@ -1015,39 +1019,11 @@
                 sessionData.analysis = data.data.analysis; 
                 sessionData.isRisk = data.data.isRisk; 
                 sessionData.isEmergency = data.data.isRisk;
-                sessionData.fileUrls = data.data.fileUrls; // Ensure fileUrls are set in sessionData
+                sessionData.fileUrls = data.data.fileUrls; // Make sure fileUrls are saved!
                 displayAiResult(data.data); 
             } else showAiError(data.message); 
         }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
     };
-
-    // ฟังก์ชันสร้างรูป Collage หน้าซ้ายขวา สำหรับโชว์บนเว็บ
-    function createFaceCollageForDisplay(baselineUrl, currentBase64, callback) {
-        let canvas = document.createElement('canvas');
-        let ctx = canvas.getContext('2d');
-        
-        let img2 = new Image();
-        img2.onload = function() {
-            canvas.width = img2.width * 2; 
-            canvas.height = img2.height;
-            // รูปขวาคือรูปปัจจุบัน
-            ctx.drawImage(img2, img2.width, 0);
-            
-            // โหลดรูปซ้ายจาก Drive
-            let img1 = new Image();
-            img1.crossOrigin = "Anonymous";
-            img1.onload = function() {
-                ctx.drawImage(img1, 0, 0, img2.width, img2.height);
-                callback(canvas.toDataURL("image/jpeg", 0.8).split(',')[1]);
-            };
-            img1.onerror = function() {
-                // ถ้าติดปัญหาโหลดรูปเก่า ให้ส่งกลับแค่รูปปัจจุบัน
-                callback(currentBase64);
-            };
-            img1.src = formatDriveUrl(baselineUrl);
-        };
-        img2.src = "data:image/jpeg;base64," + currentBase64;
-    }
 
     function displayAiResult(res) {
         const c = document.getElementById('ai-result-content');
@@ -1069,13 +1045,11 @@
             
             html += `<h5 class="mt-4 fw-bold text-center fs-4">ภาพที่วิเคราะห์</h5>`;
             
-            // รอวาดรูป Collage
             let renderButtons = function(finalFaceBase64) {
                 let innerHtml = '';
                 if (finalFaceBase64) {
                     innerHtml += `<img src="data:image/jpeg;base64,${finalFaceBase64}" class="full-img-view mb-3">`;
-                    res.fileUrls.face_merged = finalFaceBase64; 
-                    if(sessionData.fileUrls) sessionData.fileUrls.face_merged = finalFaceBase64;
+                    // ไม่ต้องส่ง Base64 เข้า Flex แล้ว เพราะมันใหญ่เกินไปและ LINE จะบล็อค เราจะใช้ URL รูปภาพเดี่ยวๆ แทนใน Flex
                 }
                 if (aiInputs.arm) {
                     innerHtml += `<img src="data:image/jpeg;base64,${aiInputs.arm}" class="full-img-view mb-3">`;
@@ -1096,8 +1070,24 @@
 
             c.innerHTML = html; // แสดงข้อความก่อน
             
+            // หน้าตาเปรียบเทียบในเว็บยังเป็น Collage Base64 ได้ปกติ แต่ตอนส่ง Flex จะดึง URL แยก
             if (aiInputs.face && aiInputs.baselineFaceUrl) {
-                createFaceCollageForDisplay(aiInputs.baselineFaceUrl, aiInputs.face, renderButtons);
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+                let img2 = new Image();
+                img2.onload = function() {
+                    canvas.width = img2.width * 2; canvas.height = img2.height;
+                    ctx.drawImage(img2, img2.width, 0);
+                    let img1 = new Image();
+                    img1.crossOrigin = "Anonymous";
+                    img1.onload = function() {
+                        ctx.drawImage(img1, 0, 0, img2.width, img2.height);
+                        renderButtons(canvas.toDataURL("image/jpeg", 0.8).split(',')[1]);
+                    };
+                    img1.onerror = function() { renderButtons(aiInputs.face); };
+                    img1.src = formatDriveUrl(aiInputs.baselineFaceUrl);
+                };
+                img2.src = "data:image/jpeg;base64," + aiInputs.face;
             } else if (aiInputs.face) {
                 renderButtons(aiInputs.face);
             } else {
@@ -1106,7 +1096,6 @@
         }
     }
 
-    // --- SAVE AND FINAL ---
     function setupTimeOptions() {
         const c = document.getElementById('time-options-container'); if (!c) return; c.innerHTML = '';
         const options = [
@@ -1162,8 +1151,6 @@
     function updateSummaryAndActions(dist) {
         const table = document.getElementById('summary-table').getElementsByTagName('tbody')[0];
         document.querySelectorAll('.distance-row').forEach(r => r.remove());
-        const contacts = document.getElementById('contact-buttons'); contacts.innerHTML = '';
-        const routes = document.getElementById('route-button-container'); routes.innerHTML = '';
         
         if (dist !== null) {
             let html = ''; const sawiBtn = document.querySelector('.tel-sawi-button')?.parentElement;
@@ -1185,7 +1172,7 @@
                 html += createTableRow('mdi:car-clock', 'ไปเองใช้เวลา', sessionData.selfTravelEstimate, false, 'distance-row');
                 html += createTableRow('mdi:ambulance', 'รถ รพ.รับใช้เวลา', sessionData.ambulanceEstimate, false, 'distance-row');
                 
-                routes.innerHTML = `<a href="https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}" target="_blank" class="contact-button route-button text-white" style="background-color:#17a2b8; flex-direction:row;"><span class="iconify" data-icon="mdi:directions"></span> เส้นทางไป รพ.สวี</a>`;
+                document.getElementById('route-button-container').innerHTML = `<a href="https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}" target="_blank" class="contact-button route-button text-white" style="background-color:#17a2b8; flex-direction:row;"><span class="iconify" data-icon="mdi:directions"></span> เส้นทางไป รพ.สวี</a>`;
             }
             table.insertAdjacentHTML('beforeend', html);
         }
@@ -1285,22 +1272,33 @@
             { type: "text", text: "เวลาประเมิน: " + formatFullDateTime(new Date()), size: "sm", color: "#666666" }
         ];
         
+        // แก้ไข Flex Image ดึง URL จาก Drive (LINE รับได้เฉพาะ URL สาธารณะ ไม่รับ Base64)
         if (data.isAiAssessment && data.fileUrls) {
-            let images = [];
-            if (data.fileUrls.face_merged) {
-                images.push(`data:image/jpeg;base64,${data.fileUrls.face_merged}`);
-            } else if (data.fileUrls.face && String(data.fileUrls.face).startsWith('http')) {
-                images.push(formatDriveUrl(data.fileUrls.face));
+            let imgBoxFace = { type: "box", layout: "horizontal", contents: [] };
+            
+            // รูปหน้าปกติ
+            if (data.normal_face && String(data.normal_face).startsWith('http')) {
+                imgBoxFace.contents.push({ type: "image", url: formatDriveUrl(data.normal_face), size: "full", aspectRatio: "3:4", aspectMode: "cover", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.normal_face) } });
             }
             
+            // รูปวิเคราะห์ปัจจุบัน
+            if (data.fileUrls.face && String(data.fileUrls.face).startsWith('http')) {
+                imgBoxFace.contents.push({ type: "image", url: formatDriveUrl(data.fileUrls.face), size: "full", aspectRatio: "3:4", aspectMode: "cover", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.fileUrls.face) } });
+            }
+            
+            if (imgBoxFace.contents.length > 0) {
+                bodyContents.unshift({ type: "separator", margin: "md" }); 
+                bodyContents.unshift(imgBoxFace);
+            }
+
+            // รูปแขน
             if (data.fileUrls.arm && String(data.fileUrls.arm).startsWith('http')) {
-                images.push(formatDriveUrl(data.fileUrls.arm));
-            }
-            
-            if (images.length > 0) {
-                let imgBox = { type: "box", layout: "horizontal", contents: [] };
-                images.forEach(url => { imgBox.contents.push({ type: "image", url: url, size: "full", aspectRatio: "3:4", aspectMode: "fit", flex: 1, margin: "sm", action: { type: "uri", uri: url } }); });
-                bodyContents.unshift({ type: "separator", margin: "md" }); bodyContents.unshift(imgBox);
+                let imgBoxArm = { type: "box", layout: "horizontal", contents: [
+                    { type: "image", url: formatDriveUrl(data.fileUrls.arm), size: "full", aspectRatio: "4:3", aspectMode: "fit", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.fileUrls.arm) } }
+                ]};
+                let insertIdx = imgBoxFace.contents.length > 0 ? 2 : 0;
+                if (insertIdx === 0) bodyContents.unshift({ type: "separator", margin: "md" });
+                bodyContents.splice(insertIdx, 0, imgBoxArm);
             }
         }
         
