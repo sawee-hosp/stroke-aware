@@ -4,28 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- ป้องกันการจำแคช (Cache Busting) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
     <title>ประเมินอาการสโตรก (AI)</title>
     
-    <!-- CSS & Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Cropper.js สำหรับครอบรูปภาพใบหน้า -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     
-    <!-- Scripts -->
     <script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
     <style>
-        /* --- Design System: สวีรู้ทันสโตรก (Super Elderly Friendly) --- */
         :root { 
             --primary-red: #ff3654; 
             --alert-red: #D32F2F; 
@@ -44,506 +38,124 @@
             padding-bottom: 80px;
         }
 
-        .container { 
-            max-width: 800px; 
-            padding: 15px; 
-            margin: 0 auto; 
-            position: relative; 
-            z-index: 10; 
-        }
-        
-        .app-header { 
-            text-align: center; 
-            margin-bottom: 15px; 
-            padding-top: 10px; 
-        }
+        .container { max-width: 800px; padding: 15px; margin: 0 auto; position: relative; z-index: 10; }
+        .app-header { text-align: center; margin-bottom: 15px; padding-top: 10px; }
+        h1.main-title { color: #fff; font-weight: 900; font-size: 30px; margin: 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); display: inline-block; }
+        .main-card { background: #fff; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); padding: 20px; margin-bottom: 10px; }
+        .section-title { font-size: 32px; font-weight: 800; color: #333; text-align: center; margin-bottom: 15px; }
 
-        h1.main-title { 
-            color: #fff; 
-            font-weight: 900; 
-            font-size: 30px; 
-            margin: 0; 
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.3); 
-            display: inline-block; 
-        }
-
-        .main-card { 
-            background: #fff; 
-            border-radius: 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
-            padding: 20px; 
-            margin-bottom: 10px; 
-        }
-
-        .section-title { 
-            font-size: 32px; 
-            font-weight: 800; 
-            color: #333; 
-            text-align: center; 
-            margin-bottom: 15px; 
-        }
-
-        /* --- Buttons Global --- */
+        /* Buttons */
         .btn-action, .btn-likely, .btn-unlikely, .file-upload-btn, .btn-back, .btn-share {
-            width: 100%; 
-            border-radius: 50px !important; 
-            font-weight: 700; 
-            padding: 15px 20px; 
-            border: none; 
-            box-shadow: 0 5px 10px rgba(0,0,0,0.15); 
-            font-size: 26px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px; 
-            cursor: pointer;
-            flex-direction: column; /* ให้ข้อความขึ้นบรรทัดใหม่ได้ */
-        }
-        
-        /* เพิ่มสไตล์สำหรับข้อความรองในปุ่ม */
-        .btn-sub-text {
-            font-size: 18px;
-            font-weight: normal;
-            opacity: 0.9;
-            margin-top: -5px;
-        }
-
-        .btn-action:active { 
-            transform: scale(0.98); 
-        }
-
-        .btn-primary-custom { 
-            background-color: #007BFF; 
-            color: white; 
-            flex-direction: row; /* กลับไปเป็น row สำหรับปุ่มทั่วไป */
-        }
-
-        .btn-likely { 
-            background-color: #D32F2F; 
-            color: white; 
-            border: 3px solid #B71C1C; 
-            margin-bottom: 10px; 
-        }
-
-        .btn-unlikely { 
-            background-color: #388E3C; 
-            color: white; 
-            border: 3px solid #2E7D32; 
-            margin-bottom: 10px;
-            flex-direction: row; /* ปุ่มไม่เข้าข่ายไม่ต้องขึ้นบรรทัดใหม่ */
-        }
-
-        .btn-no-symptom { 
-            background-color: #00bcd4; 
-            color: white; 
-            border: 4px solid #0097a7; 
-            margin-top: 25px; 
-            flex-direction: row;
-        }
-
-        .btn-back { 
-            background: transparent; 
-            color: #999; 
-            border: 2px solid #ccc; 
-            width: auto; 
-            min-width: 180px; 
-            margin: 0 auto; 
-            font-size: 24px; 
-            padding: 10px 30px; 
-            flex-direction: row;
-        }
-
-        .btn-back-container { 
-            text-align: center; 
-            margin-top: 25px; 
-        }
-
-        /* --- AI & Final Buttons Animations --- */
-        .btn-ai { 
-            background-color: var(--ai-yellow); 
-            color: black; 
-            border: 4px solid #F1C40F; 
-            margin-top: 10px; 
-            position: relative; 
-            flex-direction: row;
-        }
-
-        .wink-icon-right { 
-            font-size: 45px; 
-            color: #fff; 
-            position: absolute; 
-            right: 20px; 
-            animation: wink-slow 1.5s infinite; 
-        }
-
-        @keyframes wink-slow { 
-            0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } 
-            50% { opacity: 0.6; transform: scale(1.1) rotate(10deg); } 
-        }
-        
-        .btn-pulse-jerky { 
-            animation: jerky-pulse 2s infinite; 
-            background-color: #C0392B !important; 
-            color: white !important; 
-            font-size: 30px !important; 
-            margin-top: 30px; 
-            flex-direction: row;
-        }
-
-        @keyframes jerky-pulse { 
-            0%, 40%, 100% { transform: scale(1); } 
-            10% { transform: scale(1.05); } 
-            20% { transform: scale(1); } 
-            30% { transform: scale(1.05); } 
-        }
-
-        .btn-pulse-danger { 
-            background-color: #ff0000 !important; 
-            color: white !important; 
-            font-size: 32px !important; 
-            padding: 20px !important; 
-            border: 4px solid #cc0000 !important; 
-            animation: pulse-danger-btn 1.5s infinite; 
-            flex-direction: row;
-        }
-
-        @keyframes pulse-danger-btn { 
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 
-            50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } 
-        }
-
-        /* --- Wiggling Symptom Cards (กระตุกย่อขยาย) --- */
-        .symptom-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 10px; 
-        }
-
-        .symptom-card { 
-            border-radius: 20px; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
-            text-align: center; 
-            padding: 5px; 
-            background: #fff; 
-            border: 2px solid #eee; 
-            display: flex; 
+            width: 100%; border-radius: 50px !important; font-weight: 700; padding: 15px 20px; 
+            border: none; box-shadow: 0 5px 10px rgba(0,0,0,0.15); font-size: 26px; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
             flex-direction: column; 
-            align-items: center; 
-            animation: jerky-scale 4s infinite ease-in-out;
-            cursor: pointer;
         }
+        .btn-sub-text { font-size: 18px; font-weight: normal; opacity: 0.9; margin-top: -5px; }
+        .btn-action:active { transform: scale(0.98); }
+        .btn-primary-custom { background-color: #007BFF; color: white; flex-direction: row; }
+        .btn-likely { background-color: #D32F2F; color: white; border: 3px solid #B71C1C; margin-bottom: 10px; }
+        .btn-unlikely { background-color: #388E3C; color: white; border: 3px solid #2E7D32; margin-bottom: 10px; flex-direction: row; }
+        .btn-no-symptom { background-color: #00bcd4; color: white; border: 4px solid #0097a7; margin-top: 25px; flex-direction: row;}
+        .btn-back { background: transparent; color: #999; border: 2px solid #ccc; width: auto; min-width: 180px; margin: 0 auto; font-size: 24px; padding: 10px 30px; flex-direction: row;}
+        .btn-back-container { text-align: center; margin-top: 25px; }
 
-        .symptom-card img { 
-            width: 100%; 
-            height: auto; 
-            aspect-ratio: 1/1; 
-            object-fit: cover; 
-            border-radius: 15px; 
-            margin-bottom: 5px; 
-        }
-
-        .symptom-card p { 
-            margin: 0; 
-            font-weight: 800; 
-            font-size: 32px; 
-            color: #2c3e50; 
-            line-height: 1.1; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            width: 100%; 
-        }
+        /* AI Buttons Animations */
+        .btn-ai { background-color: var(--ai-yellow); color: black; border: 4px solid #F1C40F; margin-top: 10px; position: relative; flex-direction: row; }
+        .wink-icon-right { font-size: 45px; color: #fff; position: absolute; right: 20px; animation: wink-slow 1.5s infinite; }
+        @keyframes wink-slow { 0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); } 50% { opacity: 0.6; transform: scale(1.1) rotate(10deg); } }
         
-        /* สุ่มเวลาเต้นและจัดรูปสุดท้ายให้ชิดซ้าย ขนาดเท่าเดิม */
+        .btn-pulse-jerky { animation: jerky-pulse 2s infinite; background-color: #C0392B !important; color: white !important; font-size: 30px !important; margin-top: 30px; flex-direction: row;}
+        @keyframes jerky-pulse { 0%, 40%, 100% { transform: scale(1); } 10% { transform: scale(1.05); } 20% { transform: scale(1); } 30% { transform: scale(1.05); } }
+        .btn-pulse-danger { background-color: #ff0000 !important; color: white !important; font-size: 32px !important; padding: 20px !important; border: 4px solid #cc0000 !important; animation: pulse-danger-btn 1.5s infinite; flex-direction: row;}
+        @keyframes pulse-danger-btn { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+        /* Wiggling Symptom Cards */
+        .symptom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .symptom-card { border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; padding: 5px; background: #fff; border: 2px solid #eee; display: flex; flex-direction: column; align-items: center; animation: jerky-scale 4s infinite ease-in-out; cursor: pointer; }
+        .symptom-card img { width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; margin-bottom: 5px; }
+        .symptom-card p { margin: 0; font-weight: 800; font-size: 32px; color: #2c3e50; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
         .symptom-card:nth-child(1) { animation-delay: 0.1s; }
         .symptom-card:nth-child(2) { animation-delay: 1.5s; }
         .symptom-card:nth-child(3) { animation-delay: 0.8s; }
         .symptom-card:nth-child(4) { animation-delay: 2.2s; }
-        .symptom-card:nth-child(5) { 
-            animation-delay: 3.1s; 
-            grid-column: auto; /* ไม่ใช้ span 2 เพื่อให้ชิดซ้ายและขนาดเท่ากัน */
-        } 
-        
-        @keyframes jerky-scale { 
-            0%, 80%, 100% { transform: scale(1); } 
-            90% { transform: scale(1.05); border-color: #ff3654; } 
-            95% { transform: scale(0.98); } 
-        }
+        .symptom-card:nth-child(5) { animation-delay: 3.1s; grid-column: auto; } 
+        @keyframes jerky-scale { 0%, 80%, 100% { transform: scale(1); } 90% { transform: scale(1.05); border-color: #ff3654; } 95% { transform: scale(0.98); } }
 
-        /* --- Layer 2 Card Structure --- */
-        .symptom-card-red { 
-            border: 4px solid #ff3654; 
-            border-radius: 20px; 
-            padding: 15px; 
-            background: #fffafb; 
-            margin-bottom: 20px;
-        }
+        /* Layer 2 Card Structure */
+        .symptom-card-red { border: 4px solid #ff3654; border-radius: 20px; padding: 15px; background: #fffafb; margin-bottom: 20px;}
+        .full-img-view { width: 100%; border-radius: 15px; box-shadow: 0 5px 10px rgba(0,0,0,0.1); margin-bottom: 15px; pointer-events: none; } 
 
-        .full-img-view { 
-            width: 100%; 
-            border-radius: 15px; 
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1); 
-            margin-bottom: 15px; 
-            pointer-events: none; /* ปิดการคลิกขยายรููป */
-        } 
+        /* Time Buttons */
+        .time-btn { padding: 10px 5px !important; font-size: 22px !important; min-height: 60px; flex-direction: row; }
 
-        /* --- Time Buttons --- */
-        .time-btn { 
-            padding: 10px 5px !important; 
-            font-size: 22px !important; 
-            min-height: 60px; 
-            flex-direction: row;
-        }
+        /* Toggle 3D & Watermark */
+        .toggle-wrapper { display: flex; align-items: center; justify-content: center; background: #f0f4f8; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #d9e2ec; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .toggle-label-text { font-size: 22px; font-weight: bold; color: #555; margin-left: 15px; }
+        .switch { position: relative; display: inline-block; width: 70px; height: 38px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 38px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+        .slider:before { position: absolute; content: ""; height: 30px; width: 30px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        input:checked + .slider { background-color: #ff3654; } 
+        input:checked + .slider:before { transform: translateX(32px); }
+        .watermark { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .watermark.active { opacity: 0.15; }
+        .watermark-text { font-size: 40px; font-weight: 900; color: red; transform: rotate(-45deg); text-align: center; text-shadow: 2px 2px 0px white, -2px -2px 0px white; }
 
-        .time-btn.highlight { 
-            background-color: #ffc107 !important; 
-            border-color: #ff9800 !important; 
-            font-weight: 900; 
-            font-size: 26px !important; 
-            animation: highlight-pulse 1.5s infinite alternate; 
-        }
-
-        @keyframes highlight-pulse { 
-            from { transform: scale(1); } 
-            to { transform: scale(1.05); } 
-        }
-
-        /* --- Toggle 3D & Watermark --- */
-        .toggle-wrapper { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: #f0f4f8; 
-            padding: 15px; 
-            border-radius: 20px; 
-            margin-bottom: 20px; 
-            border: 2px solid #d9e2ec; 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); 
-        }
-
-        .toggle-label-text { 
-            font-size: 22px; 
-            font-weight: bold; 
-            color: #555; 
-            margin-left: 15px; 
-        }
-
-        .switch { 
-            position: relative; 
-            display: inline-block; 
-            width: 70px; 
-            height: 38px; 
-            flex-shrink: 0; 
-        }
-
-        .switch input { 
-            opacity: 0; 
-            width: 0; 
-            height: 0; 
-        }
-
-        .slider { 
-            position: absolute; 
-            cursor: pointer; 
-            top: 0; left: 0; right: 0; bottom: 0; 
-            background-color: #ccc; 
-            transition: .4s; 
-            border-radius: 38px; 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); 
-        }
-
-        .slider:before { 
-            position: absolute; 
-            content: ""; 
-            height: 30px; 
-            width: 30px; 
-            left: 4px; 
-            bottom: 4px; 
-            background-color: white; 
-            transition: .4s; 
-            border-radius: 50%; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
-        }
-
-        input:checked + .slider { 
-            background-color: #ff3654; 
-        } 
-
-        input:checked + .slider:before { 
-            transform: translateX(32px); 
-        }
-
-        .watermark { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100vw; height: 100vh; 
-            pointer-events: none; 
-            z-index: 9999; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            opacity: 0; 
-            transition: opacity 0.3s; 
-        }
-
-        .watermark.active { 
-            opacity: 0.15; 
-        }
-
-        .watermark-text { 
-            font-size: 40px; 
-            font-weight: 900; 
-            color: red; 
-            transform: rotate(-45deg); 
-            text-align: center; 
-            text-shadow: 2px 2px 0px white, -2px -2px 0px white; 
-        }
-
-        /* --- Loading --- */
-        #loading { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(255,255,255,0.9); 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 9999; 
-        }
-
-        .spinner { 
-            border: 12px solid #eee; 
-            border-top: 12px solid #ff3654; 
-            border-radius: 50%; 
-            width: 100px; height: 100px; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 20px;
-        }
-        
+        /* Loading Spinner */
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+        .spinner { border: 12px solid #f3f3f3; border-top: 12px solid #ff3654; border-radius: 50%; width: 100px; height: 100px; animation: spin 1s linear infinite; margin-bottom: 20px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden { display: none !important; }
         
-        /* --- Cropper Modal --- */
-        #crop-modal { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: #000; 
-            z-index: 8000; 
-            display: none; 
-            flex-direction: column; 
-        }
-
-        .crop-container { 
-            flex: 1; 
-            width: 100%; 
-            overflow: hidden; 
-            background: #333; 
-            position: relative; 
-        }
-
-        .crop-overlay-guide { 
-            position: absolute; 
-            top: 10%; left: 15%; 
-            width: 70%; height: 80%; 
-            border: 2px dashed #00FF00; 
-            border-radius: 50%; 
-            pointer-events: none; 
-            z-index: 1; 
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); 
-        }
-
-        .crop-text-guide { 
-            position: absolute; 
-            top: 20px; 
-            width: 100%; 
-            text-align: center; 
-            color: #00FF00; 
-            z-index: 2; 
-            font-weight: bold; 
-            font-size: 24px; 
-            text-shadow: 1px 1px 2px black; 
-        }
-
-        .crop-actions { 
-            padding: 20px; 
-            background: #222; 
-            display: flex; 
-            gap: 10px; 
-        }
+        /* Cropper Modal */
+        #crop-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 8000; display: none; flex-direction: column; }
+        .crop-container { flex: 1; width: 100%; overflow: hidden; background: #333; position: relative; }
+        .crop-overlay-guide { position: absolute; top: 10%; left: 15%; width: 70%; height: 80%; border: 2px dashed #00FF00; border-radius: 50%; pointer-events: none; z-index: 1; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+        .crop-text-guide { position: absolute; top: 20px; width: 100%; text-align: center; color: #00FF00; z-index: 2; font-weight: bold; font-size: 24px; text-shadow: 1px 1px 2px black; }
+        .crop-actions { padding: 20px; background: #222; display: flex; gap: 10px; }
         
-        /* --- General Modals --- */
-        .custom-modal { 
-            display: none; 
-            position: fixed; 
-            z-index: 6000; 
-            left: 0; top: 0; 
-            width: 100%; height: 100%; 
-            background-color: rgba(0,0,0,0.7); 
-            align-items: center; 
-            justify-content: center; 
-        }
-
-        .custom-modal-content { 
-            background-color: #fff; 
-            padding: 30px; 
-            width: 90%; 
-            max-width: 500px; 
-            border-radius: 30px; 
-            text-align: center; 
-        }
+        /* Modals */
+        .custom-modal { display: none; position: fixed; z-index: 6000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center; }
+        .custom-modal-content { background-color: #fff; padding: 30px; width: 90%; max-width: 500px; border-radius: 30px; text-align: center; }
         
-        /* --- Others UI elements --- */
-        #referrer-display { 
-            display: none; background-color: #e3f2fd; color: #0d47a1; 
-            border: 3px solid #90caf9; padding: 15px; border-radius: 20px; 
-            margin-bottom: 20px; font-size: 24px; align-items: center; 
-            justify-content: center; text-align: center; font-weight: 700; 
-        }
-
+        /* Other UI elements */
+        #referrer-display { display: none; background-color: #e3f2fd; color: #0d47a1; border: 3px solid #90caf9; padding: 15px; border-radius: 20px; margin-bottom: 20px; font-size: 24px; align-items: center; justify-content: center; text-align: center; font-weight: 700; }
         .action-buttons-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .action-button-wrapper { display: flex; flex-direction: column; align-items: center; background: transparent; box-shadow: none; padding: 0; margin: 0; border: none; }
+        .action-button-wrapper { display: flex; flex-direction: column; align-items: center; background: transparent; padding: 0; margin: 0; border: none; }
         .action-button { width: 100%; aspect-ratio: 1/1; border-radius: 20px; font-size: 3.5em; color: white; display: flex; align-items: center; justify-content: center; border: 4px solid white; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
         .location-button { background-color: #007BFF; } .location-button.success { background-color: #28A745; }
         .tel-sawi-button { background-color: #f39c12; } .tel-1669-button { background-color: #D32F2F; }
         .action-button-text { font-size: 18px; font-weight: bold; text-align: center; margin-top: 5px; color: #444; line-height: 1.1; }
-
         .contact-row { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 20px; border-radius: 50px; margin-bottom: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); border: 2px solid #eee; }
         .contact-info { flex-grow: 1; text-align: left; line-height: 1.2; padding-right: 10px; }
         .contact-name { font-weight: bold; font-size: 22px; color: #333; display: block; }
         .contact-role { font-size: 18px; color: #666; font-weight: normal; }
+        .call-btn-small { background-color: var(--primary-red); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 28px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); flex-shrink: 0; border: 3px solid white; cursor: pointer; }
         
-        .call-btn-small { 
-            background-color: var(--primary-red); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 28px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); flex-shrink: 0; border: 3px solid white; cursor: pointer; 
-        }
-
-        /* --- Floating Buttons --- */
+        /* Floating Buttons */
         .floating-actions { position: fixed; bottom: 70px; right: 15px; display: flex; flex-direction: column; gap: 15px; z-index: 4000; }
         .float-btn { width: 100px; height: 100px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 6px 20px rgba(0,0,0,0.5); border: 5px solid white; cursor: pointer; text-decoration: none; animation: float-pulse 3s infinite ease-in-out; }
         .float-1669 { background-color: #D32F2F; animation-delay: 0.5s; }
         .float-sawi { background-color: #f39c12; animation-delay: 1.5s; }
         .float-label { font-size: 16px; margin-top: -2px; display: block; font-weight: 800; }
-        @keyframes float-pulse { 
-            0%, 100% { transform: scale(1); } 
-            10% { transform: scale(1.1) rotate(5deg); } 
-            20% { transform: scale(1.1) rotate(-5deg); }
-            30% { transform: scale(1); }
-        }
+        @keyframes float-pulse { 0%, 100% { transform: scale(1); } 10% { transform: scale(1.1) rotate(5deg); } 20% { transform: scale(1.1) rotate(-5deg); } 30% { transform: scale(1); } }
 
-        .footer-credit { text-align: center; color: #666; font-size: 16px; margin-top: 10px; margin-bottom: 0; padding-bottom: 0; }
-        
-        /* --- Fixed Footer Alert --- */
         .fixed-footer-alert { position: fixed; bottom: 0; left: 0; width: 100%; background-color: #000; color: #fff; text-align: center; padding: 8px 5px; font-size: 16px; font-weight: bold; z-index: 5000; line-height: 1.2; box-shadow: 0 -2px 10px rgba(0,0,0,0.5); }
-        
         .alert-stroke-detected { background-color: #D32F2F !important; color: white !important; border: 4px solid #B71C1C; padding: 25px; border-radius: 25px; text-align: center; animation: pulse-bg 1s infinite alternate; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
         .alert-icon { animation: blinker 0.5s infinite; font-size: 80px; color: #FFD700; display: block; margin: 0 auto 10px; text-shadow: 0 0 10px rgba(255,255,0,0.5); }
-        .pdpa-box { background: #f9f9f9; padding: 25px; border-radius: 20px; border: 2px solid #ddd; font-size: 24px; margin-bottom: 25px; }
         .form-select, .form-control { font-size: 24px; padding: 15px; border-radius: 20px; border: 2px solid #ccc; height: auto; }
         .input-group .btn { padding: 0 30px; }
         .result-image-container { position: relative; width: 100%; max-width: 400px; margin: 20px auto; border-radius: 25px; overflow: hidden; box-shadow: 0 8px 15px rgba(0,0,0,0.15); border: 3px solid #eee; }
         .result-image-container img { width: 100%; display: block; }
-        .btn-test-close { background-color: #7f8c8d; color: white; border: 3px solid #666; font-size: 20px; margin-top: 15px; flex-direction: row; }
+        .grid-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(0, 255, 0, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.4) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 1;}
+        .badge-green { position: absolute; background: rgba(40, 167, 69, 0.9); color: white; padding: 5px 15px; border-radius: 15px; font-size: 18px; font-weight: bold; z-index: 2;}
+
+        .karaoke-text { background: linear-gradient(to right, #D32F2F 50%, #333 50%); background-size: 200% 100%; background-position: 100% 0; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: karaoke 3s linear infinite; font-size: 36px; font-weight: 900; display: block; text-align: center; }
+        @keyframes karaoke { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+        
+        /* Video Overlay Prep */
+        #video-overlay-prep { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; border-radius: 0.375rem; text-align:center; padding: 10px;}
     </style>
 </head>
 <body>
@@ -551,7 +163,6 @@
         <div class="watermark-text">โหมดทดสอบ<br>สามารถทดลองใช้งานได้ตามต้องการ<br>โดยไม่ได้ส่งข้อมูลเรียกรถโรงพยาบาล</div>
     </div>
 
-    <!-- โหลดข้อมูลเนียนๆ โดยไม่บังหน้าเว็บ -->
     <div id="loading" style="display: none;">
         <div class="spinner"></div>
         <div id="loading-text" style="color: #ff3654; font-weight: bold; font-size: 30px;">กำลังโหลด...</div>
@@ -575,6 +186,8 @@
         </div>
         
         <div class="main-card">
+            <div id="referrer-display"></div>
+            <input type="hidden" id="referrerId">
             <div id="layer-container">
                 <div id="layer-1" data-layer="1"></div>
                 <div id="layer-2" data-layer="2" class="hidden"></div>
@@ -589,9 +202,10 @@
                 <div id="layer-ai-result" data-layer="ai-result" class="hidden"></div>
             </div>
         </div>
+        <div class="footer-credit">จัดทำโดย "สวีรู้ทันสโตรก" รพ.สวี จ.ชุมพร</div>
     </div>
 
-    <!-- แถบดำล่างสุด (แจ้งเตือนโทรออกเลย) -->
+    <!-- แถบดำล่างสุด -->
     <div class="fixed-footer-alert">หากฉุกเฉินเร่งด่วนโปรดกดโทรทันที ไม่ต้องรอประเมิน</div>
 
     <!-- Modals -->
@@ -614,6 +228,17 @@
         </div>
     </div>
 
+    <div id="disclaimerModal" class="custom-modal" style="display:none;">
+        <div class="custom-modal-content">
+            <div class="custom-modal-title">จัดทำโดย รพ.สวี จ.ชุมพร</div>
+            <div class="custom-modal-body" style="font-size: 20px;">
+                ระบบนี้จัดทำโดย <strong>โรงพยาบาลสวี</strong> เพื่ออำนวยความสะดวกในการคัดกรองและประสานงานผู้ป่วยโรคหลอดเลือดสมองในเขตพื้นที่ อ.สวี เท่านั้น
+                <hr><span style="font-size: 18px; color: #666;">สำหรับผู้ใช้งานนอกเขตพื้นที่ ท่านสามารถใช้งานเพื่อศึกษาความรู้และประเมินอาการเบื้องต้นได้</span>
+            </div>
+            <div class="custom-modal-actions"><button class="btn-modal btn-modal-primary" onclick="closeCustomModal('disclaimerModal')">รับทราบ</button></div>
+        </div>
+    </div>
+
     <!-- Cropper Modal -->
     <div id="crop-modal">
         <div class="crop-text-guide">จัดใบหน้าให้อยู่ในกรอบสีเขียว</div>
@@ -622,7 +247,7 @@
             <div class="crop-overlay-guide"></div>
         </div>
         <div class="crop-actions">
-            <button class="btn-action" style="background:#555; color:white;" onclick="cancelCrop()">ยกเลิก</button>
+            <button class="btn-action" style="background:#555; color:white; flex-direction:row;" onclick="cancelCrop()">ยกเลิก</button>
             <button class="btn-action btn-primary-custom" onclick="confirmCrop()">ใช้รูปนี้</button>
         </div>
     </div>
@@ -636,16 +261,9 @@
     
     let sessionData = {};
     let aiInputs = { face: null, baselineFaceUrl: null, arm: null, audio: null };
-    let mediaRecorder;
-    let audioChunks = [];
-    let videoStream;
-    let cropper;
-    let currentAnalysisResult = null; 
-    let countdownInterval;
-    let currentActionElement = null;
-    let currentActionKey = '';
-    let currentTel = '';
-    let pendingCallUrl = null; 
+    let mediaRecorder, audioChunks = [], videoStream, cropper;
+    let currentAnalysisResult = null, countdownInterval;
+    let currentActionKey = '', currentTel = '', pendingCallUrl = null; 
 
     const symptomImages = { 
         'Balance': 'https://img2.pic.in.th/pic/-14a8e9c4fc269d4d8f.md.png', 
@@ -655,43 +273,14 @@
         'Speech': 'https://img5.pic.in.th/file/secure-sv1/-179b7758ead26c6d76.md.png' 
     };
     
-    const symptomTranslations = { 
-        'Balance': 'การทรงตัว', 
-        'Eye': 'การมองเห็น', 
-        'Face': 'ใบหน้า', 
-        'Arm': 'แขนขา', 
-        'Speech': 'การพูด' 
-    };
+    const symptomTranslations = { 'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด' };
     
     const symptomDetails = {
-        'Balance': { 
-            likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้'], 
-            unlikely: ['เวียนหัวตอนเปลี่ยนท่า', 'น้ำในหูไม่เท่ากัน'], 
-            desc: 'ยืนตัวตรงแขนแนบลำตัว 10 วินาที ไม่ได้ มีเซล้ม' 
-        },
-        'Eye': { 
-            likely: ['ตามัวหรือมองไม่เห็น', 'เห็นภาพซ้อน', 'เสียการมองเห็นครึ่งซีก'], 
-            unlikely: ['ปัญหาสายตาเดิม', 'ตาแห้ง/ระคายเคือง'], 
-            desc: 'เอามือปิดตาทีละข้างแล้วมอง เห็นไม่ชัด' 
-        },
-        'Face': { 
-            likely: ['หน้าเบี้ยวครึ่งซีก', 'มุมปากตกข้างหนึ่ง', 'ยิ้มแล้วปากเบี้ยว'], 
-            unlikely: ['โรคใบหน้าเบี้ยว (Bell\'s Palsy)', 'บวมจากปัญหาฟัน'], 
-            desc: 'ส่องกระจกยิ้มยิงฟันดูปาก และตา มุมปากหรือหางตาตก', 
-            hasAi: true 
-        },
-        'Arm': { 
-            likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่เท่ากัน', 'ของหลุดจากมือ'], 
-            unlikely: ['ปวดกล้ามเนื้อ', 'ชาจากการนอนทับ'], 
-            desc: 'ยกแขนเหยียดไปข้างหน้า ดูว่าสามารถเกร็งได้หรือไม่', 
-            hasAi: true 
-        },
-        'Speech': { 
-            likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก'], 
-            unlikely: ['พูดติดขัดเพราะเหนื่อย', 'เสียงแหบ/เป็นหวัด'], 
-            desc: 'ทดสอบพูดคำยากเช่น ยายกินลำไยน้ำลายยายไหลย้อย พูดแล้วติดขัดลิ้นพันกัน', 
-            hasAi: true 
-        }
+        'Balance': { likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้'], unlikely: ['เวียนหัวตอนเปลี่ยนท่า', 'น้ำในหูไม่เท่ากัน'], desc: 'ยืนตัวตรงแขนแนบลำตัว 10 วินาที ไม่ได้ มีเซล้ม' },
+        'Eye': { likely: ['ตามัวหรือมองไม่เห็น', 'เห็นภาพซ้อน', 'เสียการมองเห็นครึ่งซีก'], unlikely: ['ปัญหาสายตาเดิม', 'ตาแห้ง/ระคายเคือง'], desc: 'เอามือปิดตาทีละข้างแล้วมอง เห็นไม่ชัด' },
+        'Face': { likely: ['หน้าเบี้ยวครึ่งซีก', 'มุมปากตกข้างหนึ่ง', 'ยิ้มแล้วปากเบี้ยว'], unlikely: ['โรคใบหน้าเบี้ยว (Bell\'s Palsy)', 'บวมจากปัญหาฟัน'], desc: 'ส่องกระจกยิ้มยิงฟันดูปาก และตา มุมปากหรือหางตาตก', hasAi: true },
+        'Arm': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่เท่ากัน', 'ของหลุดจากมือ'], unlikely: ['ปวดกล้ามเนื้อ', 'ชาจากการนอนทับ'], desc: 'ยกแขนเหยียดไปข้างหน้า ดูว่าสามารถเกร็งได้หรือไม่', hasAi: true },
+        'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก'], unlikely: ['พูดติดขัดเพราะเหนื่อย', 'เสียงแหบ/เป็นหวัด'], desc: 'ทดสอบพูดคำยากเช่น ยายกินลำไยน้ำลายยายไหลย้อย พูดแล้วติดขัดลิ้นพันกัน', hasAi: true }
     };
     const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
 
@@ -701,33 +290,17 @@
         document.getElementById('custom-alert-modal').style.display = 'flex'; 
     };
 
-    window.closeCustomModal = function(id) { 
-        document.getElementById(id).style.display = 'none'; 
-    };
+    window.closeCustomModal = function(id) { document.getElementById(id).style.display = 'none'; };
     
     window.showCustomConfirm = function(msg, title, onConfirm, onCancel) {
         document.getElementById('custom-confirm-title').textContent = title || "ยืนยัน";
         document.getElementById('custom-confirm-body').innerHTML = msg;
-        
         const btnYes = document.getElementById('btn-confirm-yes');
         const btnNo = document.querySelector('#custom-confirm-modal .btn-modal-secondary');
-        
-        const newBtnYes = btnYes.cloneNode(true); 
-        btnYes.parentNode.replaceChild(newBtnYes, btnYes);
-        
-        const newBtnNo = btnNo.cloneNode(true); 
-        btnNo.parentNode.replaceChild(newBtnNo, btnNo);
-        
-        newBtnYes.onclick = function() { 
-            closeCustomModal('custom-confirm-modal'); 
-            if (onConfirm) onConfirm(); 
-        };
-        
-        newBtnNo.onclick = function() { 
-            closeCustomModal('custom-confirm-modal'); 
-            if (onCancel) onCancel(); 
-        };
-        
+        const newBtnYes = btnYes.cloneNode(true); btnYes.parentNode.replaceChild(newBtnYes, btnYes);
+        const newBtnNo = btnNo.cloneNode(true); btnNo.parentNode.replaceChild(newBtnNo, btnNo);
+        newBtnYes.onclick = function() { closeCustomModal('custom-confirm-modal'); if (onConfirm) onConfirm(); };
+        newBtnNo.onclick = function() { closeCustomModal('custom-confirm-modal'); if (onCancel) onCancel(); };
         document.getElementById('custom-confirm-modal').style.display = 'flex';
     };
 
@@ -740,46 +313,40 @@
         buildInitialHTML();
         buildAILayers(); 
         
-        // ไม่ต้องแสดงหน้า Loading ตอนเริ่ม รอให้ LIFF ตรวจสอบเสร็จเลยเพื่อความลื่นไหล
         try {
             await liff.init({ liffId: LIFF_ID });
             if (liff.isLoggedIn()) {
                 const profile = await liff.getProfile();
                 sessionData.userID = profile.userId;
                 sessionData.userName = profile.displayName;
-                // แสดงสถานะกำลังค้นหาที่ช่องชื่อ
                 document.getElementById('ui-name').innerHTML = '<span class="text-muted fs-5">กำลังค้นหาข้อมูล...</span>';
                 document.getElementById('user-info-bar').style.display = 'flex';
                 fetchUserDataPOST(profile.userId, 'userId');
-            } else { 
-                liff.login(); 
-            }
-        } catch (e) { 
-            console.log("LIFF Init Error");
-        }
+            } else { liff.login(); }
+        } catch (e) { console.log("LIFF Init Error"); }
+        checkReferrerDisplay();
     };
 
-    // --- Database Fetching (POST Method Fix) ---
-    window.fetchUserDataPOST = function(id, actionType) {
-        let action = actionType === 'userId' ? 'getUserData' : 'getUserDataByPhone';
-        let payload = { action: action };
-        
-        if (actionType === 'userId') {
-            payload.userId = id;
-        } else {
-            payload.phone = id;
+    function checkReferrerDisplay() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const refId = urlParams.get('ref');
+        if (refId) {
+            $('#referrerId').val(refId);
+            $.getJSON(GAS_URL, { action: 'getReferrerName', refId: refId }, function(res) {
+                if (res.success && res.name) $('#referrer-display').html(`🤝 แนะนำให้มาประเมินโดย: <b>คุณ${res.name}</b>`).css('display', 'flex');
+            });
+            $.getJSON(GAS_URL, { action: 'logVhvShare', refId: refId, page: 'aware', viewerId: sessionData.userID||'' });
         }
+    }
 
-        fetch(GAS_URL, { 
-            method: 'POST', 
-            body: JSON.stringify(payload) 
-        })
+    window.fetchUserDataPOST = function(id, actionType) {
+        let payload = { action: actionType === 'userId' ? 'getUserData' : 'getUserDataByPhone' };
+        if (actionType === 'userId') payload.userId = id; else payload.phone = id;
+
+        fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) })
         .then(r => r.json())
-        .then(res => {
-            processUserData(res);
-        }).catch(err => {
-            document.getElementById('ui-name').innerHTML = '<span class="text-danger fs-5">เชื่อมต่อฐานข้อมูลล้มเหลว</span>';
-        });
+        .then(res => { processUserData(res); })
+        .catch(err => { document.getElementById('ui-name').innerHTML = '<span class="text-danger fs-5">เชื่อมต่อฐานข้อมูลล้มเหลว</span>'; });
     }
 
     window.triggerSearch = function() {
@@ -790,23 +357,14 @@
             document.getElementById('ui-name').innerHTML = '<span class="text-muted fs-5">กำลังค้นหาข้อมูล...</span>';
             document.getElementById('user-info-bar').style.display = 'flex';
             fetchUserDataPOST(phone, 'phone');
-        } else { 
-            showCustomAlert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก"); 
-            input.focus(); 
-        }
+        } else { showCustomAlert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก"); input.focus(); }
     };
 
     window.processUserData = function(res) {
         const bar = document.getElementById('user-info-bar'); 
         const regBtn = document.getElementById('ui-register-btn'); 
-
         if(res.status==='found' && res.data) {
-            sessionData = { 
-                ...sessionData, 
-                registeredName: res.data.name, 
-                risk_group: res.data.risk_group, 
-                normal_face: res.data.normal_face 
-            };
+            sessionData = { ...sessionData, registeredName: res.data.name, risk_group: res.data.risk_group, normal_face: res.data.normal_face };
             document.getElementById('ui-name').textContent = res.data.name || '-';
             document.getElementById('ui-risk').textContent = res.data.risk_group || '-';
             document.getElementById('ui-date').textContent = res.data.timestamp || '-';
@@ -840,22 +398,17 @@
         }
     };
 
-    // --- HTML BUILDERS ---
     function buildInitialHTML() {
         document.getElementById('layer-1').innerHTML = `
             <div class="toggle-wrapper">
-                <label class="switch">
-                    <input type="checkbox" id="test-mode-toggle" onchange="toggleTestMode(this)">
-                    <span class="slider"></span>
-                </label>
+                <label class="switch"><input type="checkbox" id="test-mode-toggle" onchange="toggleTestMode(this)"><span class="slider"></span></label>
                 <div class="toggle-label-text">ฉันสบายดี ทดสอบระบบเท่านั้น</div>
             </div>
             
             <div class="assessor-row d-flex align-items-center justify-content-between mb-4 mt-2">
                 <p class="m-0 fw-bold" style="font-size:26px;">ประเมินอาการให้ใคร</p>
                 <select id="assessor-select" class="form-select w-auto rounded-pill fw-bold" onchange="handleAssessorChange(this)">
-                    <option value="myself">ตัวฉันเอง</option>
-                    <option value="others">ผู้อื่น</option>
+                    <option value="myself">ตัวฉันเอง</option><option value="others">ผู้อื่น</option>
                 </select>
             </div>
             
@@ -871,11 +424,10 @@
                 <div><strong>เสี่ยง:</strong> <span id="ui-risk">-</span></div>
                 <div><strong>อัปเดต:</strong> <span id="ui-date">-</span></div>
                 <div id="ui-register-btn" class="w-100 mt-3" style="display:none;">
-                    <a href="https://liff.line.me/${REGISTER_LIFF_ID}" class="btn-action btn-primary-custom py-2" style="font-size: 22px;">ลงทะเบียน / ประเมินความเสี่ยง</a>
+                    <a href="https://liff.line.me/${REGISTER_LIFF_ID}" class="btn-action btn-primary-custom py-2" style="font-size: 22px; flex-direction:row;">ลงทะเบียน / ประเมินความเสี่ยง</a>
                 </div>
             </div>
             
-            <!-- ปุ่ม AI เปิดให้กดได้แล้ว โดยเรียกโชว์ Layer AI Intro -->
             <button class="btn-action btn-ai mb-4" onclick="handleAiTest()">
                 <span>ทดสอบอาการด้วย AI</span>
                 <span class="iconify wink-icon-right" data-icon="mdi:sparkles"></span>
@@ -895,38 +447,10 @@
                 <span class="iconify" data-icon="mdi:emoticon-happy-outline"></span> ฉันไม่มีอาการอะไรเลย
             </button>
         `;
-        
-        document.getElementById('layer-2').innerHTML = `
-            <h2 id="layer-2-title" class="section-title"></h2>
-            <div id="layer-2-new-content"></div>
-            <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</button></div>
-        `;
-        
-        document.getElementById('layer-3').innerHTML = `
-            <h2 class="section-title">อาการเกิดขึ้นอย่างไร?</h2>
-            <div class="d-flex flex-column gap-3">
-                <button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button>
-                <button class="btn-action" style="background-color: #E67E22; color: white; flex-direction:row;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button>
-            </div>
-            <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</button></div>
-        `;
-        
-        document.getElementById('layer-4').innerHTML = `
-            <h2 class="section-title">อาการเริ่มเป็นเมื่อไหร่?</h2>
-            <div id="time-options-container" class="d-flex flex-wrap gap-2 justify-content-center"></div>
-            <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</button></div>
-        `;
-        
-        document.getElementById('layer-6').innerHTML = `
-            <div id="final-emoji" style="text-align:center; font-size: 100px; margin-bottom: 20px;"></div>
-            <h2 id="final-title" class="section-title"></h2>
-            <p id="final-text" class="text-center" style="font-size:28px;"></p>
-            <div class="d-flex flex-column gap-3 mt-4">
-                <button class="btn-action btn-pulse-jerky" onclick="handleFinalSave(this, false, true)">บันทึกและปิดหน้าต่าง</button>
-            </div>
-            <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับหน้าแรก</button></div>
-        `;
-        
+        document.getElementById('layer-2').innerHTML = `<h2 id="layer-2-title" class="section-title"></h2><div id="layer-2-new-content"></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</button></div>`;
+        document.getElementById('layer-3').innerHTML = `<h2 class="section-title">อาการเกิดขึ้นอย่างไร?</h2><div class="d-flex flex-column gap-3"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button class="btn-action" style="background-color: #E67E22; color: white; flex-direction:row;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</button></div>`;
+        document.getElementById('layer-4').innerHTML = `<h2 class="section-title">อาการเริ่มเป็นเมื่อไหร่?</h2><div id="time-options-container" class="d-flex flex-wrap gap-2 justify-content-center"></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</button></div>`;
+        document.getElementById('layer-6').innerHTML = `<div id="final-emoji" style="text-align:center; font-size: 100px; margin-bottom: 20px;"></div><h2 id="final-title" class="section-title"></h2><p id="final-text" class="text-center" style="font-size:28px;"></p><div class="d-flex flex-column gap-3 mt-4"><button class="btn-action btn-pulse-jerky" onclick="handleFinalSave(this, false, true)">บันทึกและปิดหน้าต่าง</button></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับหน้าแรก</button></div>`;
         setupTimeOptions();
     }
 
@@ -944,7 +468,7 @@
             <div class="card p-4 mb-4 border shadow-sm">
                 <h5 class="fw-bold fs-3 text-primary"><span class="iconify" data-icon="mdi:account-box-outline"></span> รูปใบหน้าตอนปกติ (อ้างอิง)</h5>
                 <div id="baseline-face-container" class="text-center mt-2">
-                    <img id="baseline-face-img" class="rounded border mx-auto mb-2" style="display:none; width:150px; height:150px; object-fit:cover;">
+                    <img id="baseline-face-img" class="rounded border mx-auto mb-2" referrerpolicy="no-referrer" style="display:none; width:150px; height:150px; object-fit:cover;">
                     <div style="position:relative; overflow:hidden;" class="mt-2">
                         <div class="file-upload-btn btn-secondary text-white" id="baseline-upload-btn">
                             <span class="iconify" data-icon="mdi:camera-plus"></span> อัปโหลดรูปหน้าปกติใหม่
@@ -967,26 +491,30 @@
             <div class="card p-4 mb-4 border shadow-sm">
                 <h5 class="fw-bold fs-3">2. แขน (Arm Drift)</h5>
                 <p class="text-danger fw-bold fs-4">สั่งการ: บอกให้ผู้ป่วยหลับตาและเหยียดแขนทั้งสองข้างตรงไปข้างหน้า (หรือยกแขนขึ้นพร้อมกัน) เป็นเวลา 10 วินาที</p>
-                <div id="arm-video-ui" class="text-center">
+                <div id="arm-video-ui" class="text-center" style="position:relative;">
                     <video id="arm-video-preview" autoplay playsinline class="w-100 rounded border bg-dark mb-3" style="display:none; max-height:300px; object-fit:cover;"></video>
+                    <div id="video-overlay-prep" style="display:none;">
+                        <h3 id="arm-overlay-text" style="font-size:32px; font-weight:bold; line-height:1.2;">โปรดถอยหลังให้เห็นเต็มกล้อง<br>แล้วยกแขนเหยียดไปด้านหน้า 10 วินาที</h3>
+                        <div id="arm-overlay-timer" style="font-size:60px; color:#F1C40F; font-weight:900;">10</div>
+                    </div>
                     <canvas id="arm-canvas-process" style="display:none;"></canvas>
                     <img id="preview-arm" class="w-100 rounded border mb-3" style="display:none;">
                     <button id="btn-start-arm-video" class="btn-action btn-primary-custom" onclick="startArmVideo()">
                         <span class="iconify" data-icon="mdi:video"></span> เริ่มถ่ายวิดีโอ (10 วินาที)
                     </button>
-                    <div id="arm-progress" class="mt-2 text-danger fw-bold fs-2" style="display:none;">กำลังบันทึก... <span id="arm-timer">10</span></div>
                 </div>
             </div>
             
             <div class="card p-4 mb-4 border shadow-sm">
                 <h5 class="fw-bold fs-3">3. เสียง (Speech)</h5>
-                <p class="text-center mb-3 fs-4">พูดว่า: <span class="karaoke-text">"ยายกินลำไย น้ำลายยายไหลย้อย"</span></p>
+                <p class="text-center mb-3 fs-4">พูดว่า:</p>
+                <span class="karaoke-text mb-3">"ยายกินลำไย น้ำลายยายไหลย้อย"</span>
                 <button id="btn-record" class="btn-action" style="background:#d9534f; color:white;" onclick="toggleRecording()">
                     <span class="iconify" data-icon="mdi:microphone"></span> กดอัดเสียง (5 วินาที)
                 </button>
                 <div id="audio-controls-container" style="display:none;" class="mt-3 text-center">
                     <audio id="audio-playback" controls class="w-100" style="height:50px;"></audio>
-                    <small class="text-success fw-bold fs-4">บันทึกแล้ว</small>
+                    <small class="text-success fw-bold fs-4">อัดเสียงเสร็จแล้ว กดปุ่มเพื่อฟัง</small>
                 </div>
             </div>
             
@@ -996,18 +524,11 @@
             </button>
             <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-ai-intro')">ย้อนกลับ</button></div>
         `;
-        
-        document.getElementById('layer-ai-processing').innerHTML = `
-            <div class="text-center py-5">
-                <div class="spinner mx-auto mb-4"></div>
-                <h2 style="font-size:32px;">กำลังวิเคราะห์...</h2>
-            </div>
-        `;
-        
+        document.getElementById('layer-ai-processing').innerHTML = `<div class="text-center py-5"><div class="spinner mx-auto mb-4"></div><h2 style="font-size:32px;">กำลังวิเคราะห์...</h2></div>`;
         document.getElementById('layer-ai-result').innerHTML = `<div id="ai-result-content"></div>`;
     }
 
-    // --- NEW LAYER 2 STRUCTURE (Card & Outside) ---
+    // --- NEW LAYER 2 STRUCTURE ---
     window.showLayer2 = function(symptomKey) {
         saveData('symptomCategory', symptomKey);
         document.getElementById('layer-2-title').textContent = `ประเมิน: ${symptomTranslations[symptomKey]}`;
@@ -1016,121 +537,61 @@
         let likelyHtml = detail.likely.map(text => `<button class="btn-likely" style="font-size:24px;" onclick="handleSymptomResult(true, '${text}')">${text}</button>`).join('');
         let unlikelyHtml = detail.unlikely.map(text => `<button class="btn-unlikely" style="font-size:24px;" onclick="handleSymptomResult(false, '${text}')">${text}</button>`).join('');
 
-        // ส่วนที่อยู่ในกรอบแดง (ปิดการคลิกขยายรูป)
-        let cardHtml = `
-            <div class="symptom-card-red">
-                <img src="${symptomImages[symptomKey]}" class="full-img-view">
-        `;
-        
-        if (detail.desc) {
-            cardHtml += `
-                <div class="alert alert-warning border-0 text-start p-3 mb-4">
-                    <strong class="fs-4 text-danger"><span class="iconify" data-icon="mdi:magnify-scan"></span> วิธีสังเกต:</strong> 
-                    <span class="fs-4">${detail.desc}</span>
-                </div>
-            `;
-        }
-        
-        if (detail.hasAi) {
-            cardHtml += `
-                <button onclick="handleAiTest()" class="btn-action btn-ai mb-4">
-                    <span>วิเคราะห์ด้วย AI</span>
-                </button>
-            `;
-        }
-        
+        let cardHtml = `<div class="symptom-card-red"><img src="${symptomImages[symptomKey]}" class="full-img-view">`;
+        if (detail.desc) cardHtml += `<div class="alert alert-warning border-0 text-start p-3 mb-4"><strong class="fs-4 text-danger"><span class="iconify" data-icon="mdi:magnify-scan"></span> วิธีสังเกต:</strong> <span class="fs-4">${detail.desc}</span></div>`;
+        if (detail.hasAi) cardHtml += `<button onclick="handleAiTest()" class="btn-action btn-ai mb-4"><span>วิเคราะห์ด้วย AI</span></button>`;
         cardHtml += `
                 <div class="d-flex flex-column gap-3">
                     <button class="btn-likely" style="font-size:28px;" onclick="handleSymptomResult(true, '${detail.likely[0]}')">
                         อาการเข้าข่าย (เป็น)
                         <span class="btn-sub-text">(${detail.likely[0]})</span>
                     </button>
-                    <button class="btn-unlikely" style="font-size:28px;" onclick="handleSymptomResult(false, 'อาการไม่เข้าข่าย')">
-                        อาการไม่เข้าข่าย (ไม่เป็น)
-                    </button>
+                    <button class="btn-unlikely" style="font-size:28px;" onclick="handleSymptomResult(false, 'อาการไม่เข้าข่าย')">อาการไม่เข้าข่าย (ไม่เป็น)</button>
                 </div>
-            </div>
-        `;
+            </div>`;
 
-        // ส่วนที่อยู่นอกกรอบ
-        let outsideHtml = `
-            <h4 class="mt-4 mb-3 fw-bold text-center">หรือมีอาการดังต่อไปนี้:</h4>
-            ${likelyHtml}
-            <hr class="m-3">
-            ${unlikelyHtml}
-        `;
-        
+        let outsideHtml = `<h4 class="mt-4 mb-3 fw-bold text-center">หรือมีอาการดังต่อไปนี้:</h4>${likelyHtml}<hr class="m-3">${unlikelyHtml}`;
         document.getElementById('layer-2-new-content').innerHTML = cardHtml + outsideHtml;
         showLayer('layer-2');
     };
 
     window.handleSymptomResult = function(isLikely, symptomDetail) {
         saveData('symptomDetail', symptomDetail);
-        if (isLikely) {
-            showLayer('layer-3'); 
-        } else { 
-            saveData('frequency', 'ไม่เข้าข่ายสโตรกเฉียบพลัน'); 
-            showFinalMessage("ผลเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่สโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์"); 
-        }
+        if (isLikely) { showLayer('layer-3'); } 
+        else { saveData('frequency', 'ไม่เข้าข่ายสโตรกเฉียบพลัน'); showFinalMessage("ผลเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่สโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์"); }
     };
     
-    // ฟังก์ชันเมื่อกด "ฉันไม่มีอาการอะไรเลย"
     window.handleFinalNoSymptom = function() { 
-        saveData('symptomCategory', 'ไม่มีอาการ'); 
-        saveData('symptomDetail', 'ฉันไม่มีอาการอะไรเลย'); 
+        saveData('symptomCategory', 'ไม่มีอาการ'); saveData('symptomDetail', 'ฉันไม่มีอาการอะไรเลย'); 
         sessionData.isEmergency = false;
         showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย"); 
     };
 
-    window.handleSeveritySelection = function(txt) { 
-        saveData('frequency', txt); 
-        showLayer('layer-4'); 
-    };
-
-    window.handleChronicSymptom = function(txt) { 
-        saveData('frequency', txt); 
-        showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรพบแพทย์เพื่อหาสาเหตุที่แท้จริง"); 
-    };
-
+    window.handleSeveritySelection = function(txt) { saveData('frequency', txt); showLayer('layer-4'); };
+    window.handleChronicSymptom = function(txt) { saveData('frequency', txt); showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรพบแพทย์เพื่อหาสาเหตุที่แท้จริง"); };
     window.handleTimeSelection = function(min, isChronic) {
-        if (isChronic) { 
-            saveData('onsetTime', 'เรื้อรัง/หลายวัน'); 
-            showFinalMessage("คำแนะนำ", "อาการเป็นมานาน อาจไม่ใช่ภาวะฉุกเฉินสโตรก ควรพบแพทย์ตามปกติ"); 
-            return; 
-        }
+        if (isChronic) { saveData('onsetTime', 'เรื้อรัง/หลายวัน'); showFinalMessage("คำแนะนำ", "อาการเป็นมานาน อาจไม่ใช่ภาวะฉุกเฉินสโตรก ควรพบแพทย์ตามปกติ"); return; }
         const onset = new Date(Date.now() - min * 60000);
-        sessionData.onsetTimeObject = onset;
-        saveData('onsetTime', formatFullDateTime(onset));
-        showLayer('layer-5');
-        buildSummaryPage();
+        sessionData.onsetTimeObject = onset; saveData('onsetTime', formatFullDateTime(onset));
+        showLayer('layer-5'); buildSummaryPage();
     };
 
     // --- CROPPER LOGIC ---
-    let currentCropType = ''; // 'baseline' or 'current'
-    
+    let currentCropType = '';
     window.openCropModal = function(input, type) {
         if (!input.files || !input.files[0]) return;
         currentCropType = type;
         const reader = new FileReader();
         reader.onload = (e) => {
-            const image = document.getElementById('crop-image');
-            image.src = e.target.result;
+            const image = document.getElementById('crop-image'); image.src = e.target.result;
             document.getElementById('crop-modal').style.display = 'flex';
             if (cropper) cropper.destroy();
-            cropper = new Cropper(image, { 
-                aspectRatio: 1, 
-                viewMode: 1, 
-                autoCropArea: 1, 
-                background: false 
-            });
+            cropper = new Cropper(image, { aspectRatio: 1, viewMode: 1, autoCropArea: 1, background: false });
         };
         reader.readAsDataURL(input.files[0]);
     };
 
-    window.cancelCrop = function() { 
-        document.getElementById('crop-modal').style.display = 'none'; 
-        if(cropper) cropper.destroy(); 
-    };
+    window.cancelCrop = function() { document.getElementById('crop-modal').style.display = 'none'; if(cropper) cropper.destroy(); };
 
     window.confirmCrop = function() {
         if (!cropper) return;
@@ -1144,227 +605,150 @@
             document.getElementById('loading-text').textContent = 'กำลังให้ AI ตรวจสอบรูป...';
             document.getElementById('loading').style.display = 'flex';
             
-            const targetId = sessionData.targetUserId || sessionData.userID;
-            const searchCol = document.getElementById('assessor-select').value === 'others' ? 'Telephone' : 'Unique_ID';
-
-            fetch(GAS_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ 
-                    action: 'validateAndSaveBaseline', 
-                    imageBase64: base64Data, 
-                    searchKey: targetId, 
-                    searchCol: searchCol 
-                }) 
-            })
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'validateAndSaveBaseline', imageBase64: base64Data, searchKey: sessionData.targetUserId || sessionData.userID, searchCol: document.getElementById('assessor-select').value === 'others' ? 'Telephone' : 'Unique_ID' }) })
             .then(res => res.json())
             .then(data => {
                 document.getElementById('loading').style.display = 'none';
                 if (data.status === 'success' || data.status === 'success_but_no_user_record') {
-                    sessionData.normal_face = data.url; 
-                    updateBaselineFaceUI();
-                    showCustomAlert("บันทึกรูปภาพอ้างอิงเรียบร้อยแล้ว");
-                } else {
-                    showCustomAlert("รูปภาพไม่ผ่าน: " + (data.message || ''));
-                }
-            }).catch(err => { 
-                document.getElementById('loading').style.display = 'none'; 
-                showCustomAlert("การเชื่อมต่อล้มเหลว"); 
-            });
-            
+                    sessionData.normal_face = data.url; updateBaselineFaceUI(); showCustomAlert("บันทึกรูปภาพอ้างอิงเรียบร้อยแล้ว");
+                } else showCustomAlert("รูปภาพไม่ผ่าน: " + (data.message || ''));
+            }).catch(err => { document.getElementById('loading').style.display = 'none'; showCustomAlert("การเชื่อมต่อล้มเหลว"); });
         } else if (currentCropType === 'current') {
-            aiInputs.face = base64Data;
-            document.getElementById('preview-face').src = "data:image/jpeg;base64," + base64Data;
-            document.getElementById('preview-face').style.display = 'block';
+            aiInputs.face = base64Data; document.getElementById('preview-face').src = "data:image/jpeg;base64," + base64Data; document.getElementById('preview-face').style.display = 'block';
         }
     };
 
     function updateBaselineFaceUI() {
-        const img = document.getElementById('baseline-face-img');
-        const btn = document.getElementById('baseline-upload-btn');
+        const img = document.getElementById('baseline-face-img'); const btn = document.getElementById('baseline-upload-btn');
         if(!img) return;
-        
         if (sessionData.normal_face) {
-            img.src = sessionData.normal_face; 
-            aiInputs.baselineFaceUrl = sessionData.normal_face;
-            img.style.display = 'block'; 
-            btn.innerHTML = `<span class="iconify" data-icon="mdi:camera-retake"></span> ถ่ายใหม่/เปลี่ยนรูป`;
+            img.src = sessionData.normal_face; aiInputs.baselineFaceUrl = sessionData.normal_face; img.style.display = 'block'; btn.innerHTML = `<span class="iconify" data-icon="mdi:camera-retake"></span> ถ่ายใหม่/เปลี่ยนรูป`;
         } else {
-            img.style.display = 'none'; 
-            aiInputs.baselineFaceUrl = null;
-            btn.innerHTML = `<span class="iconify" data-icon="mdi:camera-plus"></span> ถ่ายรูปหน้าตอนปกติ (อ้างอิง)`;
+            img.style.display = 'none'; aiInputs.baselineFaceUrl = null; btn.innerHTML = `<span class="iconify" data-icon="mdi:camera-plus"></span> ถ่ายรูปหน้าตอนปกติ (อ้างอิง)`;
         }
     }
 
-    // --- ARM VIDEO (10s) ---
+    // --- ARM VIDEO (10s Prep + 10s Rec) ---
     window.startArmVideo = function() {
         const video = document.getElementById('arm-video-preview');
+        const overlay = document.getElementById('video-overlay-prep');
+        const overlayText = document.getElementById('arm-overlay-text');
+        const overlayTimer = document.getElementById('arm-overlay-timer');
         const btnStart = document.getElementById('btn-start-arm-video');
-        const progress = document.getElementById('arm-progress');
         const imgPreview = document.getElementById('preview-arm');
         const canvas = document.getElementById('arm-canvas-process');
 
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false }).then(stream => {
-            videoStream = stream; 
-            video.srcObject = stream; 
-            video.style.display = 'block';
-            imgPreview.style.display = 'none'; 
-            btnStart.style.display = 'none';
+            videoStream = stream; video.srcObject = stream; video.style.display = 'block';
+            imgPreview.style.display = 'none'; btnStart.style.display = 'none'; overlay.style.display = 'flex';
             
             video.onloadedmetadata = () => {
-                progress.style.display = 'block';
-                canvas.width = video.videoWidth * 2; 
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                let timeLeft = 10; 
-                document.getElementById('arm-timer').textContent = timeLeft;
-
-                // Frame 0 (ซ้าย)
-                ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-                ctx.font = "40px Noto Sans Thai"; 
-                ctx.fillStyle = "yellow"; 
-                ctx.fillText("เริ่ม (0วิ)", 20, 50);
-
-                const timerInterval = setInterval(() => {
-                    timeLeft--; 
-                    document.getElementById('arm-timer').textContent = timeLeft;
-                    if(timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        
-                        // Frame 10 (ขวา)
-                        ctx.drawImage(video, video.videoWidth, 0, video.videoWidth, video.videoHeight);
-                        ctx.font = "40px Noto Sans Thai"; 
-                        ctx.fillStyle = "red"; 
-                        ctx.fillText("จบ (10วิ)", video.videoWidth + 20, 50);
-
-                        aiInputs.arm = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
-                        imgPreview.src = "data:image/jpeg;base64," + aiInputs.arm;
-                        imgPreview.style.display = 'block';
-                        
-                        if(videoStream) {
-                            videoStream.getTracks().forEach(t => t.stop());
-                        }
-                        
-                        video.style.display = 'none'; 
-                        progress.style.display = 'none';
-                        btnStart.style.display = 'inline-block'; 
-                        btnStart.innerHTML = 'ถ่ายใหม่';
+                let prepTime = 10;
+                overlayText.innerHTML = "โปรดถอยหลังให้เห็นเต็มกล้อง<br>แล้วยกแขนเหยียดไปด้านหน้า 10 วินาที<br>จะเริ่มถ่ายในอีก...";
+                overlayTimer.textContent = prepTime;
+                
+                const prepInterval = setInterval(() => {
+                    prepTime--; overlayTimer.textContent = prepTime;
+                    if(prepTime <= 0) {
+                        clearInterval(prepInterval);
+                        startRecordingArm(video, overlay, overlayText, overlayTimer, canvas, imgPreview, btnStart);
                     }
                 }, 1000);
             };
-        }).catch(err => {
-            showCustomAlert("ไม่สามารถเปิดกล้องได้");
-        });
+        }).catch(err => { showCustomAlert("ไม่สามารถเปิดกล้องได้"); });
     };
 
-    // --- OTHER LOGIC ---
+    function startRecordingArm(video, overlay, overlayText, overlayTimer, canvas, imgPreview, btnStart) {
+        overlayText.innerHTML = "กำลังบันทึกภาพ...<br>โปรดค้างแขนไว้";
+        overlayTimer.style.color = "#ff3654";
+        
+        canvas.width = video.videoWidth * 2; canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        let recTime = 10; overlayTimer.textContent = recTime;
+
+        // แคปเฟรมแรกวินาทีที่ 0
+        ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+        const recInterval = setInterval(() => {
+            recTime--; overlayTimer.textContent = recTime;
+            if(recTime <= 0) {
+                clearInterval(recInterval);
+                // แคปเฟรมสุดท้ายวินาทีที่ 10
+                ctx.drawImage(video, video.videoWidth, 0, video.videoWidth, video.videoHeight);
+
+                aiInputs.arm = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
+                imgPreview.src = "data:image/jpeg;base64," + aiInputs.arm;
+                imgPreview.style.display = 'block';
+                
+                if(videoStream) videoStream.getTracks().forEach(t => t.stop());
+                video.style.display = 'none'; overlay.style.display = 'none';
+                btnStart.style.display = 'inline-block'; btnStart.innerHTML = 'ถ่ายใหม่';
+            }
+        }, 1000);
+    }
+
+    // --- AUDIO LOGIC ---
     window.toggleRecording = function() {
         const btn = document.getElementById('btn-record');
         if (btn.innerText.includes("กดอัดเสียง")) {
             navigator.mediaDevices.getUserMedia({ audio: true }).then(s => {
-                mediaRecorder = new MediaRecorder(s); 
-                mediaRecorder.start(); 
-                audioChunks = [];
+                mediaRecorder = new MediaRecorder(s); mediaRecorder.start(); audioChunks = [];
+                let count = 5;
+                btn.innerHTML = `กำลังบันทึก... ${count}`; btn.style.backgroundColor = "#333";
                 
-                btn.innerHTML = 'กำลังบันทึก...'; 
-                btn.style.backgroundColor = "#333";
-                
+                const countInt = setInterval(() => { count--; if(count>0) btn.innerHTML = `กำลังบันทึก... ${count}`; }, 1000);
+
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
                 mediaRecorder.onstop = () => {
+                    clearInterval(countInt);
                     const blob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const r = new FileReader(); 
-                    r.readAsDataURL(blob); 
-                    r.onloadend = () => { aiInputs.audio = r.result.split(',')[1]; };
-                    
-                    btn.innerHTML = 'บันทึกแล้ว'; 
-                    btn.style.backgroundColor = "#28a745";
+                    document.getElementById('audio-playback').src = URL.createObjectURL(blob);
+                    document.getElementById('audio-controls-container').style.display = 'block';
+                    const r = new FileReader(); r.readAsDataURL(blob); r.onloadend = () => { aiInputs.audio = r.result.split(',')[1]; };
+                    btn.innerHTML = '<span class="iconify" data-icon="mdi:microphone-retake"></span> อัดเสียงใหม่'; btn.style.backgroundColor = "#28a745";
                 };
-                
-                setTimeout(() => { 
-                    if (mediaRecorder.state === "recording") {
-                        mediaRecorder.stop(); 
-                    }
-                }, 5000);
+                setTimeout(() => { if (mediaRecorder.state === "recording") mediaRecorder.stop(); }, 5000);
             });
         }
     };
 
     window.analyzeWithGemini = function() {
-        if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { 
-            showCustomAlert("ส่งข้อมูลอย่างน้อย 1 อย่าง"); 
-            return; 
-        }
-        
+        if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { showCustomAlert("ส่งข้อมูลอย่างน้อย 1 อย่าง"); return; }
         showLayer('layer-ai-processing');
-        
-        fetch(GAS_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ 
-                action: 'analyzeStroke', 
-                faceImage: aiInputs.face, 
-                baselineFaceUrl: aiInputs.baselineFaceUrl, 
-                armImage: aiInputs.arm, 
-                speechAudio: aiInputs.audio, 
-                userData: sessionData, 
-                isTestMode: sessionData.isTestMode || false 
-            }) 
-        })
-        .then(res => res.json())
-        .then(data => { 
+        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'analyzeStroke', faceImage: aiInputs.face, baselineFaceUrl: aiInputs.baselineFaceUrl, armImage: aiInputs.arm, speechAudio: aiInputs.audio, userData: sessionData, isTestMode: sessionData.isTestMode || false }) })
+        .then(res => res.json()).then(data => { 
             if (data.status === 'success') { 
-                currentAnalysisResult = data.data; 
-                sessionData.isAiAssessment = true; 
-                sessionData.riskScore = data.data.riskScore; 
-                sessionData.analysis = data.data.analysis; 
+                currentAnalysisResult = data.data; sessionData.isAiAssessment = true; 
+                sessionData.riskScore = data.data.riskScore; sessionData.analysis = data.data.analysis; 
                 displayAiResult(data.data); 
-            } else {
-                showAiError(data.message); 
-            }
-        }).catch(err => {
-            showAiError("เชื่อมต่อไม่ได้");
-        });
+            } else showAiError(data.message); 
+        }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
     };
 
     function displayAiResult(res) {
         const c = document.getElementById('ai-result-content');
         if (!res.isValid) {
-            c.innerHTML = `
-                <div class="text-center">
-                    <h3 class="text-warning fw-bold fs-2">⚠️ ข้อมูลไม่ชัดเจน</h3>
-                    <p>${res.refusalReason}</p>
-                    <button class="btn-action btn-secondary" onclick="showLayer('layer-ai-input')">กลับไปถ่ายใหม่</button>
-                </div>
-            `;
+            c.innerHTML = `<div class="text-center"><h3 class="text-warning fw-bold fs-2">⚠️ ข้อมูลไม่ชัดเจน</h3><p>${res.refusalReason}</p><button class="btn-action btn-secondary" onclick="showLayer('layer-ai-input')">กลับไปถ่ายใหม่</button></div>`;
         } else {
-            let html = `
-                <h3 class="text-center fw-bold fs-2 ${res.isRisk ? 'text-danger' : 'text-success'}">
-                    ${res.isRisk ? `🚨 เสี่ยงสูง (${res.riskScore}%)` : '✅ ไม่พบความเสี่ยงชัดเจน'}
-                </h3>
-                <div class="bg-light p-3 rounded mb-3 text-start border fs-5">
-                    <strong>ผล:</strong>
-                    <p>${res.analysis}</p>
-                </div>
-            `;
+            let html = `<h3 class="text-center fw-bold fs-2 ${res.isRisk ? 'text-danger' : 'text-success'}">${res.isRisk ? `🚨 เสี่ยงสูง (${res.riskScore}%)` : '✅ ไม่พบความเสี่ยงชัดเจน'}</h3>`;
+            
+            html += `<div class="bg-light p-3 rounded mb-3 text-start border fs-5"><strong>ผลการวิเคราะห์:</strong><br>${res.analysis.replace(/\n/g, '<br>')}</div>`;
+            html += `<p class="text-danger mt-3 mb-4" style="font-size: 20px; font-weight: bold; border: 2px dashed #ff3654; padding: 15px; border-radius: 15px; background-color: #ffe6e6;">🚨 คำเตือน: ผลลัพธ์จาก AI เป็นเพียงการประเมินเบื้องต้น หากไม่แน่ใจโปรดพบแพทย์หรือโทร 1669 ทันที</p>`;
             
             if (aiInputs.face) {
-                html += `<img src="data:image/jpeg;base64,${aiInputs.face}" class="full-img-view">`;
+                html += `<div class="result-image-container"><div class="badge-green" style="top:10px; left:10px;">ผลวิเคราะห์ใบหน้า</div><div class="grid-overlay"></div><img src="data:image/jpeg;base64,${aiInputs.face}"></div>`;
             }
             if (aiInputs.arm) {
-                html += `<img src="data:image/jpeg;base64,${aiInputs.arm}" class="full-img-view">`;
+                html += `<div class="result-image-container"><div class="badge-green" style="top:10px; left:10px;">1 วินาที</div><div class="badge-green" style="top:10px; right:10px;">10 วินาที</div><img src="data:image/jpeg;base64,${aiInputs.arm}"></div>`;
             }
+
+            html += `<div class="d-flex flex-column gap-3 mt-4">`;
+            if (res.isRisk) html += `<button class="btn-action btn-pulse-danger" onclick="showLayer('layer-3'); saveData('symptomDetail', 'AI: ' + currentAnalysisResult.analysis);">ประเมินความฉับพลันต่อ</button>`;
+            else html += `<button class="btn-action btn-primary-custom" onclick="saveData('symptomDetail', 'AI: Low Risk'); handleFinalSave(this, false, true);">บันทึกและปิดโดยไม่ประเมินต่อ</button>`;
             
-            html += `
-                <p class="text-danger mt-4 mb-4" style="font-size: 20px; font-weight: bold; border: 2px dashed #ff3654; padding: 15px; border-radius: 15px; background-color: #ffe6e6;">
-                    🚨 คำเตือน: ผลลัพธ์จาก AI เป็นเพียงการประเมินเบื้องต้นจากข้อมูลที่ส่งมาเท่านั้น ไม่สามารถใช้แทนการวินิจฉัยของแพทย์ได้ หากไม่แน่ใจโปรดพบแพทย์หรือโทร 1669
-                </p>
-            `;
-            
-            if (res.isRisk) {
-                html += `<button class="btn-action btn-pulse-danger mt-4 mb-3" onclick="showLayer('layer-3'); saveData('symptomDetail', 'AI: ' + currentAnalysisResult.analysis);">ประเมินความฉับพลันต่อ</button>`;
-            } else {
-                html += `<button class="btn-action btn-pulse-jerky mt-3" onclick="saveData('symptomDetail', 'AI: Low Risk'); handleFinalSave(this, false, true);">บันทึกและจบการประเมิน</button>`;
-            }
-            
+            html += `<button class="btn-action btn-share" onclick="handleShare()">แชร์ผลการประเมินนี้</button>`;
             html += `<button class="btn-action btn-back" onclick="showLayer('layer-ai-input')">กลับไปแก้ไข</button>`;
+            html += `</div>`;
             c.innerHTML = html;
         }
         showLayer('layer-ai-result');
@@ -1373,144 +757,56 @@
     // --- SAVE AND FINAL ---
     window.handleFinalSave = function(btn, isUrg, skipLoc = false) {
         if(btn && btn.disabled) return;
-        
         if (isUrg && !sessionData.location && !skipLoc) {
-             showCustomConfirm("ท่านยังไม่ได้ระบุพิกัด \nต้องการส่งพิกัดเพื่อให้รถ รพ. มารับถูกจุดหรือไม่?", "แจ้งเตือนพิกัด", 
-             () => { 
-                 document.getElementById('loading').style.display = 'flex'; 
-                 getLocation(false, true, () => { 
-                     document.getElementById('loading').style.display = 'none'; 
-                     handleFinalSave(btn, isUrg, true); 
-                 }); 
-             }, 
-             () => { 
-                 handleFinalSave(btn, isUrg, true); 
-             });
+             showCustomConfirm("ท่านยังไม่ได้ระบุพิกัด \nต้องการส่งพิกัดเพื่อให้รถ รพ. มารับถูกจุดหรือไม่?", "แจ้งเตือนพิกัด", () => { document.getElementById('loading').style.display = 'flex'; getLocation(false, true, () => { document.getElementById('loading').style.display = 'none'; handleFinalSave(btn, isUrg, true); }); }, () => { handleFinalSave(btn, isUrg, true); });
              return;
         }
-        
         if(btn) btn.disabled = true;
         document.getElementById('loading').style.display = 'flex';
-        sessionData.isEmergency = isUrg; 
-        sessionData.isFinalSave = true;
+        sessionData.isEmergency = isUrg; sessionData.isFinalSave = true;
         
-        fetch(GAS_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: 'saveData', data: sessionData }) 
-        })
-        .then(res => res.json())
-        .then(res => {
+        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'saveData', data: sessionData }) })
+        .then(res => res.json()).then(res => {
             if(res.status==='success') {
-                if(liff.isInClient()) {
-                    liff.sendMessages([createFlexMessage(sessionData)])
-                        .then(() => liff.closeWindow())
-                        .catch(e => { liff.closeWindow(); });
-                } else { 
-                    document.getElementById('loading').style.display = 'none'; 
-                    showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว"); 
-                }
-            } else { 
-                document.getElementById('loading').style.display = 'none'; 
-                showCustomAlert("บันทึกไม่สำเร็จ"); 
-                if(btn) btn.disabled=false; 
-            }
-        }).catch(err => { 
-            document.getElementById('loading').style.display = 'none'; 
-            if(btn) btn.disabled=false; 
+                if(liff.isInClient()) { liff.sendMessages([createFlexMessage(sessionData)]).then(() => liff.closeWindow()).catch(e => { liff.closeWindow(); }); } 
+                else { document.getElementById('loading').style.display = 'none'; showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว"); }
+            } else { document.getElementById('loading').style.display = 'none'; showCustomAlert("บันทึกไม่สำเร็จ"); if(btn) btn.disabled=false; }
+        }).catch(err => { document.getElementById('loading').style.display = 'none'; if(btn) btn.disabled=false; });
+    };
+
+    window.handleShare = function() {
+        if (!liff.isInClient()) { showCustomAlert("ฟังก์ชันนี้ใช้ได้เฉพาะใน LINE เท่านั้น"); return; }
+        showCustomConfirm("เมื่อกดปุ่มนี้จะแชร์ข้อมูลผลการประเมินไปให้คนที่ท่านเลือกใน LINE\n\nคำเตือน: โปรดระมัดระวังข้อมูลส่วนบุคคล (PDPA)", "ยืนยันการแชร์", () => {
+            liff.shareTargetPicker([createFlexMessage(sessionData)]).then(res => { if (res) showCustomAlert("แชร์ข้อมูลเรียบร้อย"); }).catch(err => { showCustomAlert("การแชร์ล้มเหลว หรือถูกยกเลิก"); });
+        });
+    };
+
+    window.handleTestClose = function() {
+        showCustomConfirm("ยืนยันการปิดหน้าต่าง?\n(ข้อมูลจะไม่ถูกบันทึก และไม่แจ้งเตือน รพ.)", "ออกจากการทดสอบ", () => {
+            if(liff.isInClient()) liff.closeWindow(); else window.close();
         });
     };
 
     function setupTimeOptions() {
-        const c = document.getElementById('time-options-container'); 
-        if (!c) return; 
-        c.innerHTML = '';
-        
-        const options = [
-            { text: `เพิ่งเกิด`, min: 0, h: true },
-            { text: '10 นาที', min: 10 },
-            { text: '30 นาที', min: 30 },
-            { text: '1 ชม.', min: 60 },
-            { text: '2 ชม.', min: 120 },
-            { text: '3 ชม.', min: 180 },
-            { text: '4 ชม.', min: 240 },
-            { text: '6 ชม.', min: 360 },
-            { text: '12 ชม.', min: 720 },
-            { text: '1 วันก่อน', min: 1440, chronic: true },
-            { text: 'หลายวัน', min: 0, chronic: true }
-        ];
-        
+        const c = document.getElementById('time-options-container'); if (!c) return; c.innerHTML = '';
+        const options = [{ text: `เพิ่งเกิด (${formatTime(new Date())})`, min: 0 }, { text: '10 นาที', min: 10 }, { text: '30 นาที', min: 30 }, { text: '1 ชม.', min: 60 }, { text: '2 ชม.', min: 120 }, { text: '3 ชม.', min: 180 }, { text: '4 ชม.', min: 240 }, { text: '6 ชม.', min: 360 }, { text: '12 ชม.', min: 720 }, { text: '1 วันก่อน', min: 1440, chronic: true }, { text: 'หลายวัน', min: 0, chronic: true }];
         options.forEach(opt => {
-            let cls = 'btn-action time-btn' + (opt.h ? ' highlight' : '');
-            let sty = opt.chronic 
-                ? 'background:#E67E22; color:white; width:calc(33% - 15px);' 
-                : 'background:#f8f9fa; color:#333; border: 2px solid #ccc; width:calc(33% - 15px);';
-            c.innerHTML += `<button class="${cls}" style="${sty}" onclick="handleTimeSelection(${opt.min}, ${opt.chronic})">${opt.text}</button>`;
+            let sty = opt.chronic ? 'background:#E67E22; color:white; width:calc(33% - 15px);' : 'background:#f8f9fa; color:#333; border: 2px solid #ccc; width:calc(33% - 15px);';
+            c.innerHTML += `<button class="btn-action time-btn" style="${sty}" onclick="handleTimeSelection(${opt.min}, ${opt.chronic})">${opt.text}</button>`;
         });
     }
 
     function createFlexMessage(data) {
         const isAbnormal = data.isEmergency || (data.isAiAssessment && data.riskScore >= 50);
-        return { 
-            type: "flex", 
-            altText: "ผลประเมินสโตรก", 
-            contents: { 
-                type: "bubble", 
-                header: { 
-                    type: "box", 
-                    layout: "vertical", 
-                    backgroundColor: isAbnormal ? "#D32F2F" : "#2E7D32", 
-                    contents: [{ 
-                        type: "text", 
-                        text: data.isTestMode ? "[ทดสอบ] ประเมินอาการ" : "ประเมินอาการสโตรก", 
-                        color: "#ffffff", 
-                        weight: "bold", 
-                        size: "xl", 
-                        align: "center" 
-                    }] 
-                }, 
-                body: { 
-                    type: "box", 
-                    layout: "vertical", 
-                    contents: [{ 
-                        type: "text", 
-                        text: "ผล: " + (data.symptomDetail || "ปกติ"), 
-                        wrap: true 
-                    }] 
-                } 
-            } 
-        };
+        return { type: "flex", altText: "ผลประเมินสโตรก", contents: { type: "bubble", header: { type: "box", layout: "vertical", backgroundColor: isAbnormal?"#D32F2F":"#2E7D32", contents: [{ type: "text", text: data.isTestMode?"[ทดสอบ] ประเมินอาการ":"ประเมินอาการสโตรก", color: "#ffffff", weight: "bold", size: "xl", align: "center" }] }, body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "ผล: " + (data.symptomDetail||"ปกติ"), wrap: true }] } } };
     }
 
-    // UTILS
-    window.showFinalMessage = function(t, txt) { 
-        document.getElementById('final-title').textContent = t; 
-        document.getElementById('final-text').textContent = txt; 
-        document.getElementById('final-emoji').textContent = '👍'; 
-        showLayer('layer-6'); 
-    };
-    
-    function formatTime(d) { 
-        return d.toTimeString().slice(0,5); 
-    }
-    
-    function formatFullDateTime(d) { 
-        return `${new Date(d).getDate()}/${new Date(d).getMonth()+1}/${new Date(d).getFullYear()+543} ${formatTime(new Date(d))}`; 
-    }
-    
-    window.showLayer = function(id) { 
-        document.querySelectorAll('[data-layer]').forEach(e => e.classList.add('hidden')); 
-        document.getElementById(id).classList.remove('hidden'); 
-    };
-    
-    window.saveData = function(k, v) { 
-        sessionData[k] = v; 
-    };
-    
-    // กำหนดฟังก์ชัน handleAiTest อย่างชัดเจน
-    window.handleAiTest = function() { 
-        showLayer('layer-ai-intro'); 
-        updateBaselineFaceUI(); 
-    };
+    window.showFinalMessage = function(t, txt) { document.getElementById('final-title').textContent = t; document.getElementById('final-text').textContent = txt; document.getElementById('final-emoji').textContent = '👍'; showLayer('layer-6'); };
+    function formatTime(d) { return d.toTimeString().slice(0,5); }
+    function formatFullDateTime(d) { return `${new Date(d).getDate()}/${new Date(d).getMonth()+1}/${new Date(d).getFullYear()+543} ${formatTime(new Date(d))}`; }
+    window.showLayer = function(id) { document.querySelectorAll('[data-layer]').forEach(e => e.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); };
+    window.saveData = function(k, v) { sessionData[k] = v; };
+    window.handleAiTest = function() { showLayer('layer-ai-intro'); updateBaselineFaceUI(); };
 </script>
 </body>
 </html>
