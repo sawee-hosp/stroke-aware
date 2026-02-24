@@ -142,8 +142,6 @@
         
         .result-image-container { position: relative; width: 100%; max-width: 400px; margin: 20px auto; border-radius: 25px; overflow: hidden; box-shadow: 0 8px 15px rgba(0,0,0,0.15); border: 3px solid #eee; }
         .result-image-container img { width: 100%; display: block; }
-        
-        /* เอาเส้น Grid แบบ HTML เดิมออก เพราะเราจะวาดลงรูปตรงๆ แทน */
         .btn-test-close { background-color: #7f8c8d; color: white; border: 3px solid #666; font-size: 20px; margin-top: 15px; flex-direction: row;}
 
         .toggle-wrapper { display: flex; align-items: center; justify-content: center; background: #f0f4f8; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #d9e2ec; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
@@ -157,20 +155,20 @@
 
         .watermark { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .watermark.active { opacity: 0.15; }
-        .watermark-text { font-size: 50px; font-weight: 900; color: red; transform: rotate(-45deg); white-space: nowrap; text-align: center; line-height: 1.2; text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white; }
+        .watermark-text { font-size: 40px; font-weight: 900; color: red; transform: rotate(-30deg); white-space: nowrap; text-align: center; line-height: 1.2; text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white; }
 
         .full-img-view { width: 100%; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; pointer-events: none; }
         .symptom-card-red { border: 4px solid #ff3654; border-radius: 20px; padding: 15px; background: #fffafb; margin-bottom: 20px; }
         
-        #video-overlay-prep { position: absolute; top:0; left:0; width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; border-radius: 0.375rem; text-align:center; padding: 10px; }
+        #video-overlay-prep { position: absolute; top:0; left:0; width:100%; height:100%; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; border-radius: 0.375rem; text-align:center; padding: 10px; text-shadow: 2px 2px 4px #000;}
         
-        /* Cropper CSS (รูปไข่ กลางจอ ลากรูปได้) */
-        #crop-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 8000; flex-direction: column; display: none; }
+        /* Cropper CSS (Fixed Oval with Center Lines) */
+        #crop-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 8000; flex-direction: column; display: none;} 
         .crop-container { flex: 1; width: 100%; overflow: hidden; background: #333; position: relative; display: flex; align-items: center; justify-content: center; }
         .crop-text-guide { position: absolute; top: 20px; width: 100%; text-align: center; color: #00FF00; z-index: 2; font-weight: bold; font-size: 24px; text-shadow: 1px 1px 2px black; }
         .crop-actions { padding: 20px; background: #222; display: flex; gap: 10px; z-index: 3;}
         
-        /* สร้างกรอบ Crop เป็นรูปไข่และล็อคไว้ตรงกลาง */
+        /* Make Cropper View Box Oval */
         .cropper-view-box, .cropper-face { border-radius: 50%; }
         .cropper-view-box { outline: 3px solid #00FF00; outline-color: rgba(0, 255, 0, 0.7); }
         .crop-center-line-v { position: absolute; top:0; left:50%; width:2px; height:100%; background:rgba(0,255,0,0.5); transform: translateX(-50%); pointer-events: none;}
@@ -187,7 +185,7 @@
 <body>
 
     <div id="test-watermark" class="watermark">
-        <div class="watermark-text">[กำลังทดสอบ ไม่ได้ใช้งานจริง]</div>
+        <div class="watermark-text">กำลังทดสอบ<br>ไม่ได้ใช้งานจริง<br>และไม่ได้ส่งข้อมูล<br>เรียกรถโรงพยาบาล</div>
     </div>
 
     <div id="loading" style="display: none;">
@@ -207,14 +205,14 @@
         </div>
     </div>
 
+    <!-- แถบดำล่างสุด -->
     <div class="fixed-footer-alert">หากฉุกเฉินเร่งด่วนโปรดกดโทรทันที ไม่ต้องรอประเมิน</div>
 
     <div class="container">
         <div class="app-header">
             <h1 class="main-title">ประเมินอาการสโตรก</h1>
-            <div id="info-btn" class="help-btn">อ่านก่อน</div>
         </div>
-
+        
         <div class="main-card">
             <div id="referrer-display"></div>
             <input type="hidden" id="referrerId">
@@ -267,11 +265,18 @@
         </div>
     </div>
 
+    <div id="image-viewer-modal" class="custom-modal" style="background-color: rgba(0,0,0,0.95);" onclick="this.style.display='none'">
+        <img id="full-image" style="max-width: 95%; max-height: 80vh; object-fit: contain; border-radius: 20px;">
+        <div style="color: #ccc; margin-top: 20px; font-size: 28px; font-weight:bold;">แตะที่ว่างเพื่อปิด</div>
+        <div class="btn-back" style="color: white; border-color: white; width: auto; padding: 15px 50px; margin-top: 30px; cursor:pointer;" onclick="this.style.display='none'">ปิด</div>
+    </div>
+
     <!-- Cropper Modal -->
     <div id="crop-modal" style="display: none;">
         <div class="crop-text-guide">เลื่อนและขยายรูปให้พอดีกรอบเขียว</div>
         <div class="crop-container">
             <img id="crop-image" style="max-width: 100%; display: block;">
+            <div class="crop-overlay-guide"></div>
         </div>
         <div class="crop-actions">
             <button class="btn-action" style="background:#555; color:white; flex-direction:row;" onclick="cancelCrop()">ยกเลิก</button>
@@ -292,13 +297,13 @@
     let audioChunks = [];
     let currentAnalysisResult = null; 
     let countdownInterval;
+    let currentActionElement = null;
     let currentActionKey = '';
     let currentTel = '';
     let videoStream; 
     let cropper;
     let activeAiModule = 'all'; 
 
-    const symptomTranslations = { 'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด' };
     const symptomImages = {
         'Balance': 'https://img2.pic.in.th/pic/-14a8e9c4fc269d4d8f.md.png',
         'Eye': 'https://img2.pic.in.th/pic/-16881cec753a949477.md.png',
@@ -306,6 +311,7 @@
         'Arm': 'https://img2.pic.in.th/pic/-15dbb33e12115949f4.md.png',
         'Speech': 'https://img5.pic.in.th/file/secure-sv1/-179b7758ead26c6d76.md.png'
     };
+    const symptomTranslations = { 'Balance': 'การทรงตัว', 'Eye': 'การมองเห็น', 'Face': 'ใบหน้า', 'Arm': 'แขนขา', 'Speech': 'การพูด' };
     const symptomDetails = {
         'Balance': { likely: ['เดินเซรุนแรง', 'สูญเสียการทรงตัว', 'ยืน/นั่งนิ่งไม่ได้'], unlikely: ['เวียนหัวตอนเปลี่ยนท่า', 'น้ำในหูไม่เท่ากัน'], desc: 'ยืนตัวตรงแขนแนบลำตัว 10 วินาที ไม่ได้ มีเซล้ม' },
         'Eye': { likely: ['ตามัวหรือมองไม่เห็น', 'เห็นภาพซ้อน', 'เสียการมองเห็นครึ่งซีก'], unlikely: ['ปัญหาสายตาเดิม', 'ตาแห้ง/ระคายเคือง'], desc: 'เอามือปิดตาทีละข้างแล้วมอง เห็นไม่ชัด' },
@@ -553,7 +559,6 @@
                             <div class="file-upload-btn text-white" style="background-color:#555;" id="baseline-upload-btn">
                                 <span class="iconify" data-icon="mdi:camera-plus"></span> อัปโหลดรูปหน้าปกติใหม่
                             </div>
-                            <!-- อนุญาตให้เปิดกล้องได้ -->
                             <input type="file" accept="image/*" id="baseline-file-input" onchange="openCropModal(this, 'baseline')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
                         </div>
                     </div>
@@ -569,7 +574,7 @@
                                 <div class="file-upload-btn btn-primary-custom" style="flex-direction:row;">
                                     <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูปปัจจุบัน
                                 </div>
-                                <input type="file" accept="image/*" capture="user" onchange="openCropModal(this, 'current')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                                <input type="file" accept="image/*" onchange="openCropModal(this, 'current')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
                             </div>
                         </div>
                     </div>
@@ -658,6 +663,7 @@
             showCustomAlert("กรุณายอมรับเงื่อนไข"); return; 
         } 
         
+        // Show/Hide specific cards based on selection
         document.getElementById('card-ai-face').style.display = (activeAiModule === 'all' || activeAiModule === 'Face') ? 'block' : 'none';
         document.getElementById('card-ai-arm').style.display = (activeAiModule === 'all' || activeAiModule === 'Arm') ? 'block' : 'none';
         document.getElementById('card-ai-speech').style.display = (activeAiModule === 'all' || activeAiModule === 'Speech') ? 'block' : 'none';
@@ -757,17 +763,29 @@
             // วาดรูปต้นฉบับ
             ctx.drawImage(img, 0, 0);
 
-            // ตีเส้น Grid สีเขียว (เบาๆ)
-            ctx.strokeStyle = "rgba(0, 255, 0, 0.4)";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.moveTo(0, canvas.height / 2); ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.stroke();
+            // ตีเส้น Grid สีเขียวสด 4x6 (เส้นหนา)
+            ctx.strokeStyle = "rgba(0, 255, 0, 0.8)";
+            ctx.lineWidth = 4;
+            
+            // 3 vertical lines (4 columns)
+            for(let i=1; i<=3; i++) {
+                ctx.beginPath();
+                ctx.moveTo((canvas.width/4)*i, 0);
+                ctx.lineTo((canvas.width/4)*i, canvas.height);
+                ctx.stroke();
+            }
+            
+            // 5 horizontal lines (6 rows)
+            for(let j=1; j<=5; j++) {
+                ctx.beginPath();
+                ctx.moveTo(0, (canvas.height/6)*j);
+                ctx.lineTo(canvas.width, (canvas.height/6)*j);
+                ctx.stroke();
+            }
 
             // วาด Badge ที่มุมซ้ายบน
             ctx.fillStyle = "#00FF00";
-            ctx.fillRect(10, 10, 220, 45); // ปรับขนาดให้พอดี
+            ctx.fillRect(10, 10, 220, 45); 
             ctx.fillStyle = "black";
             ctx.font = "bold 26px Noto Sans Thai";
             ctx.fillText(label, 20, 40);
@@ -776,12 +794,11 @@
             let timeStr = formatFullDateTime(new Date());
             ctx.fillStyle = "#00FF00";
             ctx.font = "bold 22px Noto Sans Thai";
-            // วาดเงาดำให้ตัวหนังสืออ่านง่ายขึ้น
             ctx.shadowColor = "black";
             ctx.shadowBlur = 4;
             ctx.fillText(timeStr, 15, canvas.height - 15);
-            
             ctx.shadowBlur = 0; // reset
+            
             callback(canvas.toDataURL("image/jpeg", 0.8).split(',')[1]);
         };
         img.src = "data:image/jpeg;base64," + base64Str;
@@ -900,7 +917,7 @@
 
                         // แคปเฟรมแรกวินาทีที่ 0
                         ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-                        // วาดป้าย 1 วินาที ทับไปเลย
+                        // วาดป้าย 1 วินาที ทับไปเลย สีเขียวสด
                         ctx.fillStyle = "#00FF00";
                         ctx.fillRect(10, 10, 150, 45);
                         ctx.fillStyle = "black";
@@ -913,7 +930,7 @@
                                 clearInterval(recInterval);
                                 // แคปเฟรมสุดท้ายวินาทีที่ 10
                                 ctx.drawImage(video, video.videoWidth, 0, video.videoWidth, video.videoHeight);
-                                // วาดป้าย 10 วินาที ทับไปเลย
+                                // วาดป้าย 10 วินาที ทับไปเลย สีเขียวสด
                                 ctx.fillStyle = "#00FF00";
                                 ctx.fillRect(video.videoWidth + 10, 10, 160, 45);
                                 ctx.fillStyle = "black";
@@ -998,6 +1015,7 @@
                 sessionData.analysis = data.data.analysis; 
                 sessionData.isRisk = data.data.isRisk; 
                 sessionData.isEmergency = data.data.isRisk;
+                sessionData.fileUrls = data.data.fileUrls; // Ensure fileUrls are set in sessionData
                 displayAiResult(data.data); 
             } else showAiError(data.message); 
         }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
@@ -1015,7 +1033,7 @@
             // รูปขวาคือรูปปัจจุบัน
             ctx.drawImage(img2, img2.width, 0);
             
-            // โหลดรูปซ้ายจาก Drive (อาจจะติด CORS ถ้ารูป Drive ไม่ยอมให้โหลดแบบ Anonymous)
+            // โหลดรูปซ้ายจาก Drive
             let img1 = new Image();
             img1.crossOrigin = "Anonymous";
             img1.onload = function() {
@@ -1023,7 +1041,7 @@
                 callback(canvas.toDataURL("image/jpeg", 0.8).split(',')[1]);
             };
             img1.onerror = function() {
-                // ถ้าติด CORS ก็ส่งแค่รูปขวากลับไป
+                // ถ้าติดปัญหาโหลดรูปเก่า ให้ส่งกลับแค่รูปปัจจุบัน
                 callback(currentBase64);
             };
             img1.src = formatDriveUrl(baselineUrl);
@@ -1038,6 +1056,7 @@
         } else {
             let html = `<h3 class="text-center fw-bold fs-2 ${res.isRisk?'text-danger':'text-success'}">${res.isRisk ? `🚨 เสี่ยงสูง (${res.riskScore}%)` : '✅ ไม่พบความเสี่ยงชัดเจน'}</h3>`;
             
+            // Format AI output to bold headers and separate lines
             let formattedAnalysis = res.analysis
                 .replace(/ใบหน้า:/g, '<br><b>ใบหน้า:</b>')
                 .replace(/แขน:/g, '<br><b>แขน:</b>')
@@ -1055,8 +1074,8 @@
                 let innerHtml = '';
                 if (finalFaceBase64) {
                     innerHtml += `<img src="data:image/jpeg;base64,${finalFaceBase64}" class="full-img-view mb-3">`;
-                    // เซฟรูปใบหน้าที่โดนแปะรวมกันแล้วไปใช้ใน Flex ด้วย
                     res.fileUrls.face_merged = finalFaceBase64; 
+                    if(sessionData.fileUrls) sessionData.fileUrls.face_merged = finalFaceBase64;
                 }
                 if (aiInputs.arm) {
                     innerHtml += `<img src="data:image/jpeg;base64,${aiInputs.arm}" class="full-img-view mb-3">`;
@@ -1087,6 +1106,7 @@
         }
     }
 
+    // --- SAVE AND FINAL ---
     function setupTimeOptions() {
         const c = document.getElementById('time-options-container'); if (!c) return; c.innerHTML = '';
         const options = [
@@ -1265,23 +1285,21 @@
             { type: "text", text: "เวลาประเมิน: " + formatFullDateTime(new Date()), size: "sm", color: "#666666" }
         ];
         
-        // แนบรูปที่ผ่านการตกแต่งแล้ว ถ้ามี
-        if (currentAnalysisResult && currentAnalysisResult.fileUrls) {
+        if (data.isAiAssessment && data.fileUrls) {
             let images = [];
-            // ใช้รูป face_merged (Collage) ถ้ามี ถ้าไม่มีใช้รูปเดี่ยว
-            if (currentAnalysisResult.fileUrls.face_merged) {
-                images.push(`data:image/jpeg;base64,${currentAnalysisResult.fileUrls.face_merged}`);
-            } else if (currentAnalysisResult.fileUrls.face && String(currentAnalysisResult.fileUrls.face).startsWith('http')) {
-                images.push(formatDriveUrl(currentAnalysisResult.fileUrls.face));
+            if (data.fileUrls.face_merged) {
+                images.push(`data:image/jpeg;base64,${data.fileUrls.face_merged}`);
+            } else if (data.fileUrls.face && String(data.fileUrls.face).startsWith('http')) {
+                images.push(formatDriveUrl(data.fileUrls.face));
             }
             
-            if (currentAnalysisResult.fileUrls.arm && String(currentAnalysisResult.fileUrls.arm).startsWith('http')) {
-                images.push(formatDriveUrl(currentAnalysisResult.fileUrls.arm));
+            if (data.fileUrls.arm && String(data.fileUrls.arm).startsWith('http')) {
+                images.push(formatDriveUrl(data.fileUrls.arm));
             }
             
             if (images.length > 0) {
                 let imgBox = { type: "box", layout: "horizontal", contents: [] };
-                images.forEach(url => { imgBox.contents.push({ type: "image", url: url, size: "full", aspectRatio: "1:1", aspectMode: "cover", flex: 1, margin: "sm", action: { type: "uri", uri: url } }); });
+                images.forEach(url => { imgBox.contents.push({ type: "image", url: url, size: "full", aspectRatio: "3:4", aspectMode: "fit", flex: 1, margin: "sm", action: { type: "uri", uri: url } }); });
                 bodyContents.unshift({ type: "separator", margin: "md" }); bodyContents.unshift(imgBox);
             }
         }
@@ -1299,7 +1317,10 @@
 
              adviceBox.contents = [{ type: "text", text: "คำแนะนำเบื้องต้น:", weight: "bold", size: "md", color: "#D32F2F" }, { type: "text", text: "1. โทร 1669 ทันที\n2. ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย\n3. ห้ามกินยาหรือดื่มน้ำป้องกันสำลัก", size: "md", wrap: true }];
         } else {
-             adviceBox.contents = [{ type: "text", text: "คำแนะนำ:", weight: "bold", size: "md", color: "#2E7D32" }, { type: "text", text: "ดูแลสุขภาพ + ปรึกษาแพทย์เพิ่มเติม", wrap: true, size: "md", margin: "sm" }];
+             adviceBox.contents = [
+                 { type: "text", text: "คำแนะนำ:", weight: "bold", size: "md", color: "#2E7D32" }, 
+                 { type: "text", text: "AI อาจผิดพลาดได้มาก หากมีความสงสัย โปรดปรึกษาแพทย์เสมอ", wrap: true, size: "md", margin: "sm", color: "#666666" }
+             ];
         }
         
         bodyContents.push(adviceBox); 
