@@ -297,7 +297,6 @@
     let audioChunks = [];
     let currentAnalysisResult = null; 
     let countdownInterval;
-    let currentActionElement = null;
     let currentActionKey = '';
     let currentTel = '';
     let videoStream; 
@@ -322,7 +321,7 @@
     const hospitalCoords = { lat: 10.229937, lon: 99.109073 };
 
     window.showAiError = function(msg) {
-        document.getElementById('layer-ai-processing').innerHTML = `<div class="text-center py-5"><span class="iconify" data-icon="mdi:robot-confused" style="font-size: 100px; color: #999;"></span><h3 class="mt-4 text-danger" style="font-size:32px;">AI วิเคราะห์ไม่สำเร็จ</h3><p class="text-muted fs-3">${msg}</p><div class="d-flex flex-column gap-3 mt-4"><button class="btn-action btn-secondary" onclick="showLayer('layer-ai-input'); document.getElementById('layer-ai-processing').innerHTML = '<div class=\\'text-center py-5\\'><div class=\\'spinner mx-auto mb-4\\'></div><h2 style=\\'font-size:32px;\\'>กำลังวิเคราะห์...</h2><p class=\\'text-muted fs-3\\'>AI กำลังตรวจสอบข้อมูลที่ส่งมา</p></div>';">กลับไปแก้ไขข้อมูล</button></div></div>`;
+        document.getElementById('layer-ai-processing').innerHTML = `<div class="text-center py-5"><span class="iconify" data-icon="mdi:robot-confused" style="font-size: 100px; color: #999;"></span><h3 class="mt-4 text-danger" style="font-size:32px;">AI วิเคราะห์ไม่สำเร็จ</h3><p class="text-muted fs-3">${msg}</p><div class="d-flex flex-column gap-3 mt-4"><button class="btn-action btn-secondary" style="flex-direction:row;" onclick="showLayer('layer-ai-input'); document.getElementById('layer-ai-processing').innerHTML = '<div class=\\'text-center py-5\\'><div class=\\'spinner mx-auto mb-4\\'></div><h2 style=\\'font-size:32px;\\'>กำลังวิเคราะห์...</h2><p class=\\'text-muted fs-3\\'>AI กำลังตรวจสอบข้อมูลที่ส่งมา</p></div>';">กลับไปแก้ไขข้อมูล</button></div></div>`;
     };
 
     window.showCustomAlert = function(msg, title="แจ้งเตือน") {
@@ -462,18 +461,32 @@
 
     function updateBaselineFaceUI() {
         const img = document.getElementById('baseline-face-img');
-        const btn = document.getElementById('baseline-upload-btn');
+        const container = document.getElementById('baseline-upload-btn-container');
         if(!img) return;
 
         if (sessionData.normal_face) {
             img.src = formatDriveUrl(sessionData.normal_face);
             aiInputs.baselineFaceUrl = sessionData.normal_face;
             img.style.display = 'block';
-            btn.innerHTML = `<span class="iconify" data-icon="mdi:camera-retake"></span> เปลี่ยนรูปภาพใหม่`;
+            container.innerHTML = `
+                <div style="position:relative; overflow:hidden;">
+                    <div class="file-upload-btn btn-secondary text-white" style="flex-direction:row; font-size:20px; padding:10px;">
+                        <span class="iconify" data-icon="mdi:camera-retake"></span> เปลี่ยนรูปภาพใหม่
+                    </div>
+                    <input type="file" accept="image/*" onchange="openCropModal(this, 'baseline')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                </div>
+            `;
         } else {
             img.style.display = 'none';
             aiInputs.baselineFaceUrl = null;
-            btn.innerHTML = `<span class="iconify" data-icon="mdi:camera-plus"></span> อัปโหลดรูปหน้าปกติ (ยังไม่มีข้อมูล)`;
+            container.innerHTML = `
+                <div style="position:relative; overflow:hidden;">
+                    <div class="file-upload-btn text-white" style="background-color:#555; flex-direction:row; font-size:20px; padding:10px;">
+                        <span class="iconify" data-icon="mdi:camera-plus"></span> ถ่ายรูป / อัปโหลด (ยังไม่มีข้อมูล)
+                    </div>
+                    <input type="file" accept="image/*" onchange="openCropModal(this, 'baseline')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                </div>
+            `;
         }
     }
 
@@ -554,16 +567,17 @@
         document.getElementById('layer-ai-input').innerHTML = `
             <h2 class="section-title">เก็บข้อมูลวิเคราะห์</h2>
             
+            <div class="alert alert-info text-center fs-4 fw-bold">
+                👉 โปรดเลือกประเมิน ใบหน้า การยกแขน หรือการพูด <span class="text-danger">อย่างน้อย 1 อย่าง</span> แล้วกดส่ง
+            </div>
+
             <div id="card-ai-face" style="display:none;">
                 <div class="card p-4 mb-4 border shadow-sm">
                     <h5 class="fw-bold fs-3 text-primary"><span class="iconify" data-icon="mdi:account-box-outline"></span> รูปหน้าตอนปกติ (อ้างอิง)</h5>
                     <div id="baseline-face-container" class="text-center mt-2">
                         <img id="baseline-face-img" class="rounded border mx-auto mb-2" referrerpolicy="no-referrer" style="display:none; width:150px; height:150px; object-fit:cover;">
-                        <div style="position:relative; overflow:hidden;" class="mt-2">
-                            <div class="file-upload-btn text-white" style="background-color:#555;" id="baseline-upload-btn">
-                                <span class="iconify" data-icon="mdi:camera-plus"></span> อัปโหลดรูปหน้าปกติใหม่
-                            </div>
-                            <input type="file" accept="image/*" id="baseline-file-input" onchange="openCropModal(this, 'baseline')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                        <div id="baseline-upload-btn-container" class="mt-2">
+                           <!-- Buttons handled by updateBaselineFaceUI() -->
                         </div>
                     </div>
                 </div>
@@ -575,10 +589,9 @@
                         <div class="flex-grow-1">
                             <small class="text-muted d-block mb-3 fs-4">ยิ้มกว้างๆ ให้เห็นฟัน เหมือนรูปตัวอย่าง</small>
                             <div id="upload-face-btn-container" style="position:relative; overflow:hidden;">
-                                <div class="file-upload-btn btn-primary-custom" style="flex-direction:row;">
-                                    <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูปปัจจุบัน
+                                <div class="file-upload-btn btn-primary-custom" style="flex-direction:row; font-size:20px; padding:10px;">
+                                    <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูป / อัปโหลด
                                 </div>
-                                <!-- ไม่บังคับกล้อง อนุญาตให้เปิดแกลเลอรี่ได้ -->
                                 <input type="file" accept="image/*" onchange="openCropModal(this, 'current')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
                             </div>
                         </div>
@@ -592,10 +605,12 @@
             
             <div id="card-ai-arm" class="card p-4 mb-4 border shadow-sm" style="display:none;">
                 <h5 class="fw-bold fs-3">2. แขน (Arm Drift)</h5>
-                <p class="text-danger fw-bold fs-4 mb-2">บอกให้ผู้ป่วยหลับตาและเหยียดแขนทั้งสองข้างตรงไปข้างหน้า (หรือยกแขนขึ้นพร้อมกัน) เป็นเวลา 10 วินาที</p>
                 <div class="d-flex gap-3 align-items-start mb-3">
                     <img src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" class="rounded border" style="width:120px; height:120px; object-fit:cover;">
-                    <small class="text-muted fs-4">ให้เห็นแขนทั้งสองข้างเต็มจอ</small>
+                    <div class="text-dark fs-4">
+                        บอกให้ผู้ป่วยหลับตาและเหยียดแขนทั้งสองข้างตรงไปข้างหน้า (หรือยกแขนขึ้นพร้อมกัน) เป็นเวลา 10 วินาที<br>
+                        <small class="text-muted">* ให้เห็นแขนทั้งสองข้างเต็มจอเหมือนรูปตัวอย่าง</small>
+                    </div>
                 </div>
                 <div id="arm-video-ui" class="text-center" style="position:relative;">
                     <video id="arm-video-preview" autoplay playsinline class="w-100 rounded border bg-dark mb-3" style="display:none; max-height:300px; object-fit:cover;"></video>
@@ -636,8 +651,6 @@
                 </div>
             </div>
             
-            <p class="text-center text-primary fw-bold mt-2 mb-3 fs-4">* เลือกประเมิน ใบหน้า การยกแขน หรือการพูด อย่างน้อย 1 อย่างแล้วกดส่ง *</p>
-
             <button class="btn-action btn-ai" style="font-size:30px; flex-direction:row;" onclick="analyzeWithGemini()">
                 <span>ส่งวิเคราะห์</span>
                 <span class="iconify wink-icon-right" data-icon="mdi:sparkles"></span>
@@ -758,6 +771,7 @@
         buildSummaryPage();
     };
 
+    // --- CANVAS IMAGE PROCESSING (Stamping Badge & Grid) ---
     function applyGridAndBadge(base64Str, label, callback) {
         let img = new Image();
         img.onload = function() {
@@ -772,14 +786,14 @@
             ctx.strokeStyle = "rgba(0, 255, 0, 0.8)";
             ctx.lineWidth = 4;
             
-            // 3 vertical lines
+            // 3 vertical lines (4 columns)
             for(let i=1; i<=3; i++) {
                 ctx.beginPath();
                 ctx.moveTo((canvas.width/4)*i, 0);
                 ctx.lineTo((canvas.width/4)*i, canvas.height);
                 ctx.stroke();
             }
-            // 5 horizontal lines
+            // 5 horizontal lines (6 rows)
             for(let j=1; j<=5; j++) {
                 ctx.beginPath();
                 ctx.moveTo(0, (canvas.height/6)*j);
@@ -1024,6 +1038,34 @@
             } else showAiError(data.message); 
         }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
     };
+
+    // ฟังก์ชันสร้างรูป Collage หน้าซ้ายขวา สำหรับโชว์บนเว็บ
+    function createFaceCollageForDisplay(baselineUrl, currentBase64, callback) {
+        let canvas = document.createElement('canvas');
+        let ctx = canvas.getContext('2d');
+        
+        let img2 = new Image();
+        img2.onload = function() {
+            canvas.width = img2.width * 2; 
+            canvas.height = img2.height;
+            // รูปขวาคือรูปปัจจุบัน
+            ctx.drawImage(img2, img2.width, 0);
+            
+            // โหลดรูปซ้ายจาก Drive
+            let img1 = new Image();
+            img1.crossOrigin = "Anonymous";
+            img1.onload = function() {
+                ctx.drawImage(img1, 0, 0, img2.width, img2.height);
+                callback(canvas.toDataURL("image/jpeg", 0.8).split(',')[1]);
+            };
+            img1.onerror = function() {
+                // ถ้าติดปัญหาโหลดรูปเก่า ให้ส่งกลับแค่รูปปัจจุบัน
+                callback(currentBase64);
+            };
+            img1.src = formatDriveUrl(baselineUrl);
+        };
+        img2.src = "data:image/jpeg;base64," + currentBase64;
+    }
 
     function displayAiResult(res) {
         const c = document.getElementById('ai-result-content');
@@ -1278,12 +1320,12 @@
             
             // รูปหน้าปกติ
             if (data.normal_face && String(data.normal_face).startsWith('http')) {
-                imgBoxFace.contents.push({ type: "image", url: formatDriveUrl(data.normal_face), size: "full", aspectRatio: "3:4", aspectMode: "cover", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.normal_face) } });
+                imgBoxFace.contents.push({ type: "image", url: formatDriveUrl(data.normal_face), size: "full", aspectRatio: "3:4", aspectMode: "fit", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.normal_face) } });
             }
             
             // รูปวิเคราะห์ปัจจุบัน
             if (data.fileUrls.face && String(data.fileUrls.face).startsWith('http')) {
-                imgBoxFace.contents.push({ type: "image", url: formatDriveUrl(data.fileUrls.face), size: "full", aspectRatio: "3:4", aspectMode: "cover", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.fileUrls.face) } });
+                imgBoxFace.contents.push({ type: "image", url: formatDriveUrl(data.fileUrls.face), size: "full", aspectRatio: "3:4", aspectMode: "fit", flex: 1, margin: "sm", action: { type: "uri", uri: formatDriveUrl(data.fileUrls.face) } });
             }
             
             if (imgBoxFace.contents.length > 0) {
@@ -1303,6 +1345,7 @@
         }
         
         let displayAnalysis = data.isAiAssessment ? `AI: ${data.analysis||'-'}` : (data.symptomDetail||"ไม่มีอาการ");
+        // Clean up HTML tags for Flex Message
         displayAnalysis = displayAnalysis.replace(/<br>/g, '\n').replace(/<b>/g, '').replace(/<\/b>/g, '');
         
         bodyContents.push({ type: "text", text: "ผล: " + displayAnalysis, wrap: true, size: "md", color: "#333333", margin: "sm" });
