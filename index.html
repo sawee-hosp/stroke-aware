@@ -160,11 +160,16 @@
         .watermark.active { opacity: 0.15; }
         .watermark-text { font-size: 50px; font-weight: 900; color: red; transform: rotate(-45deg); white-space: nowrap; text-align: center; line-height: 1.2; text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white; }
 
-        /* Full Image View styling */
         .full-img-view { width: 100%; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; pointer-events: none; }
         .symptom-card-red { border: 4px solid #ff3654; border-radius: 20px; padding: 15px; background: #fffafb; margin-bottom: 20px; }
         
         #video-overlay-prep { position: absolute; top:0; left:0; width:100%; height:100%; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; border-radius: 0.375rem; text-align:center; padding: 10px; text-shadow: 2px 2px 4px #000;}
+        
+        /* Cropper CSS แก้ไขให้ตรงกลาง */
+        #crop-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 8000; display: none; flex-direction: column; }
+        .crop-container { flex: 1; width: 100%; overflow: hidden; background: #333; position: relative; display: flex; align-items: center; justify-content: center; }
+        .crop-text-guide { position: absolute; top: 20px; width: 100%; text-align: center; color: #00FF00; z-index: 2; font-weight: bold; font-size: 24px; text-shadow: 1px 1px 2px black; }
+        .crop-actions { padding: 20px; background: #222; display: flex; gap: 10px; }
     </style>
 </head>
 <body>
@@ -173,7 +178,6 @@
         <div class="watermark-text">โหมดทดสอบ<br>สามารถทดลองใช้งานได้ตามต้องการ<br>โดยไม่ได้ส่งข้อมูลเรียกรถโรงพยาบาล</div>
     </div>
 
-    <!-- เอาหน้าโหลดแบบทึบๆ ออก ให้แสดงโครงเว็บเลย -->
     <div id="loading" style="display: none;">
         <div class="spinner"></div>
         <div id="loading-text" style="color: #ff3654; font-weight: bold; font-size: 30px;">กำลังโหลด...</div>
@@ -252,7 +256,6 @@
         </div>
     </div>
 
-    <!-- Image Viewer -->
     <div id="image-viewer-modal" class="custom-modal" style="background-color: rgba(0,0,0,0.95);" onclick="this.style.display='none'">
         <img id="full-image" style="max-width: 95%; max-height: 80vh; object-fit: contain; border-radius: 20px;">
         <div style="color: #ccc; margin-top: 20px; font-size: 28px; font-weight:bold;">แตะที่ว่างเพื่อปิด</div>
@@ -264,7 +267,6 @@
         <div class="crop-text-guide">จัดใบหน้าให้อยู่ในกรอบสีเขียว</div>
         <div class="crop-container">
             <img id="crop-image" style="max-width: 100%; display: block;">
-            <div class="crop-overlay-guide"></div>
         </div>
         <div class="crop-actions">
             <button class="btn-action" style="background:#555; color:white; flex-direction:row;" onclick="cancelCrop()">ยกเลิก</button>
@@ -279,7 +281,7 @@
     const DAILY_CHECK_LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTER_LIFF_ID = "2005789397-nebQ8oJy";
     
-    let sessionData = { assessorType: 'myself' };
+    let sessionData = { assessorType: 'myself', isTestMode: false, isRisk: false };
     let aiInputs = { face: null, baselineFaceUrl: null, arm: null, audio: null };
     let mediaRecorder;
     let audioChunks = [];
@@ -290,6 +292,7 @@
     let currentTel = '';
     let videoStream; 
     let cropper;
+    let activeAiModule = 'all'; // ใช้ระบุว่าจะเปิด AI หมวดไหน
 
     const symptomImages = {
         'Balance': 'https://img2.pic.in.th/pic/-14a8e9c4fc269d4d8f.md.png',
@@ -306,7 +309,7 @@
         'Arm': { likely: ['แขน/ขาอ่อนแรงซีกเดียว', 'ยกแขนไม่เท่ากัน', 'ของหลุดจากมือ'], unlikely: ['ปวดกล้ามเนื้อ', 'ชาจากการนอนทับ'], desc: 'ยกแขนเหยียดไปข้างหน้า ดูว่าสามารถเกร็งได้หรือไม่', hasAi: true },
         'Speech': { likely: ['พูดไม่ชัด/ไม่เป็นคำ', 'ลิ้นแข็งเหมือนคนเมา', 'นึกคำพูดไม่ออก'], unlikely: ['พูดติดขัดเพราะเหนื่อย', 'เสียงแหบ/เป็นหวัด'], desc: 'ทดสอบพูดคำยากเช่น ยายกินลำไยน้ำลายยายไหลย้อย พูดแล้วติดขัดลิ้นพันกัน', hasAi: true }
     };
-    const hospitalCoords = { lat: 10.2300226, lon: 99.1087481 };
+    const hospitalCoords = { lat: 10.229937, lon: 99.109073 };
 
     window.showCustomAlert = function(msg, title="แจ้งเตือน") {
         document.getElementById('custom-alert-title').textContent = title;
@@ -426,7 +429,6 @@
         }
     };
 
-    // แก้ไข Google Drive URL อัตโนมัติให้แสดงผลรูปได้
     function formatDriveUrl(url) {
         if (!url) return '';
         const match = url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -480,8 +482,7 @@
                 </div>
             </div>
             
-            <!-- AI Button -->
-            <button class="btn-action btn-ai mb-4" onclick="showLayer('layer-ai-intro'); updateBaselineFaceUI();">
+            <button class="btn-action btn-ai mb-4" onclick="handleAiTest('all')">
                 <span>ทดสอบอาการด้วย AI</span>
                 <span class="iconify wink-icon-right" data-icon="mdi:sparkles"></span>
             </button>
@@ -508,6 +509,13 @@
         setupTimeOptions();
     }
 
+    // กำหนดเปิด AI ตามฟิลด์ที่ส่งมา
+    window.handleAiTest = function(moduleName) { 
+        activeAiModule = moduleName;
+        showLayer('layer-ai-intro'); 
+        updateBaselineFaceUI(); 
+    };
+
     function buildAILayers() {
         document.getElementById('layer-ai-intro').innerHTML = `
             <h2 class="section-title"><span class="iconify" data-icon="mdi:brain"></span> ทดสอบด้วย AI</h2>
@@ -525,38 +533,39 @@
         document.getElementById('layer-ai-input').innerHTML = `
             <h2 class="section-title">เก็บข้อมูลวิเคราะห์</h2>
             
-            <!-- Baseline Face Section -->
-            <div class="card p-4 mb-4 border shadow-sm">
-                <h5 class="fw-bold fs-3 text-primary"><span class="iconify" data-icon="mdi:account-box-outline"></span> รูปหน้าตอนปกติ (อ้างอิง)</h5>
-                <div id="baseline-face-container" class="text-center mt-2">
-                    <img id="baseline-face-img" class="rounded border mx-auto mb-2" referrerpolicy="no-referrer" style="display:none; width:150px; height:150px; object-fit:cover;">
-                    <div style="position:relative; overflow:hidden;" class="mt-2">
-                        <div class="file-upload-btn text-white" style="background-color:#555;" id="baseline-upload-btn">
-                            <span class="iconify" data-icon="mdi:camera-plus"></span> อัปโหลดรูปหน้าปกติใหม่
-                        </div>
-                        <input type="file" accept="image/*" id="baseline-file-input" onchange="openCropModal(this, 'baseline')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
-                    </div>
-                </div>
-            </div>
-
-            <div class="card p-4 mb-4 border shadow-sm">
-                <h5 class="fw-bold fs-3">1. ใบหน้าปัจจุบัน (Face)</h5>
-                <div class="d-flex gap-3 align-items-start">
-                    <img src="https://img2.pic.in.th/pic/-19b938acd92f7035f5.png" class="rounded border" style="width:120px; height:120px; object-fit:cover;">
-                    <div class="flex-grow-1">
-                        <small class="text-muted d-block mb-3 fs-4">ยิ้มกว้างๆ ให้เห็นฟัน เหมือนรูปตัวอย่าง</small>
-                        <div style="position:relative; overflow:hidden;">
-                            <div class="file-upload-btn btn-primary-custom" style="flex-direction:row;">
-                                <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูปปัจจุบัน
+            <div id="card-ai-face" style="display:none;">
+                <div class="card p-4 mb-4 border shadow-sm">
+                    <h5 class="fw-bold fs-3 text-primary"><span class="iconify" data-icon="mdi:account-box-outline"></span> รูปหน้าตอนปกติ (อ้างอิง)</h5>
+                    <div id="baseline-face-container" class="text-center mt-2">
+                        <img id="baseline-face-img" class="rounded border mx-auto mb-2" referrerpolicy="no-referrer" style="display:none; width:150px; height:150px; object-fit:cover;">
+                        <div style="position:relative; overflow:hidden;" class="mt-2">
+                            <div class="file-upload-btn text-white" style="background-color:#555;" id="baseline-upload-btn">
+                                <span class="iconify" data-icon="mdi:camera-plus"></span> อัปโหลดรูปหน้าปกติใหม่
                             </div>
-                            <input type="file" accept="image/*" capture="user" onchange="openCropModal(this, 'current')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                            <input type="file" accept="image/*" id="baseline-file-input" onchange="openCropModal(this, 'baseline')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
                         </div>
                     </div>
                 </div>
-                <img id="preview-face" class="w-100 mt-3 rounded" style="display:none;">
+
+                <div class="card p-4 mb-4 border shadow-sm">
+                    <h5 class="fw-bold fs-3">1. ใบหน้าปัจจุบัน (Face)</h5>
+                    <div class="d-flex gap-3 align-items-start">
+                        <img src="https://img2.pic.in.th/pic/-19b938acd92f7035f5.png" class="rounded border" style="width:120px; height:120px; object-fit:cover;">
+                        <div class="flex-grow-1">
+                            <small class="text-muted d-block mb-3 fs-4">ยิ้มกว้างๆ ให้เห็นฟัน เหมือนรูปตัวอย่าง</small>
+                            <div style="position:relative; overflow:hidden;">
+                                <div class="file-upload-btn btn-primary-custom" style="flex-direction:row;">
+                                    <span class="iconify" data-icon="mdi:camera"></span> ถ่ายรูปปัจจุบัน
+                                </div>
+                                <input type="file" accept="image/*" capture="user" onchange="openCropModal(this, 'current')" style="position:absolute; top:0; left:0; opacity:0; width:100%; height:100%; cursor:pointer;">
+                            </div>
+                        </div>
+                    </div>
+                    <img id="preview-face" class="w-100 mt-3 rounded" style="display:none;">
+                </div>
             </div>
             
-            <div class="card p-4 mb-4 border shadow-sm">
+            <div id="card-ai-arm" class="card p-4 mb-4 border shadow-sm" style="display:none;">
                 <h5 class="fw-bold fs-3">2. แขน (Arm Drift)</h5>
                 <div class="d-flex gap-3 align-items-start mb-3">
                     <img src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" class="rounded border" style="width:120px; height:120px; object-fit:cover;">
@@ -578,7 +587,7 @@
                 </div>
             </div>
             
-            <div class="card p-4 mb-4 border shadow-sm">
+            <div id="card-ai-speech" class="card p-4 mb-4 border shadow-sm" style="display:none;">
                 <h5 class="fw-bold fs-3">3. เสียง (Speech)</h5>
                 <p class="text-center mb-3 fs-4">พูดว่า:</p>
                 <span class="karaoke-text mb-3">"ยายกินลำไย น้ำลายยายไหลย้อย"</span>
@@ -597,11 +606,23 @@
             </button>
             <div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-ai-intro')">ย้อนกลับ</button></div>
         `;
-        document.getElementById('layer-ai-processing').innerHTML = `<div class="text-center py-5"><div class="spinner mx-auto mb-4"></div><h2 style="font-size:32px;">กำลังวิเคราะห์...</h2><p class="text-muted fs-3">AI กำลังตรวจสอบความสมมาตรของใบหน้า<br>ระดับของแขน และความชัดเจนของเสียง</p></div>`;
+        document.getElementById('layer-ai-processing').innerHTML = `<div class="text-center py-5"><div class="spinner mx-auto mb-4"></div><h2 style="font-size:32px;">กำลังวิเคราะห์...</h2><p class="text-muted fs-3">AI กำลังตรวจสอบข้อมูลที่ส่งมา</p></div>`;
         document.getElementById('layer-ai-result').innerHTML = `<div id="ai-result-content"></div>`;
     }
 
-    // --- NEW LAYER 2 STRUCTURE (Card & Outside) ---
+    window.startAiTestFlow = function() { 
+        if (!document.getElementById('pdpa-consent').checked) { 
+            showCustomAlert("กรุณายอมรับเงื่อนไข"); return; 
+        } 
+        
+        // Show/Hide specific cards based on selection
+        document.getElementById('card-ai-face').style.display = (activeAiModule === 'all' || activeAiModule === 'Face') ? 'block' : 'none';
+        document.getElementById('card-ai-arm').style.display = (activeAiModule === 'all' || activeAiModule === 'Arm') ? 'block' : 'none';
+        document.getElementById('card-ai-speech').style.display = (activeAiModule === 'all' || activeAiModule === 'Speech') ? 'block' : 'none';
+        
+        showLayer('layer-ai-input'); 
+    };
+
     window.showLayer2 = function(symptomKey) {
         saveData('symptomCategory', symptomKey);
         document.getElementById('layer-2-title').textContent = `ประเมิน: ${symptomTranslations[symptomKey]}`;
@@ -610,10 +631,9 @@
         let likelyHtml = detail.likely.map(text => `<button class="btn-likely" style="font-size:24px;" onclick="handleSymptomResult(true, '${text}')">${text}</button>`).join('');
         let unlikelyHtml = detail.unlikely.map(text => `<button class="btn-unlikely" style="font-size:24px;" onclick="handleSymptomResult(false, '${text}')">${text}</button>`).join('');
 
-        // ส่วนที่อยู่ในกรอบแดง (รูปไม่สามารถคลิกขยายได้แล้วตามสั่ง)
         let cardHtml = `<div class="symptom-card-red"><img src="${symptomImages[symptomKey]}" class="full-img-view">`;
         if (detail.desc) cardHtml += `<div class="alert alert-warning border-0 text-start p-3 mb-4"><strong class="fs-4 text-danger"><span class="iconify" data-icon="mdi:magnify-scan"></span> วิธีสังเกต:</strong> <span class="fs-4">${detail.desc}</span></div>`;
-        if (detail.hasAi) cardHtml += `<button onclick="handleAiTest()" class="btn-action btn-ai mb-4"><span>วิเคราะห์ด้วย AI</span></button>`;
+        if (detail.hasAi) cardHtml += `<button onclick="handleAiTest('${symptomKey}')" class="btn-action btn-ai mb-4"><span>วิเคราะห์ด้วย AI</span></button>`;
         
         cardHtml += `
             <div class="d-flex flex-column gap-3">
@@ -627,31 +647,56 @@
             </div>
         </div>`;
 
-        // ส่วนที่อยู่นอกกรอบ
         let outsideHtml = `<h4 class="mt-4 mb-3 fw-bold text-center">หรือมีอาการดังต่อไปนี้:</h4>${likelyHtml}<hr class="m-3">${unlikelyHtml}`;
-        
         document.getElementById('layer-2-new-content').innerHTML = cardHtml + outsideHtml;
         showLayer('layer-2');
     };
 
     window.handleSymptomResult = function(isLikely, symptomDetail) {
-        saveData('symptomDetail', symptomDetail);
-        if (isLikely) { showLayer('layer-3'); } 
-        else { saveData('frequency', 'อาจไม่เข้าข่ายสโตรกเฉียบพลัน'); showFinalMessage("คำแนะนำเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่สโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์"); }
+        const category = sessionData.symptomCategory;
+        if (isLikely) { 
+            sessionData.isRisk = true;
+            sessionData.isEmergency = true;
+            saveData('symptomDetail', symptomDetail);
+            showLayer('layer-3'); 
+        } else { 
+            sessionData.isRisk = false;
+            sessionData.isEmergency = false;
+            // จัดรูปแบบ symptom แบบรวม
+            let freq = 'ไม่เข้าข่ายสโตรกเฉียบพลัน';
+            saveData('frequency', freq); 
+            saveData('symptomDetail', `${category} - ${symptomDetail} (${freq})`);
+            showFinalMessage("ผลเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่สโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์"); 
+        }
     };
     
     window.handleFinalNoSymptom = function() { 
         saveData('symptomCategory', 'ไม่มีอาการ'); 
         saveData('symptomDetail', 'ฉันไม่มีอาการอะไรเลย'); 
+        saveData('frequency', 'ปกติ');
+        sessionData.isRisk = false;
         sessionData.isEmergency = false;
         showFinalMessage("เยี่ยมมาก!", "วันนี้คุณไม่มีอาการน่าสงสัยสโตรกเลย"); 
     };
 
     window.handleSeveritySelection = function(txt) { saveData('frequency', txt); showLayer('layer-4'); };
-    window.handleChronicSymptom = function(txt) { saveData('frequency', txt); showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรปรึกษาแพทย์เพื่อหาสาเหตุที่แท้จริง"); };
+    window.handleChronicSymptom = function(txt) { 
+        saveData('frequency', txt); 
+        sessionData.isRisk = false;
+        sessionData.isEmergency = false;
+        saveData('symptomDetail', `${sessionData.symptomCategory} - ${sessionData.symptomDetail} (${txt})`);
+        showFinalMessage("คำแนะนำ", "อาการที่เป็นมานานหรือเรื้อรัง ควรปรึกษาแพทย์เพื่อหาสาเหตุที่แท้จริง"); 
+    };
     
     window.handleTimeSelection = function(min, isChronic) {
-        if (isChronic) { saveData('onsetTime', 'เรื้อรัง/หลายวัน'); showFinalMessage("คำแนะนำ", "เนื่องจากอาการเป็นมานานแล้ว อาจไม่ใช่ภาวะฉุกเฉินของสโตรก แต่ควรพบแพทย์เพื่อประเมิน"); return; }
+        if (isChronic) { 
+            saveData('onsetTime', 'เรื้อรัง/หลายวัน'); 
+            sessionData.isRisk = false;
+            sessionData.isEmergency = false;
+            saveData('symptomDetail', `${sessionData.symptomCategory} - ${sessionData.symptomDetail} (เรื้อรัง/หลายวัน)`);
+            showFinalMessage("คำแนะนำ", "เนื่องจากอาการเป็นมานานแล้ว อาจไม่ใช่ภาวะฉุกเฉินของสโตรก แต่ควรพบแพทย์เพื่อประเมิน"); 
+            return; 
+        }
         const onset = new Date(Date.now() - min * 60000);
         sessionData.onsetTimeObject = onset;
         saveData('onsetTime', formatFullDateTime(onset));
@@ -809,13 +854,6 @@
         }
     };
 
-    window.startAiTestFlow = function() { 
-        if (!document.getElementById('pdpa-consent').checked) { 
-            showCustomAlert("กรุณายอมรับเงื่อนไข"); return; 
-        } 
-        showLayer('layer-ai-input'); 
-    };
-
     window.analyzeWithGemini = function() {
         if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { showCustomAlert("ส่งข้อมูลอย่างน้อย 1 อย่าง"); return; }
         showLayer('layer-ai-processing');
@@ -845,6 +883,8 @@
                 sessionData.isAiAssessment = true; 
                 sessionData.riskScore = data.data.riskScore; 
                 sessionData.analysis = data.data.analysis; 
+                sessionData.isRisk = data.data.isRisk; // ดึงค่า risk จริงมาเก็บ
+                sessionData.isEmergency = data.data.isRisk;
                 displayAiResult(data.data); 
             } else showAiError(data.message); 
         }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
@@ -878,7 +918,7 @@
             html += `<div class="d-flex flex-column gap-3 mt-4">`;
             if (res.isRisk) html += `<button class="btn-action btn-pulse-danger" onclick="showLayer('layer-3'); saveData('symptomDetail', 'AI: ' + currentAnalysisResult.analysis);">ประเมินความฉับพลันต่อ</button>`;
             html += `<button class="btn-action btn-share" onclick="handleShare()">แชร์ผลการประเมินนี้</button>`;
-            html += `<button class="btn-action btn-primary-custom" onclick="saveData('symptomDetail', 'AI: Result Logged'); handleFinalSave(this, false, true);">บันทึกและปิดโดยไม่ประเมินต่อ</button>`;
+            html += `<button class="btn-action btn-primary-custom" onclick="saveData('symptomDetail', 'AI Analysis'); handleFinalSave(this, false, true);">บันทึกและปิดโดยไม่ประเมินต่อ</button>`;
             html += `<button class="btn-action btn-back" onclick="showLayer('layer-ai-input')">กลับไปแก้ไข</button>`;
             html += `</div>`;
             c.innerHTML = html;
@@ -953,13 +993,13 @@
             } else {
                 if (sawiBtn) sawiBtn.style.display = 'flex';
                 
-                // Calculate estimates
                 const travelMins = Math.round((dist / 40) * 60);
                 const ambMins = Math.round((travelMins * 2) + 10);
                 
                 sessionData.distance = `${dist.toFixed(1)} กม.`;
                 sessionData.selfTravelEstimate = `${travelMins} นาที`;
                 sessionData.ambulanceEstimate = `${ambMins} นาที`;
+                sessionData.duration = `${travelMins} นาที`;
                 
                 html += createTableRow('mdi:map-marker-distance', 'ระยะทาง', sessionData.distance, false, 'distance-row');
                 html += createTableRow('mdi:car-clock', 'ไปเองใช้เวลา', sessionData.selfTravelEstimate, false, 'distance-row');
@@ -991,7 +1031,6 @@
         if(btn) btn.disabled = true;
         document.getElementById('loading-text').textContent = 'กำลังบันทึกและส่งข้อมูล...';
         document.getElementById('loading').style.display = 'flex';
-        sessionData.isEmergency = isUrg; 
         sessionData.isFinalSave = true;
         
         fetch(GAS_URL, { 
@@ -1058,7 +1097,12 @@
 
     function createFlexMessage(data) {
         const isAbnormal = data.isEmergency || (data.isAiAssessment && data.riskScore >= 50);
-        let bodyContents = [{ type: "text", text: "ชื่อ: " + String(data.registeredName || data.userName || "-"), weight: "bold", size: "lg", wrap: true }, { type: "text", text: "เวลา: " + formatFullDateTime(new Date()), size: "sm", color: "#666666" }];
+        let headerText = data.isTestMode ? "[กำลังทดสอบ ไม่ได้ใช้งานจริง]\nประเมินอาการสโตรก" : "ประเมินอาการสโตรก";
+        
+        let bodyContents = [
+            { type: "text", text: "ชื่อ: " + String(data.registeredName || data.userName || "-"), weight: "bold", size: "lg", wrap: true }, 
+            { type: "text", text: "เวลาประเมิน: " + formatFullDateTime(new Date()), size: "sm", color: "#666666" }
+        ];
         
         if (data.isAiAssessment && data.fileUrls) {
             let images = [];
@@ -1072,29 +1116,49 @@
         }
         
         let displayAnalysis = data.isAiAssessment ? `AI: ${data.analysis||'-'}` : (data.symptomDetail||"ไม่มีอาการ");
-        // Clean up HTML tags for Flex Message
         displayAnalysis = displayAnalysis.replace(/<br>/g, '\n').replace(/<b>/g, '').replace(/<\/b>/g, '');
         
         bodyContents.push({ type: "text", text: "ผล: " + displayAnalysis, wrap: true, size: "md", color: "#333333", margin: "sm" });
 
         let adviceBox = { type: "box", layout: "vertical", margin: "md", backgroundColor: isAbnormal ? "#FFEBEE" : "#E8F5E9", cornerRadius: "md", paddingAll: "md", contents: [] };
         if (isAbnormal) {
+             if (data.onsetTime) bodyContents.push({ type: "text", text: "เริ่มเป็น: " + data.onsetTime, size: "sm", color: "#D32F2F", weight: "bold" });
+             if (data.rtpaDeadline) bodyContents.push({ type: "text", text: "หมดเวลาให้ยา: " + data.rtpaDeadline, size: "sm", color: "#D32F2F", weight: "bold" });
+             if (data.distance) bodyContents.push({ type: "text", text: "ระยะทาง: " + data.distance, size: "sm", color: "#D32F2F", weight: "bold" });
+
              adviceBox.contents = [{ type: "text", text: "คำแนะนำเบื้องต้น:", weight: "bold", size: "md", color: "#D32F2F" }, { type: "text", text: "1. โทร 1669 ทันที\n2. ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย\n3. ห้ามกินยาหรือดื่มน้ำป้องกันสำลัก", size: "md", wrap: true }];
         } else {
-             adviceBox.contents = [{ type: "text", text: "คำแนะนำ:", weight: "bold", size: "md", color: "#2E7D32" }, { type: "text", text: "เรียนรู้อาการสโตรก (BEFAST) หากพบอาการรีบมา รพ. หรือโทร 1669", wrap: true, size: "md", margin: "sm" }];
+             adviceBox.contents = [{ type: "text", text: "คำแนะนำ:", weight: "bold", size: "md", color: "#2E7D32" }, { type: "text", text: "ดูแลสุขภาพ + ปรึกษาแพทย์เพิ่มเติม", wrap: true, size: "md", margin: "sm" }];
         }
-        bodyContents.push(adviceBox); bodyContents.push({ type: "separator", margin: "lg" }); bodyContents.push({ type: "text", text: "หมายเหตุ: จัดทำเพื่อการประเมินเบื้องต้น อาจมีข้อมีผิดพลาด โปรดยืนยันอาการกับแพทย์ก่อนทุกครั้ง", size: "xs", color: "#aaaaaa", wrap: true, margin: "md", align: "center" });
+        
+        bodyContents.push(adviceBox); 
+        bodyContents.push({ type: "separator", margin: "lg" }); 
+        bodyContents.push({ type: "text", text: (data.isTestMode ? "[โหมดทดสอบ] " : "") + "หมายเหตุ: จัดทำเพื่อการประเมินเบื้องต้น อาจมีข้อมีผิดพลาด โปรดยืนยันอาการกับแพทย์ก่อนทุกครั้ง", size: "xs", color: "#aaaaaa", wrap: true, margin: "md", align: "center" });
 
         let footerContents = [];
         if (isAbnormal) {
-            if (data.location) { const loc = String(data.location).split(','); if (loc.length >= 2) { footerContents.push({ type: "button", style: "secondary", height: "sm", action: { type: "uri", label: "📍 แผนที่ผู้ป่วย", uri: `https://www.google.com/maps/search/?api=1&query=${loc[0]},${loc[1]}` } }); } }
+            footerContents.push({ type: "button", style: "secondary", height: "sm", action: { type: "uri", label: "📍 แผนที่ไป รพ.สวี", uri: `https://www.google.com/maps/dir/?api=1&destination=10.229937,99.109073` } });
             footerContents.push({ type: "button", style: "primary", color: "#D32F2F", height: "sm", margin: "sm", action: { type: "uri", label: "📞 โทร 1669", uri: "tel:1669" } });
             footerContents.push({ type: "button", style: "primary", color: "#F57C00", height: "sm", margin: "sm", action: { type: "uri", label: "📞 โทร รพ.สวี", uri: "tel:0894745523" } });
             footerContents.push({ type: "separator", margin: "md" });
         }
         footerContents.push({ type: "box", layout: "horizontal", margin: "md", spacing: "sm", contents: [{ type: "button", style: "primary", color: "#17a2b8", height: "sm", action: { type: "uri", label: "ประเมินใหม่", uri: `https://liff.line.me/${DAILY_CHECK_LIFF_ID}` } }, { type: "button", style: "primary", color: "#6c757d", height: "sm", action: { type: "uri", label: "ข้อมูลส่วนตัว", uri: `https://liff.line.me/${HEALTH_INFO_LIFF_ID}` } }] });
 
-        return { type: "flex", altText: "ผลประเมินสโตรก", contents: { type: "bubble", size: "giga", header: { type: "box", layout: "vertical", background: { type: "linearGradient", angle: "90deg", startColor: isAbnormal?"#D32F2F":"#2E7D32", endColor: isAbnormal?"#B71C1C":"#1B5E20" }, contents: [{ type: "text", text: data.isTestMode?"[ทดสอบ] ประเมินอาการ":"ประเมินอาการสโตรก", color: "#ffffff", weight: "bold", size: "xl", align: "center" }] }, body: { type: "box", layout: "vertical", contents: bodyContents }, footer: { type: "box", layout: "vertical", contents: footerContents } } };
+        return { 
+            type: "flex", 
+            altText: data.isTestMode ? "[ทดสอบ] ผลประเมิน" : "ผลประเมินสโตรก", 
+            contents: { 
+                type: "bubble", 
+                size: "mega", 
+                header: { 
+                    type: "box", layout: "vertical", 
+                    backgroundColor: isAbnormal ? "#D32F2F" : "#2E7D32", 
+                    contents: [{ type: "text", text: headerText, color: "#ffffff", weight: "bold", size: "xl", align: "center", wrap: true }] 
+                }, 
+                body: { type: "box", layout: "vertical", contents: bodyContents }, 
+                footer: { type: "box", layout: "vertical", contents: footerContents } 
+            } 
+        };
     }
 
     window.showFinalMessage = function(t, txt) { document.getElementById('final-title').textContent = t; document.getElementById('final-text').textContent = txt; document.getElementById('final-emoji').textContent = '👍'; showLayer('layer-6'); };
