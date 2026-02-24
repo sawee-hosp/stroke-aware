@@ -164,7 +164,7 @@
         .full-img-view { width: 100%; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: 20px; pointer-events: none; }
         .symptom-card-red { border: 4px solid #ff3654; border-radius: 20px; padding: 15px; background: #fffafb; margin-bottom: 20px; }
         
-        #video-overlay-prep { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; border-radius: 0.375rem; text-align:center; padding: 10px;}
+        #video-overlay-prep { position: absolute; top:0; left:0; width:100%; height:100%; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; border-radius: 0.375rem; text-align:center; padding: 10px; text-shadow: 2px 2px 4px #000;}
     </style>
 </head>
 <body>
@@ -226,7 +226,7 @@
         <div class="custom-modal-content">
             <div id="custom-alert-title" class="custom-modal-title">แจ้งเตือน</div>
             <div id="custom-alert-body" class="custom-modal-body"></div>
-            <div class="custom-modal-actions"><button class="btn-modal btn-modal-primary" onclick="closeCustomModal('custom-alert-modal')">รับทราบ</button></div>
+            <div class="custom-modal-actions"><button class="btn-action btn-primary-custom" onclick="closeCustomModal('custom-alert-modal')">รับทราบ</button></div>
         </div>
     </div>
 
@@ -235,8 +235,8 @@
             <div id="custom-confirm-title" class="custom-modal-title">ยืนยัน</div>
             <div id="custom-confirm-body" class="custom-modal-body"></div>
             <div class="custom-modal-actions">
-                <button id="btn-confirm-yes" class="btn-modal btn-modal-primary">ยืนยัน</button>
-                <button class="btn-modal btn-modal-secondary" onclick="closeCustomModal('custom-confirm-modal')">ยกเลิก</button>
+                <button id="btn-confirm-yes" class="btn-action btn-primary-custom">ยืนยัน</button>
+                <button class="btn-action btn-modal-secondary" onclick="closeCustomModal('custom-confirm-modal')">ยกเลิก</button>
             </div>
         </div>
     </div>
@@ -248,7 +248,7 @@
                 ระบบนี้จัดทำโดย <strong>โรงพยาบาลสวี</strong> เพื่ออำนวยความสะดวกในการคัดกรองและประสานงานผู้ป่วยโรคหลอดเลือดสมองในเขตพื้นที่ อ.สวี เท่านั้น
                 <hr><span style="font-size: 18px; color: #666;">สำหรับผู้ใช้งานนอกเขตพื้นที่ ท่านสามารถใช้งานเพื่อศึกษาความรู้และประเมินอาการเบื้องต้นได้</span>
             </div>
-            <div class="custom-modal-actions"><button class="btn-modal btn-modal-primary" onclick="closeCustomModal('disclaimerModal')">รับทราบ</button></div>
+            <div class="custom-modal-actions"><button class="btn-action btn-primary-custom" onclick="closeCustomModal('disclaimerModal')">รับทราบ</button></div>
         </div>
     </div>
 
@@ -259,8 +259,8 @@
         <div class="btn-back" style="color: white; border-color: white; width: auto; padding: 15px 50px; margin-top: 30px; cursor:pointer;" onclick="this.style.display='none'">ปิด</div>
     </div>
 
-    <!-- Cropper Modal -->
-    <div id="crop-modal">
+    <!-- Cropper Modal: ซ่อนไว้ตั้งแต่ต้น -->
+    <div id="crop-modal" style="display: none;">
         <div class="crop-text-guide">จัดใบหน้าให้อยู่ในกรอบสีเขียว</div>
         <div class="crop-container">
             <img id="crop-image" style="max-width: 100%; display: block;">
@@ -279,7 +279,7 @@
     const DAILY_CHECK_LIFF_ID = "2005789397-WRm1lYd9";
     const REGISTER_LIFF_ID = "2005789397-nebQ8oJy";
     
-    let sessionData = {};
+    let sessionData = { assessorType: 'myself' };
     let aiInputs = { face: null, baselineFaceUrl: null, arm: null, audio: null };
     let mediaRecorder;
     let audioChunks = [];
@@ -357,10 +357,11 @@
         const refId = urlParams.get('ref');
         if (refId) {
             $('#referrerId').val(refId);
-            $.getJSON(GAS_URL, { action: 'getReferrerName', refId: refId }, function(res) {
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'getReferrerName', refId: refId }) })
+            .then(r => r.json()).then(res => {
                 if (res.success && res.name) $('#referrer-display').html(`🤝 แนะนำให้มาประเมินโดย: <b>คุณ${res.name}</b>`).css('display', 'flex');
             });
-            $.getJSON(GAS_URL, { action: 'logVhvShare', refId: refId, page: 'aware', viewerId: sessionData.userID||'' });
+            fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'logVhvShare', refId: refId, page: 'aware', viewerId: sessionData.userID||'' }) });
         }
     }
 
@@ -411,6 +412,7 @@
     };
 
     window.handleAssessorChange = function(select) {
+        sessionData.assessorType = select.value;
         if (select.value === 'others') { 
             document.getElementById('patient-phone-wrapper').style.display = 'block'; 
             sessionData.targetUserId = null; 
@@ -427,6 +429,10 @@
     // แก้ไข Google Drive URL อัตโนมัติให้แสดงผลรูปได้
     function formatDriveUrl(url) {
         if (!url) return '';
+        const match = url.match(/id=([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) {
+            return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
         return url.replace('&export=download', '');
     }
 
@@ -552,16 +558,15 @@
             
             <div class="card p-4 mb-4 border shadow-sm">
                 <h5 class="fw-bold fs-3">2. แขน (Arm Drift)</h5>
-                <p class="text-danger fw-bold fs-4 mb-2">สั่งการ: บอกให้ผู้ป่วยหลับตาและเหยียดแขนทั้งสองข้างตรงไปข้างหน้า (หรือยกแขนขึ้นพร้อมกัน) เป็นเวลา 10 วินาที</p>
                 <div class="d-flex gap-3 align-items-start mb-3">
                     <img src="https://img5.pic.in.th/file/secure-sv1/-20d4026a1d1efbfe8e.png" class="rounded border" style="width:120px; height:120px; object-fit:cover;">
-                    <small class="text-muted fs-4">ตั้งกล้องให้เห็นแขนชัดเจนเหมือนรูปตัวอย่าง</small>
+                    <small class="text-muted fs-4">ให้เห็นแขนทั้งสองข้างเต็มจอ</small>
                 </div>
                 <div id="arm-video-ui" class="text-center" style="position:relative;">
                     <video id="arm-video-preview" autoplay playsinline class="w-100 rounded border bg-dark mb-3" style="display:none; max-height:300px; object-fit:cover;"></video>
                     
                     <div id="video-overlay-prep" style="display:none;">
-                        <h3 id="arm-overlay-text" style="font-size:32px; font-weight:bold; line-height:1.2;">โปรดถอยหลังให้เห็นเต็มกล้อง<br>แล้วยกแขนเหยียดไปด้านหน้า</h3>
+                        <h3 id="arm-overlay-text" style="font-size:32px; font-weight:bold; line-height:1.2;">วิดีโอจะเริ่มถ่ายในอีก ...</h3>
                         <div id="arm-overlay-timer" style="font-size:80px; color:#F1C40F; font-weight:900;">10</div>
                     </div>
                     
@@ -599,9 +604,7 @@
     // --- NEW LAYER 2 STRUCTURE (Card & Outside) ---
     window.showLayer2 = function(symptomKey) {
         saveData('symptomCategory', symptomKey);
-        document.getElementById('layer-2-title').textContent = `อาการด้าน${symptomTranslations[symptomKey]}`;
-        const newContent = document.getElementById('layer-2-new-content');
-        
+        document.getElementById('layer-2-title').textContent = `ประเมิน: ${symptomTranslations[symptomKey]}`;
         const detail = symptomDetails[symptomKey];
         
         let likelyHtml = detail.likely.map(text => `<button class="btn-likely" style="font-size:24px;" onclick="handleSymptomResult(true, '${text}')">${text}</button>`).join('');
@@ -627,12 +630,11 @@
         // ส่วนที่อยู่นอกกรอบ
         let outsideHtml = `<h4 class="mt-4 mb-3 fw-bold text-center">หรือมีอาการดังต่อไปนี้:</h4>${likelyHtml}<hr class="m-3">${unlikelyHtml}`;
         
-        newContent.innerHTML = cardHtml + outsideHtml;
+        document.getElementById('layer-2-new-content').innerHTML = cardHtml + outsideHtml;
         showLayer('layer-2');
     };
 
     window.handleSymptomResult = function(isLikely, symptomDetail) {
-        const category = sessionData.symptomCategory;
         saveData('symptomDetail', symptomDetail);
         if (isLikely) { showLayer('layer-3'); } 
         else { saveData('frequency', 'อาจไม่เข้าข่ายสโตรกเฉียบพลัน'); showFinalMessage("คำแนะนำเบื้องต้น", "อาการดังกล่าวอาจไม่ใช่สโตรกเฉียบพลัน แต่หากกังวลควรปรึกษาแพทย์"); }
@@ -731,7 +733,7 @@
             
             video.onloadedmetadata = () => {
                 let prepTime = 10;
-                overlayText.innerHTML = "โปรดถอยหลังให้เห็นเต็มกล้อง<br>แล้วยกแขนเหยียดไปด้านหน้า 10 วินาที<br><br>จะเริ่มถ่ายในอีก...";
+                overlayText.innerHTML = "วิดีโอจะเริ่มถ่ายในอีก ...";
                 overlayTimer.style.color = "#F1C40F";
                 overlayTimer.textContent = prepTime;
                 
@@ -741,7 +743,7 @@
                         clearInterval(prepInterval);
                         
                         // เริ่มบันทึกจริง 10 วินาที
-                        overlayText.innerHTML = "กำลังบันทึกภาพ...<br>โปรดค้างแขนไว้";
+                        overlayText.innerHTML = "กำลังถ่ายวิดีโอ....";
                         overlayTimer.style.color = "#ff3654";
                         let recTime = 10;
                         overlayTimer.textContent = recTime;
@@ -817,14 +819,32 @@
     window.analyzeWithGemini = function() {
         if (!aiInputs.face && !aiInputs.arm && !aiInputs.audio) { showCustomAlert("ส่งข้อมูลอย่างน้อย 1 อย่าง"); return; }
         showLayer('layer-ai-processing');
+        
+        const payloadData = { 
+            action: 'analyzeStroke', 
+            faceImage: aiInputs.face, 
+            baselineFaceUrl: aiInputs.baselineFaceUrl, 
+            armImage: aiInputs.arm, 
+            speechAudio: aiInputs.audio, 
+            userData: {
+                risk_group: sessionData.risk_group, 
+                score: sessionData.thai_cv_risk_score, 
+                userId: sessionData.targetUserId || sessionData.userID, 
+                name: sessionData.registeredName 
+            }, 
+            isTestMode: sessionData.isTestMode || false 
+        };
+
         fetch(GAS_URL, { 
             method: 'POST', 
-            body: JSON.stringify({ action: 'analyzeStroke', faceImage: aiInputs.face, baselineFaceUrl: aiInputs.baselineFaceUrl, armImage: aiInputs.arm, speechAudio: aiInputs.audio, userData: sessionData, isTestMode: sessionData.isTestMode || false }) 
+            body: JSON.stringify(payloadData) 
         })
         .then(res => res.json()).then(data => { 
             if (data.status === 'success') { 
-                currentAnalysisResult = data.data; sessionData.isAiAssessment = true; 
-                sessionData.riskScore = data.data.riskScore; sessionData.analysis = data.data.analysis; 
+                currentAnalysisResult = data.data; 
+                sessionData.isAiAssessment = true; 
+                sessionData.riskScore = data.data.riskScore; 
+                sessionData.analysis = data.data.analysis; 
                 displayAiResult(data.data); 
             } else showAiError(data.message); 
         }).catch(err => showAiError("เชื่อมต่อไม่ได้"));
@@ -837,12 +857,17 @@
         } else {
             let html = `<h3 class="text-center fw-bold fs-2 ${res.isRisk?'text-danger':'text-success'}">${res.isRisk ? `🚨 เสี่ยงสูง (${res.riskScore}%)` : '✅ ไม่พบความเสี่ยงชัดเจน'}</h3>`;
             
-            // แยกผลการวิเคราะห์ให้เป็นบรรทัดตามที่ AI ส่งมา (ใบหน้า, แขน, พูด)
-            html += `<div class="bg-light p-3 rounded mb-3 text-start border fs-5"><strong>ผลการวิเคราะห์:</strong><br>${res.analysis.replace(/\n/g, '<br>')}</div>`;
+            // Format AI output to bold headers and separate lines
+            let formattedAnalysis = res.analysis
+                .replace(/ใบหน้า:/g, '<br><b>ใบหน้า:</b>')
+                .replace(/แขน:/g, '<br><b>แขน:</b>')
+                .replace(/การพูด:/g, '<br><b>การพูด:</b>')
+                .replace(/^\s*<br>/, '');
+
+            html += `<div class="bg-light p-3 rounded mb-3 text-start border fs-5"><strong>ผลการวิเคราะห์:</strong><br>${formattedAnalysis}</div>`;
             
             html += `<p class="text-danger mt-3 mb-4" style="font-size: 20px; font-weight: bold; border: 2px dashed #ff3654; padding: 15px; border-radius: 15px; background-color: #ffe6e6;">🚨 คำเตือน: ผลลัพธ์จาก AI เป็นเพียงการประเมินเบื้องต้น หากไม่แน่ใจโปรดพบแพทย์หรือโทร 1669 ทันที</p>`;
             
-            html += `<h5 class="mt-4 fw-bold text-center fs-4">ภาพที่วิเคราะห์</h5>`;
             if (aiInputs.face) {
                 html += `<div class="result-image-container"><div class="badge-green" style="top:10px; left:10px;">ผลวิเคราะห์ใบหน้า</div><div class="grid-overlay"></div><img src="data:image/jpeg;base64,${aiInputs.face}"></div>`;
             }
@@ -864,7 +889,6 @@
     // --- SAVE AND FINAL ---
     function setupTimeOptions() {
         const c = document.getElementById('time-options-container'); if (!c) return; c.innerHTML = '';
-        // ลบ default highlight และใส่เวลาในวงเล็บ
         const options = [
             { text: `เพิ่งเกิด (${formatTime(new Date())})`, min: 0 },
             { text: '10 นาที', min: 10 }, { text: '30 นาที', min: 30 }, { text: '1 ชม.', min: 60 },
@@ -928,13 +952,19 @@
                 if (sawiBtn) sawiBtn.style.display = 'none';
             } else {
                 if (sawiBtn) sawiBtn.style.display = 'flex';
-                const travelMins = (dist / 40) * 60;
-                const ambMins = travelMins * 1.5 + 15;
-                const deadline = sessionData.onsetTimeObject ? new Date(sessionData.onsetTimeObject.getTime() + 4.5 * 3600000) : new Date();
+                
+                // Calculate estimates
+                const travelMins = Math.round((dist / 40) * 60);
+                const ambMins = Math.round((travelMins * 2) + 10);
+                
                 sessionData.distance = `${dist.toFixed(1)} กม.`;
+                sessionData.selfTravelEstimate = `${travelMins} นาที`;
+                sessionData.ambulanceEstimate = `${ambMins} นาที`;
+                
                 html += createTableRow('mdi:map-marker-distance', 'ระยะทาง', sessionData.distance, false, 'distance-row');
-                html += createTableRow('mdi:car-clock', 'ไปเองถึง', `${formatTime(new Date(Date.now() + travelMins * 60000))} น.`, false, 'distance-row');
-                html += createTableRow('mdi:ambulance', 'รถ รพ. ถึง', `${formatTime(new Date(Date.now() + ambMins * 60000))} น.`, false, 'distance-row');
+                html += createTableRow('mdi:car-clock', 'ไปเองใช้เวลา', sessionData.selfTravelEstimate, false, 'distance-row');
+                html += createTableRow('mdi:ambulance', 'รถ รพ.รับใช้เวลา', sessionData.ambulanceEstimate, false, 'distance-row');
+                
                 routes.innerHTML = `<a href="https://www.google.com/maps/dir/?api=1&destination=${hospitalCoords.lat},${hospitalCoords.lon}" target="_blank" class="contact-button route-button text-white" style="background-color:#17a2b8; flex-direction:row;"><span class="iconify" data-icon="mdi:directions"></span> เส้นทางไป รพ.สวี</a>`;
             }
             table.insertAdjacentHTML('beforeend', html);
@@ -957,17 +987,31 @@
              () => { handleFinalSave(btn, isUrg, true); });
              return;
         }
+        
         if(btn) btn.disabled = true;
         document.getElementById('loading-text').textContent = 'กำลังบันทึกและส่งข้อมูล...';
         document.getElementById('loading').style.display = 'flex';
-        sessionData.isEmergency = isUrg; sessionData.isFinalSave = true;
+        sessionData.isEmergency = isUrg; 
+        sessionData.isFinalSave = true;
         
-        fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'saveData', data: sessionData }) }).then(res => res.json()).then(res => {
+        fetch(GAS_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: 'saveData', data: sessionData }) 
+        }).then(res => res.json()).then(res => {
             if(res.status==='success') {
-                if(liff.isInClient()) { liff.sendMessages([createFlexMessage(sessionData)]).then(() => liff.closeWindow()).catch(e => { liff.closeWindow(); }); } 
-                else { document.getElementById('loading').style.display = 'none'; showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว"); }
-            } else { document.getElementById('loading').style.display = 'none'; showCustomAlert("บันทึกไม่สำเร็จ"); if(btn) btn.disabled=false; }
-        }).catch(err => { document.getElementById('loading').style.display = 'none'; if(btn) btn.disabled=false; });
+                if(liff.isInClient()) { 
+                    liff.sendMessages([createFlexMessage(sessionData)]).then(() => liff.closeWindow()).catch(e => { liff.closeWindow(); }); 
+                } 
+                else { 
+                    document.getElementById('loading').style.display = 'none'; showCustomAlert("บันทึกข้อมูลเรียบร้อยแล้ว"); 
+                }
+            } else { 
+                document.getElementById('loading').style.display = 'none'; showCustomAlert("บันทึกไม่สำเร็จ"); if(btn) btn.disabled=false; 
+            }
+        }).catch(err => { 
+            document.getElementById('loading').style.display = 'none'; 
+            if(btn) btn.disabled=false; 
+        });
     };
 
     window.handleShare = function() {
@@ -1027,7 +1071,11 @@
             }
         }
         
-        bodyContents.push({ type: "text", text: "ผล: " + (data.isAiAssessment ? `AI: ${data.analysis||'-'}` : (data.symptomDetail||"ไม่มีอาการ")), wrap: true, size: "md", color: "#333333", margin: "sm" });
+        let displayAnalysis = data.isAiAssessment ? `AI: ${data.analysis||'-'}` : (data.symptomDetail||"ไม่มีอาการ");
+        // Clean up HTML tags for Flex Message
+        displayAnalysis = displayAnalysis.replace(/<br>/g, '\n').replace(/<b>/g, '').replace(/<\/b>/g, '');
+        
+        bodyContents.push({ type: "text", text: "ผล: " + displayAnalysis, wrap: true, size: "md", color: "#333333", margin: "sm" });
 
         let adviceBox = { type: "box", layout: "vertical", margin: "md", backgroundColor: isAbnormal ? "#FFEBEE" : "#E8F5E9", cornerRadius: "md", paddingAll: "md", contents: [] };
         if (isAbnormal) {
