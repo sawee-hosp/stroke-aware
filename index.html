@@ -196,11 +196,11 @@
     <!-- Floating Buttons (กระตุกๆ โทรด่วน) -->
     <div class="floating-actions">
         <div class="float-btn float-sawi" onclick="handleCallClick(this, 'tel_sawee', '0894745523', 'รพ.สวี')">
-            <span class="iconify" data-icon="mdi:hospital-box"></span>
+            <span class="iconify" data-icon="mdi:phone-in-talk" style="font-size: 45px;"></span>
             <span class="float-label">รพ.สวี</span>
         </div>
         <div class="float-btn float-1669" onclick="handleCallClick(this, 'tel_1669', '1669', '1669')">
-            <span class="iconify" data-icon="mdi:phone-alert"></span>
+            <span class="iconify" data-icon="mdi:phone-alert" style="font-size: 45px;"></span>
             <span class="float-label" style="font-size: 20px;">1669</span>
         </div>
     </div>
@@ -540,7 +540,7 @@
         document.getElementById('layer-2').innerHTML = `<h2 id="layer-2-title" class="section-title"></h2><div id="layer-2-new-content"></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับ</button></div>`;
         document.getElementById('layer-3').innerHTML = `<h2 class="section-title">อาการเกิดขึ้นอย่างไร?</h2><div class="d-flex flex-column gap-3"><button class="btn-likely" onclick="handleSeveritySelection('เกิดขึ้นอย่างเฉียบพลัน')">เกิดขึ้นอย่างเฉียบพลัน</button><button class="btn-action" style="background-color: #E67E22; color: white; flex-direction:row;" onclick="handleChronicSymptom('เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น')">เป็นมานาน/ค่อยๆเป็น</button></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-2')">ย้อนกลับ</button></div>`;
         document.getElementById('layer-4').innerHTML = `<h2 class="section-title">อาการเริ่มเป็นเมื่อไหร่?</h2><div id="time-options-container" class="d-flex flex-wrap gap-2 justify-content-center"></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-3')">ย้อนกลับ</button></div>`;
-        document.getElementById('layer-5').innerHTML = `<div class="alert-stroke-detected mb-4"><span class="iconify alert-icon" data-icon="mdi:alarm-light"></span><p class="mb-2 fs-3">อาการของท่าน เข้าข่าย</p><p class="fw-bold" style="font-size: 36px; line-height:1.1;">เป็นอาการของสโตรก</p><p class="fw-bold fs-3 mt-2">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="fw-bold text-white mt-3 fs-3 border-top pt-2"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="table table-borderless mt-4 fs-4"></table><div id="contact-buttons" class="mt-4"></div><div id="route-button-container" class="mt-4"></div><button class="btn-action btn-pulse-jerky" onclick="handleFinalSave(this, true)">บันทึกข้อมูลและปิดหน้าต่าง</button><button class="btn-action btn-share" onclick="handleShare()">แชร์ผลการประเมินให้คนอื่น</button><button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</button></div>`;
+        document.getElementById('layer-5').innerHTML = `<div class="alert-stroke-detected mb-4"><span class="iconify alert-icon" data-icon="mdi:alarm-light"></span><p class="mb-2 fs-3">อาการของท่าน เข้าข่าย</p><p class="fw-bold" style="font-size: 36px; line-height:1.1;">เป็นอาการของสโตรก</p><p class="fw-bold fs-3 mt-2">โปรดกดส่งพิกัด และโทรออกหา รพ.ด้วยตัวเอง</p><div id="countdown-timer" class="fw-bold mt-3 fs-3 border-top pt-2" style="color: #FFD700;"></div></div><div id="action-grid-container" class="action-buttons-grid"></div><table id="summary-table" class="table table-borderless mt-4 fs-4"></table><div id="contact-buttons" class="mt-4"></div><div id="route-button-container" class="mt-4"></div><button class="btn-action btn-pulse-jerky" onclick="handleFinalSave(this, true)">บันทึกข้อมูลและปิดหน้าต่าง</button><button class="btn-action btn-share" onclick="handleShare()">แชร์ผลการประเมินให้คนอื่น</button><button class="btn-action btn-test-close" onclick="handleTestClose()">ออกจากการทดสอบโดยไม่บันทึก</button><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-4')">ย้อนกลับ</button></div>`;
         document.getElementById('layer-6').innerHTML = `<div id="final-emoji" style="text-align:center; font-size: 100px; margin-bottom: 20px;"></div><h2 id="final-title" class="section-title" style="font-size:36px;"></h2><p id="final-text" class="text-center" style="font-size:28px;"></p><div class="d-flex flex-column gap-3 mt-4"><button class="btn-action btn-pulse-jerky" onclick="handleFinalSave(this, false, true)">บันทึกและปิดหน้าต่าง</button></div><div class="btn-back-container"><button class="btn-back" onclick="showLayer('layer-1')">ย้อนกลับหน้าแรก</button></div>`;
         setupTimeOptions();
     }
@@ -1186,7 +1186,8 @@
             const dist = deadline - new Date().getTime();
             if (dist < 0) { timer.textContent = "หมดเวลาการให้ยาแล้ว"; timer.style.color = "#FFCDD2"; clearInterval(countdownInterval); return; }
             const h = Math.floor(dist / 3600000); const m = Math.floor((dist % 3600000) / 60000);
-            timer.textContent = `ต้องได้รับยาภายใน ${h} ชม. ${String(m).padStart(2, '0')} นาที`;
+            const s = Math.floor((dist % 60000) / 1000);
+            timer.textContent = `ต้องได้รับยาภายใน ${h} ชม. ${String(m).padStart(2, '0')} นาที ${String(s).padStart(2, '0')} วินาที`;
         };
         update(); countdownInterval = setInterval(update, 1000);
     }
@@ -1359,9 +1360,13 @@
 
              adviceBox.contents = [{ type: "text", text: "คำแนะนำเบื้องต้น:", weight: "bold", size: "md", color: "#D32F2F" }, { type: "text", text: "1. โทร 1669 ทันที\n2. ให้นอนราบหรือเอนศีรษะสูงเล็กน้อย\n3. ห้ามกินยาหรือดื่มน้ำป้องกันสำลัก", size: "md", wrap: true }];
         } else {
+             let normalAdvice = "AI อาจผิดพลาดได้มาก หากมีความสงสัย โปรดปรึกษาแพทย์เสมอ";
+             if (data.frequency === 'เกิดขึ้นเรื้อรัง/ค่อยๆ เป็น' || data.onsetTime === 'เรื้อรัง/หลายวัน' || String(data.symptomDetail).includes('เรื้อรัง')) {
+                 normalAdvice = "อาการสโตรกมักจะเกิดขึ้นอย่างเฉียบพลัน ทันทีทันใด อาการที่เป็นแบบเรื้อรังมักจะไม่เข้าข่าย หากมีความสงสัย โปรดปรึกษาแพทย์เสมอ";
+             }
              adviceBox.contents = [
                  { type: "text", text: "คำแนะนำ:", weight: "bold", size: "md", color: "#2E7D32" }, 
-                 { type: "text", text: "AI อาจผิดพลาดได้มาก หากมีความสงสัย โปรดปรึกษาแพทย์เสมอ", wrap: true, size: "md", margin: "sm", color: "#666666" }
+                 { type: "text", text: normalAdvice, wrap: true, size: "md", margin: "sm", color: "#666666" }
              ];
         }
         
